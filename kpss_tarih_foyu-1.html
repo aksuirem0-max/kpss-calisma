@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Tarih Tekrar Föyü</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:wght@300;400;600&display=swap');
+  :root{--bg:#1a1a2e;--card:#16213e;--card2:#0f3460;--border:#2d4a7a;--accent:#e94560;--accent2:#f5a623;--text:#e8e8e8;--muted:#8a9bb5;--correct:#27ae60;--correct-bg:#0d2b1a;--correct-border:#27ae60;--wrong:#e74c3c;--wrong-bg:#2b0d0d;--wrong-border:#e74c3c;--opt-exp-bg:#1a1a3e;--explain-bg:#0f2040;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 4rem;}
+  header{text-align:center;margin-bottom:1.4rem;width:100%;max-width:720px;}
+  header h1{font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent2);}
+  header p{color:var(--muted);font-size:0.88rem;margin-top:0.3rem;font-style:italic;}
+  .progress-bar-wrap{width:100%;max-width:720px;background:#0a0a1a;border-radius:20px;height:6px;margin:0.6rem 0 0.3rem;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:20px;transition:width 0.4s ease;width:0%;}
+  .progress-text{font-size:0.8rem;color:var(--muted);text-align:center;margin-bottom:0.8rem;}
+  .scoreboard{display:flex;justify-content:center;gap:2.5rem;width:100%;max-width:720px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.65rem 1.5rem;margin-bottom:1.3rem;flex-wrap:wrap;}
+  .score-item{text-align:center;}.score-item .snum{font-family:'Playfair Display',serif;font-size:1.5rem;display:block;}.score-item .slabel{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+  #sc-correct .snum{color:var(--correct);}#sc-wrong .snum{color:var(--accent);}#sc-remain .snum{color:var(--accent2);}
+  .q-card{width:100%;max-width:720px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.8rem 2rem 1.4rem;box-shadow:0 8px 32px rgba(0,0,0,0.4);animation:slideIn 0.3s ease;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .q-top{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.2rem;}
+  .q-num-badge{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--accent);line-height:1;min-width:2.8rem;}
+  .q-meta{flex:1;}
+  .bolum-badge{display:inline-block;font-size:0.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:0.3rem;background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+  .tag-badge{display:inline-block;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-left:0.4rem;background:var(--accent);color:white;}
+  .q-text{font-size:0.97rem;line-height:1.75;color:var(--text);white-space:pre-line;}
+  .options{display:flex;flex-direction:column;gap:0.5rem;margin-top:1.2rem;}
+  .opt-wrap{display:flex;flex-direction:column;}
+  .opt{display:flex;align-items:flex-start;gap:0.8rem;padding:0.7rem 1.1rem;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;font-size:0.93rem;line-height:1.5;background:#0d1b2e;transition:all 0.15s;user-select:none;}
+  .opt:hover:not(.disabled){border-color:var(--accent2);background:#1a2d45;transform:translateX(4px);}
+  .opt-letter{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--accent2);min-width:1.3rem;}
+  .opt-text{flex:1;}.opt-icon{font-size:1.1rem;margin-left:auto;display:none;padding-top:1px;}
+  .opt.correct-ans{background:var(--correct-bg);border-color:var(--correct-border);}.opt.correct-ans .opt-letter{color:var(--correct);}.opt.correct-ans .opt-icon{display:block;color:var(--correct);}
+  .opt.wrong-ans{background:var(--wrong-bg);border-color:var(--wrong-border);}.opt.wrong-ans .opt-letter{color:var(--wrong);}.opt.wrong-ans .opt-icon{display:block;color:var(--wrong);}
+  .opt.disabled{cursor:default;pointer-events:none;}
+  .opt-exp{display:none;font-size:0.84rem;line-height:1.65;padding:0.7rem 1rem 0.7rem 1.3rem;border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;background:var(--opt-exp-bg);color:#b0c4de;}
+  .opt-exp.show{display:block;}.opt-exp.correct-exp{background:var(--correct-bg);border-color:var(--correct-border);color:#7ddba0;}.opt-exp.wrong-exp{background:var(--wrong-bg);border-color:var(--wrong-border);color:#f0a0a0;}
+  .general-exp{display:none;margin-top:1rem;padding:1rem 1.2rem;background:var(--explain-bg);border-left:3px solid var(--correct);border-radius:0 8px 8px 0;font-size:0.9rem;line-height:1.75;color:#a8d8b0;}
+  .general-exp.show{display:block;animation:fadeIn 0.25s ease;}.general-exp.wrong-border{border-left-color:var(--accent);color:#d8b0a8;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+  .next-btn{display:none;margin-top:1.3rem;width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--card2),#1a3a6e);color:var(--accent2);border:1px solid var(--border);border-radius:8px;font-family:'Source Serif 4',serif;font-size:1rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;}
+  .next-btn:hover{background:var(--card2);border-color:var(--accent2);transform:translateY(-1px);}.next-btn.show{display:block;}
+  .finish-screen{display:none;width:100%;max-width:720px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2.5rem 2rem;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+  .finish-screen.show{display:block;animation:slideIn 0.4s ease;}.finish-screen h2{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--accent2);margin-bottom:0.4rem;}
+  .finish-scores{display:flex;justify-content:center;gap:4rem;margin:2rem 0 1.5rem;flex-wrap:wrap;}
+  .finish-score .num{font-family:'Playfair Display',serif;font-size:3.5rem;display:block;line-height:1;}.finish-score .lbl{font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:0.3rem;display:block;}
+  .finish-score.c .num{color:var(--correct);}.finish-score.w .num{color:var(--accent);}
+  #fin-msg{font-size:1rem;margin-bottom:1.8rem;color:var(--muted);font-style:italic;}
+  .restart-btn{padding:0.8rem 2.8rem;background:var(--accent);color:white;border:none;border-radius:8px;font-family:'Source Serif 4',serif;font-size:1rem;cursor:pointer;}.restart-btn:hover{opacity:0.85;}
+  .resume-screen{text-align:center;padding:2rem 1rem;}.resume-screen h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--accent2);margin-bottom:0.8rem;}
+  .resume-btn{display:inline-block;margin:0.4rem;padding:0.75rem 1.8rem;border-radius:8px;font-family:'Source Serif 4',serif;font-size:0.95rem;cursor:pointer;border:none;transition:all 0.2s;}
+  .resume-btn.primary{background:var(--accent);color:white;}.resume-btn.secondary{background:transparent;color:var(--muted);border:1px solid var(--border);}.resume-btn:hover{opacity:0.85;transform:translateY(-1px);}
+  @media(max-width:500px){.q-card{padding:1.2rem 1rem;}.q-num-badge{font-size:1.6rem;}}
+</style>
+</head>
+<body>
+<header>
+  <h1>KPSS Tarih Tekrar Föyü</h1>
+  <p>Orta Asya · Selçuklular · Osmanlı · Kurtuluş Savaşı · Cumhuriyet · Dünya Tarihi</p>
+</header>
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog"></div></div>
+<div class="progress-text" id="prog-text">Soru 1 / 21</div>
+<div class="scoreboard">
+  <div class="score-item" id="sc-correct"><span class="snum">0</span><span class="slabel">Doğru</span></div>
+  <div class="score-item" id="sc-wrong"><span class="snum">0</span><span class="slabel">Yanlış</span></div>
+  <div class="score-item" id="sc-remain"><span class="snum">21</span><span class="slabel">Kalan</span></div>
+</div>
+<div class="q-card" id="qcard"></div>
+<div class="finish-screen" id="finish">
+  <h2>Tamamlandı!</h2>
+  <p style="color:var(--muted);font-style:italic;margin-top:0.3rem;">21 soru tamamlandı</p>
+  <div class="finish-scores">
+    <div class="finish-score c"><span class="num" id="fin-c">0</span><span class="lbl">Doğru</span></div>
+    <div class="finish-score w"><span class="num" id="fin-w">0</span><span class="lbl">Yanlış</span></div>
+  </div>
+  <p id="fin-msg"></p>
+  <button class="restart-btn" id="restart-btn">Tekrar Çöz</button>
+</div>
+<script>
+const QUESTIONS=[
+  {
+    "id": "t1",
+    "num": "1",
+    "bolum": "Orta Asya Türk Tarihi",
+    "tag": "İlk Türkler",
+    "text": "Orta Asya Türk devletlerinde 'toy' ne anlama gelir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "Savaş meydanı",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "Vergi toplama merkezi",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Devlet meclisi / kurultay",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "Ordu komutanı",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "Dini tören",
+        "optExp": ""
+      }
+    ],
+    "exp": "Toy: İlk Türk devletlerinde hükümdarın önderliğinde toplanan devlet meclisidir. Önemli kararlar burada alınırdı. Kurultay ile aynı anlamda kullanılır.",
+    "isVerbal": false
+  },
+  {
+    "id": "t2",
+    "num": "2",
+    "bolum": "Orta Asya Türk Tarihi",
+    "tag": "Devlet Anlayışı",
+    "text": "İlk Türk devletlerinde 'kut' anlayışına göre hükümdar olmanın temel koşulu nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "B",
+        "text": "Savaşta üstünlük göstermek",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "B",
+        "text": "Tanrı tarafından yönetme yetkisi verilmiş olmak",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "B",
+        "text": "Boyların oyuyla seçilmek",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "B",
+        "text": "Hanlık soyundan gelmek",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "B",
+        "text": "En kalabalık boyu temsil etmek",
+        "optExp": ""
+      }
+    ],
+    "exp": "Kut: Tanrı tarafından hükümdara verilen yönetme yetkisidir. Kut'u olan kişi hükümdar olur; kut'unu kaybeden hükümdar tahtını kaybeder. Bu anlayış İlk Türk devletlerinin temel meşruiyet kaynağıdır.",
+    "isVerbal": false
+  },
+  {
+    "id": "t3",
+    "num": "3",
+    "bolum": "Türk-İslam Tarihi",
+    "tag": "Selçuklular",
+    "text": "1040 Dandanakan Savaşı'nın önemi nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "D",
+        "text": "Bizans'a karşı ilk büyük Türk zaferidir",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "D",
+        "text": "Haçlı Seferleri'nin başlamasına neden olmuştur",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "D",
+        "text": "İlk Müslüman Türk devletinin kuruluşunu sağlamıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "D",
+        "text": "Selçukluların Gaznelileri yenerek Horasan'a hâkim olmasını sağlamıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "D",
+        "text": "Abbasi Halifeliği'nin yıkılmasına zemin hazırlamıştır",
+        "optExp": ""
+      }
+    ],
+    "exp": "Dandanakan Savaşı (1040): Selçuklular vs Gazneli Sultan Mesut. Selçuklular kazandı → Horasan'a hâkim oldular → Büyük Selçuklu İmparatorluğu kuruldu. Gazneliler bu savaştan sonra güç kaybetti.",
+    "isVerbal": false
+  },
+  {
+    "id": "t4",
+    "num": "4",
+    "bolum": "Türk-İslam Tarihi",
+    "tag": "Selçuklular",
+    "text": "Malazgirt Savaşı'nın (1071) tarihsel önemi nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "İlk Türk-İslam devletinin kurulmasını sağladı",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "Abbasi Halifeliği'ni Büveyhilere karşı korudu",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Anadolu'nun Türklere kapısını açtı, kalıcı yerleşim başladı",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "Haçlı Seferleri'ni sona erdirdi",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "Osmanlı Devleti'nin kuruluşunu doğrudan sağladı",
+        "optExp": ""
+      }
+    ],
+    "exp": "Malazgirt (1071): Sultan Alparslan vs Bizans İmparatoru Romanos Diogenes. Türkler kazandı → Anadolu'ya Türk göçü başladı → Anadolu Selçuklu Devleti kuruldu → Osmanlı'nın zeminini hazırladı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t5",
+    "num": "5",
+    "bolum": "Osmanlı Tarihi",
+    "tag": "Kuruluş Dönemi",
+    "text": "Osmanlı Devleti'nde ilk divan hangi padişah döneminde kurulmuştur?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "B",
+        "text": "Osman Bey",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "B",
+        "text": "Orhan Bey",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "B",
+        "text": "I. Murat",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "B",
+        "text": "I. Bayezit",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "B",
+        "text": "II. Murat",
+        "optExp": ""
+      }
+    ],
+    "exp": "İlk divan Orhan Bey döneminde kurulmuştur. I. Murat döneminde veziriazamlık makamı oluşturulmuş, II. Mehmet döneminde ise padişah divana katılmayı bırakarak veziriazama yetki devretmiştir.",
+    "isVerbal": false
+  },
+  {
+    "id": "t6",
+    "num": "6",
+    "bolum": "Osmanlı Tarihi",
+    "tag": "Yükselme Dönemi",
+    "text": "Fatih Sultan Mehmet döneminde hazırlanan Kanunname'nin temel amacı nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "D",
+        "text": "Halkın vergilerini düzenlemek",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "D",
+        "text": "Yeniçeri Ocağı'nın disiplinini sağlamak",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "D",
+        "text": "Gayrimüslimlerin haklarını güvence altına almak",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "D",
+        "text": "Devlet teşkilatını ve veraset sistemini düzenlemek, padişahın otoritesini pekiştirmek",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "D",
+        "text": "Osmanlı-Bizans ilişkilerini düzenlemek",
+        "optExp": ""
+      }
+    ],
+    "exp": "Fatih Kanunnamesi: Devlet teşkilatının kurallarını yazılı hale getirdi. 'Kardeş katli' yasasını da içerir (devlet birliği için şehzadelerin öldürülmesi). Padişah otoritesini kurumsal zemine oturttu.",
+    "isVerbal": false
+  },
+  {
+    "id": "t7",
+    "num": "7",
+    "bolum": "Osmanlı Tarihi",
+    "tag": "Yükselme Dönemi",
+    "text": "Yavuz Sultan Selim'in babasını tahttan indirerek padişah olması hangi gelişmeye örnektir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "Veraset sisteminin düzenli işlediğine",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "Yeniçerilerin padişah seçiminde etkisiz olduğuna",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Osmanlı'da şehzadelerin taht mücadelesi verdiğine",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "Divana bağlı bir veraset sisteminin uygulandığına",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "Halkın yönetime katıldığına",
+        "optExp": ""
+      }
+    ],
+    "exp": "Yavuz Sultan Selim (I. Selim) babasını II. Bayezit'i Yeniçerilerin desteğiyle tahttan indirdi. Bu durum Osmanlı'da şehzadeler arasındaki taht mücadelesinin ve Yeniçerilerin siyasi gücünün somut örneğidir.",
+    "isVerbal": false
+  },
+  {
+    "id": "t8",
+    "num": "8",
+    "bolum": "Osmanlı Tarihi",
+    "tag": "Gerileme Dönemi",
+    "text": "Osmanlı'da Karlofça Antlaşması'nın (1699) önemi nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "B",
+        "text": "Osmanlı'nın Avrupa'da ilk büyük toprak kazanımıdır",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "B",
+        "text": "Osmanlı'nın ilk büyük toprak kayıplarını içeren antlaşmadır, gerilemenin resmi başlangıcı sayılır",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "B",
+        "text": "Rusya ile yapılan ilk barış antlaşmasıdır",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "B",
+        "text": "Kapitülasyonların ilk kez verildiği antlaşmadır",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "B",
+        "text": "İlk Osmanlı anayasasının temelini oluşturmuştur",
+        "optExp": ""
+      }
+    ],
+    "exp": "Karlofça (1699): Osmanlı'nın Avusturya, Venedik ve Polonya'ya önemli topraklar bıraktığı antlaşmadır. Osmanlı tarihinde 'gerilemenin başlangıcı' kabul edilir. Bu tarihten sonra Osmanlı savunmaya geçmiştir.",
+    "isVerbal": false
+  },
+  {
+    "id": "t9",
+    "num": "9",
+    "bolum": "Osmanlı Tarihi",
+    "tag": "Osmanlı Islahatları",
+    "text": "Tanzimat Fermanı'nın (1839) getirdiği en temel yenilik hangisidir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "D",
+        "text": "İlk Osmanlı parlamentosunun kurulması",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "D",
+        "text": "Yeniçeri Ocağı'nın kaldırılması",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "D",
+        "text": "Azınlıklara geniş özerklik tanınması",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "D",
+        "text": "Can, mal ve namus güvenliğinin herkese eşit biçimde kanunla güvence altına alınması",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "D",
+        "text": "Padişahın yetkilerinin meclise devredilmesi",
+        "optExp": ""
+      }
+    ],
+    "exp": "Tanzimat Fermanı (Gülhane Hattı): Müslüman-gayrimüslim ayrımı gözetmeksizin tüm Osmanlı vatandaşlarına can, mal, namus güvenliği ve adil vergi güvencesi verdi. İlk anayasal belge niteliği taşır ama meclis kurmadı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t10",
+    "num": "10",
+    "bolum": "Osmanlı Tarihi",
+    "tag": "Osmanlı Çöküşü",
+    "text": "Mora İsyanı'nı (Rum İsyanı) bastıramayan Osmanlı kimin yardımına başvurmuştur?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "A",
+        "text": "Mısır Valisi Kavalalı Mehmet Ali Paşa",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "A",
+        "text": "Fransız ordusu",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "A",
+        "text": "İran Şahı",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "A",
+        "text": "Prusya ordusu",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "A",
+        "text": "Rusya Çarı",
+        "optExp": ""
+      }
+    ],
+    "exp": "Mora (Rum) İsyanı'nı kendi ordusuyla bastıramayan Osmanlı, Mısır Valisi Kavalalı Mehmet Ali Paşa'dan yardım istedi. Mehmet Ali Paşa yardım karşılığında Mora ve Girit valiliklerini istedi.",
+    "isVerbal": false
+  },
+  {
+    "id": "t11",
+    "num": "11",
+    "bolum": "Kurtuluş Savaşı",
+    "tag": "Kongreler",
+    "text": "Sivas Kongresi'nin (Eylül 1919) Erzurum Kongresi'nden farkı nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "İlk kez yabancı devletlerle görüşme yapılmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "Saltanatın kaldırılması kararı alınmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Tüm yurdu kapsayan ulusal birlik sağlanmış, bölgesel cemiyetler tek çatı altında toplanmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "İlk kez Misak-ı Millî sınırları çizilmiştir",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "TBMM'nin açılması kararlaştırılmıştır",
+        "optExp": ""
+      }
+    ],
+    "exp": "Erzurum Kongresi → bölgesel (Doğu Anadolu). Sivas Kongresi → tüm yurt. Sivas'ta bölgesel cemiyetler 'Anadolu ve Rumeli Müdafaa-i Hukuk Cemiyeti' adı altında birleşti. Ulusal birliğin temeli atıldı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t12",
+    "num": "12",
+    "bolum": "Kurtuluş Savaşı",
+    "tag": "TBMM",
+    "text": "TBMM'nin 23 Nisan 1920'de açılmasının ardından İstanbul Hükümeti ile arasındaki temel farklılık nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "B",
+        "text": "TBMM'nin başında padişah bulunmaktadır",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "B",
+        "text": "TBMM milli egemenlik ilkesine dayanırken İstanbul Hükümeti işgal altındaki padişaha bağlıdır",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "B",
+        "text": "İstanbul Hükümeti Anadolu'da daha fazla destek görmektedir",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "B",
+        "text": "Her ikisi de Misak-ı Millî'yi kabul etmiştir",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "B",
+        "text": "TBMM sadece Doğu Anadolu'yu temsil etmektedir",
+        "optExp": ""
+      }
+    ],
+    "exp": "TBMM: Milli egemenlik → halk adına yönetim. İstanbul Hükümeti: İşgal kuvvetlerinin baskısı altında, padişaha bağlı. İstanbul Hükümeti TBMM'yi tanımadı; TBMM de İstanbul'u işgal altındaki düşman toprak saydı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t13",
+    "num": "13",
+    "bolum": "Kurtuluş Savaşı",
+    "tag": "Savaşlar",
+    "text": "I. ve II. İnönü Savaşları'nın kazanılmasının diplomatik sonucu ne olmuştur?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "D",
+        "text": "Lozan Antlaşması imzalanmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "D",
+        "text": "Yunanistan'la ateşkes yapılmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "D",
+        "text": "İstanbul işgalden kurtarılmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "D",
+        "text": "Londra Konferansı'na TBMM davet edilmiş ve Misak-ı Millî savunulmuştur",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "D",
+        "text": "Fransızlarla Ankara Antlaşması imzalanmıştır",
+        "optExp": ""
+      }
+    ],
+    "exp": "I. İnönü (Ocak 1921) → Londra Konferansı'na davet. II. İnönü (Mart 1921) → Afganistan ile dostluk antlaşması + Fransızlarla yakınlaşma. Kazanılan zaferler TBMM'nin uluslararası meşruiyetini artırdı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t14",
+    "num": "14",
+    "bolum": "Kurtuluş Savaşı",
+    "tag": "Antlaşmalar",
+    "text": "Lozan Antlaşması (1923) ile Sevr Antlaşması (1920) arasındaki temel fark nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "E",
+        "text": "Lozan'da kapitülasyonlar yeniden verilmiştir",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "E",
+        "text": "Sevr'de Türklere daha geniş toprak tanınmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "E",
+        "text": "Her iki antlaşma da Osmanlı Devleti tarafından imzalanmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "E",
+        "text": "Lozan'da Kürdistan kurulması öngörülmüştür",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "E",
+        "text": "Sevr imzalanıp uygulanamamışken Lozan Kurtuluş Savaşı'nı kazanan Türkiye'nin bağımsızlığını uluslararası alanda tanıyan antlaşmadır",
+        "optExp": ""
+      }
+    ],
+    "exp": "Sevr (1920): Osmanlı'ya imzalatıldı, fiilen uygulanamadı. Lozan (1923): TBMM Türkiye'si tarafından imzalandı, kapitülasyonlar kaldırıldı, Boğazlar'ın statüsü belirlendi, yeni Türkiye'nin sınırları çizildi.",
+    "isVerbal": false
+  },
+  {
+    "id": "t15",
+    "num": "15",
+    "bolum": "Cumhuriyet Dönemi",
+    "tag": "İlk Yıllar",
+    "text": "Halifeliğin kaldırılmasının (3 Mart 1924) temel gerekçesi nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "Halifenin yabancı devletlerle iş birliği yapması",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "İslam dünyasının Halifeliği tanımaması",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Milli egemenlik ve laiklik ilkeleriyle bağdaşmaması; iki başlılık oluşturması",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "Ekonomik nedenler",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "Lozan Antlaşması'nın zorunlu kılması",
+        "optExp": ""
+      }
+    ],
+    "exp": "Cumhuriyet ilan edildi (1923) ama Halife hâlâ vardı → iki başlılık sorunu. Halife dini otorite, Cumhurbaşkanı siyasi otorite → çatışma potansiyeli. Laiklik ve milli egemenlik ilkeleriyle bağdaşmadığı için 3 Mart 1924'te kaldırıldı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t16",
+    "num": "16",
+    "bolum": "Cumhuriyet Dönemi",
+    "tag": "Ekonomi",
+    "text": "İzmir İktisat Kongresi'nde (1923) benimsenen ekonomi modeli hangisidir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "B",
+        "text": "Tam devlet kontrolüne dayalı planlı ekonomi",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "B",
+        "text": "Özel girişimciliğin teşvik edildiği karma ekonomi",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "B",
+        "text": "Tarıma dayalı feodal ekonomi",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "B",
+        "text": "Yabancı sermayeye dayalı dışa açık ekonomi",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "B",
+        "text": "Komünist ekonomi modeli",
+        "optExp": ""
+      }
+    ],
+    "exp": "İzmir İktisat Kongresi (Şubat 1923): Özel sektör öncülüğünde kalkınma hedeflendi. Ancak özel sektörün yetersizliği nedeniyle 1930'larda devletçilik ilkesi benimsendi ve KİT'ler kuruldu.",
+    "isVerbal": false
+  },
+  {
+    "id": "t17",
+    "num": "17",
+    "bolum": "Cumhuriyet Dönemi",
+    "tag": "İnkılaplar",
+    "text": "Türk Medeni Kanunu'nun (1926) kabulünün toplumsal açıdan en önemli sonucu nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "D",
+        "text": "Eğitim öğretimin laikleşmesi",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "D",
+        "text": "Halifeliğin kaldırılması",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "D",
+        "text": "Çok partili sisteme geçilmesi",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "D",
+        "text": "Kadın-erkek eşitliği, tek eşlilik, resmi nikah ve miras hakkı güvence altına alındı",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "D",
+        "text": "Osmanlı'dan kalan borçların silinmesi",
+        "optExp": ""
+      }
+    ],
+    "exp": "İsviçre Medeni Kanunu'ndan uyarlanan Türk Medeni Kanunu: Çok eşlilik yasaklandı, resmi nikah zorunlu hale geldi, kadınlar miras ve boşanma hakkı kazandı. Laik hukuk sistemi yerleşti.",
+    "isVerbal": false
+  },
+  {
+    "id": "t18",
+    "num": "18",
+    "bolum": "Cumhuriyet Dönemi",
+    "tag": "Dış Politika",
+    "text": "Montrö Boğazlar Sözleşmesi'nin (1936) Türkiye'ye sağladığı en önemli kazanım nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "Boğazlarda yabancı savaş gemisi geçişinin tamamen yasaklanması",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "Yunanistan ile Ege sınırının netleşmesi",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Boğazlar üzerindeki egemenliğin Türkiye'ye geri verilmesi, Lozan'daki kısıtlamaların kaldırılması",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "Kapitülasyonların yeniden yürürlüğe girmesi",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "Türkiye'nin NATO'ya üye olması",
+        "optExp": ""
+      }
+    ],
+    "exp": "Lozan'da Boğazlar uluslararası komisyon yönetimine bırakılmıştı. Montrö (1936) ile bu komisyon kaldırıldı, Boğazlar Türkiye'nin yönetimine verildi. Türkiye burada askeri önlem alma hakkını da kazandı.",
+    "isVerbal": false
+  },
+  {
+    "id": "t19",
+    "num": "19",
+    "bolum": "Cumhuriyet Dönemi",
+    "tag": "Atatürk İlkeleri",
+    "text": "Halkçılık ilkesinin temel anlamı nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "D",
+        "text": "Ekonomik kalkınmada devletin belirleyici olması",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "D",
+        "text": "Dini kurumların devletten bağımsız olması",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "D",
+        "text": "Türk milletinin esas alınması",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "D",
+        "text": "Sınıf ve zümre ayrımının reddedilmesi, egemenliğin kayıtsız şartsız millete ait olması",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "D",
+        "text": "Eski kurumların kaldırılarak yenilerinin kurulması",
+        "optExp": ""
+      }
+    ],
+    "exp": "Altı ilkenin karşılığı: Cumhuriyetçilik=yönetim biçimi, Milliyetçilik=milli kimlik, Halkçılık=egemenlik+eşitlik, Devletçilik=ekonomi, Laiklik=din-devlet ayrılığı, İnkılapçılık=dinamik değişim.",
+    "isVerbal": false
+  },
+  {
+    "id": "t20",
+    "num": "20",
+    "bolum": "Dünya Tarihi",
+    "tag": "Soğuk Savaş",
+    "text": "Marshall Planı ve Molotov Planı'nın ortak özelliği nedir?",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "C",
+        "text": "Her ikisi de askeri ittifak niteliği taşır",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "C",
+        "text": "Her ikisi de Asya ülkelerine yönelik yardım planlarıdır",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "C",
+        "text": "Her ikisi de Soğuk Savaş döneminde iki blokun ekonomik nüfuz alanı oluşturma araçlarıdır",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "C",
+        "text": "Her ikisi de BM çatısı altında hazırlanmıştır",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "C",
+        "text": "Her ikisi de serbest piyasa ekonomisini öngörür",
+        "optExp": ""
+      }
+    ],
+    "exp": "Marshall Planı: ABD → Batı Avrupa'ya ekonomik yardım. Molotov Planı: SSCB → Doğu Avrupa'ya ekonomik yardım. İkisi de ekonomik araçlarla kendi blok ülkelerini güçlendirme ve nüfuz alanı oluşturma politikasıdır.",
+    "isVerbal": false
+  },
+  {
+    "id": "t21",
+    "num": "21",
+    "bolum": "Dünya Tarihi",
+    "tag": "XX. Yüzyıl",
+    "text": "Aşağıdaki olayları kronolojik sıraya göre diziniz:\nI. Birinci Dünya Savaşı'nın başlaması\nII. Osmanlı'nın savaşa girmesi\nIII. Mondros Ateşkesi'nin imzalanması\nIV. Paris Barış Konferansı",
+    "opts": [
+      {
+        "letter": "A",
+        "correct": "A",
+        "text": "I → II → III → IV",
+        "optExp": ""
+      },
+      {
+        "letter": "B",
+        "correct": "A",
+        "text": "II → I → III → IV",
+        "optExp": ""
+      },
+      {
+        "letter": "C",
+        "correct": "A",
+        "text": "I → III → II → IV",
+        "optExp": ""
+      },
+      {
+        "letter": "D",
+        "correct": "A",
+        "text": "II → III → I → IV",
+        "optExp": ""
+      },
+      {
+        "letter": "E",
+        "correct": "A",
+        "text": "I → II → IV → III",
+        "optExp": ""
+      }
+    ],
+    "exp": "I. Dünya Savaşı başladı (Ağustos 1914) → Osmanlı savaşa girdi (Kasım 1914) → Mondros Ateşkesi (30 Ekim 1918) → Paris Barış Konferansı (1919). Hatırlama: savaş başlar → Osmanlı girer → ateşkes → konferans.",
+    "isVerbal": false
+  }
+];
+const SAVE_KEY='kpss_tarih_foyu2';
+const TOTAL=QUESTIONS.length;
+function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({current,correctCount,wrongCount,answers}));}catch(e){}}
+function loadState(){try{const r=localStorage.getItem(SAVE_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function clearState(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+let current=0,correctCount=0,wrongCount=0,answers={};
+
+function render(idx){
+  const q=QUESTIONS[idx];
+  const card=document.getElementById('qcard');
+  const optsHtml=q.opts.map(o=>`
+    <div class="opt-wrap">
+      <div class="opt" data-letter="${o.letter}" data-correct="${o.correct}">
+        <span class="opt-letter">${o.letter}</span>
+        <span class="opt-text">${o.text}</span>
+        <span class="opt-icon"></span>
+      </div>
+      <div class="opt-exp" id="optexp-${o.letter}"></div>
+    </div>`).join('');
+  card.innerHTML=`
+    <div class="q-top">
+      <div class="q-num-badge">${q.num}</div>
+      <div class="q-meta">
+        <span class="bolum-badge">${q.bolum}</span>
+        <span class="tag-badge">${q.tag}</span>
+      </div>
+    </div>
+    <div class="q-text">${q.text}</div>
+    <div class="options" id="options-area">${optsHtml}</div>
+    <div class="general-exp" id="genexp"></div>
+    <button class="next-btn" id="nextbtn">${idx<TOTAL-1?'Sonraki Soru →':'Sonuçları Gör'}</button>`;
+
+  // Event listeners - inline onclick yerine addEventListener
+  card.querySelectorAll('.opt').forEach(optEl=>{
+    optEl.addEventListener('click',function(){
+      const chosen=this.getAttribute('data-letter');
+      const correct=this.getAttribute('data-correct');
+      doAnswer(chosen,correct);
+    });
+  });
+  document.getElementById('nextbtn').addEventListener('click',nextQ);
+
+  document.getElementById('prog').style.width=((idx/TOTAL)*100)+'%';
+  document.getElementById('prog-text').textContent='Soru '+(idx+1)+' / '+TOTAL;
+  if(answers[idx])restoreAnswer(idx,answers[idx].chosen,answers[idx].correct);
+}
+
+function restoreAnswer(idx,chosen,correct){
+  const card=document.getElementById('qcard');
+  card.dataset.answered='1';
+  const q=QUESTIONS[idx];
+  card.querySelectorAll('.opt').forEach(el=>el.classList.add('disabled'));
+  markOpts(chosen,correct);
+  showExplanations(q,chosen,correct);
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function markOpts(chosen,correct){
+  const cEl=document.querySelector(`.opt[data-letter="${correct}"]`);
+  if(cEl){cEl.classList.add('correct-ans');cEl.querySelector('.opt-icon').textContent='✓';}
+  if(chosen!==correct){
+    const wEl=document.querySelector(`.opt[data-letter="${chosen}"]`);
+    if(wEl){wEl.classList.add('wrong-ans');wEl.querySelector('.opt-icon').textContent='✗';}
+  }
+}
+
+function showExplanations(q,chosen,correct){
+  if(q.isVerbal){
+    q.opts.forEach(o=>{
+      const expEl=document.getElementById('optexp-'+o.letter);
+      const btn=document.querySelector(`.opt[data-letter="${o.letter}"]`);
+      if(expEl&&o.optExp){
+        expEl.innerHTML=o.optExp;expEl.classList.add('show');
+        if(btn)btn.style.borderRadius='8px 8px 0 0';
+        expEl.classList.add(o.letter===correct?'correct-exp':'wrong-exp');
+      }
+    });
+  }else{
+    const g=document.getElementById('genexp');
+    if(g){g.innerHTML=q.exp;g.classList.add('show');if(chosen!==correct)g.classList.add('wrong-border');}
+  }
+}
+
+function doAnswer(chosen,correct){
+  const card=document.getElementById('qcard');
+  if(card.dataset.answered)return;
+  card.dataset.answered='1';
+  const q=QUESTIONS[current];
+  card.querySelectorAll('.opt').forEach(el=>el.classList.add('disabled'));
+  markOpts(chosen,correct);
+  if(chosen!==correct){wrongCount++;}else{correctCount++;}
+  showExplanations(q,chosen,correct);
+  answers[current]={chosen,correct};
+  saveState();
+  document.querySelector('#sc-correct .snum').textContent=correctCount;
+  document.querySelector('#sc-wrong .snum').textContent=wrongCount;
+  document.querySelector('#sc-remain .snum').textContent=TOTAL-current-1;
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function nextQ(){
+  current++;
+  if(current>=TOTAL){showFinish();return;}
+  delete document.getElementById('qcard').dataset.answered;
+  saveState();render(current);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showFinish(){
+  document.getElementById('qcard').style.display='none';
+  document.querySelector('.progress-bar-wrap').style.display='none';
+  document.querySelector('.progress-text').style.display='none';
+  document.getElementById('prog').style.width='100%';
+  clearState();
+  document.getElementById('finish').classList.add('show');
+  document.getElementById('fin-c').textContent=correctCount;
+  document.getElementById('fin-w').textContent=wrongCount;
+  const pct=Math.round(correctCount/TOTAL*100);
+  document.getElementById('fin-msg').textContent=
+    pct>=85?'Harika! Tarih konuları oturmuş.':
+    pct>=70?'İyi gidiyorsun. Eksik kalan konuları tekrar et.':
+    pct>=50?'Orta seviye. Kronoloji ve kurumları pekiştir.':
+    'Konu anlatımına dön, ezber değil bağlantı kur.';
+}
+
+function doRestart(){
+  current=0;correctCount=0;wrongCount=0;answers={};clearState();
+  document.querySelector('#sc-correct .snum').textContent=0;
+  document.querySelector('#sc-wrong .snum').textContent=0;
+  document.querySelector('#sc-remain .snum').textContent=TOTAL;
+  document.getElementById('qcard').style.display='';
+  document.querySelector('.progress-bar-wrap').style.display='';
+  document.querySelector('.progress-text').style.display='';
+  document.getElementById('finish').classList.remove('show');
+  delete document.getElementById('qcard').dataset.answered;
+  render(0);window.scrollTo({top:0});
+}
+
+document.getElementById('restart-btn').addEventListener('click',doRestart);
+
+// Sayfa açılışında kayıt kontrolü
+const saved=loadState();
+if(saved&&saved.current>0&&saved.current<TOTAL){
+  current=saved.current;correctCount=saved.correctCount;wrongCount=saved.wrongCount;answers=saved.answers||{};
+  document.getElementById('qcard').innerHTML=`
+    <div class="resume-screen">
+      <h2>Kaldığın yerden devam et</h2>
+      <p style="color:var(--muted);font-size:0.92rem;margin-bottom:1.5rem;">
+        ${current}. soruya kadar tamamlandı &nbsp;·&nbsp;
+        <span style="color:var(--correct)">✓ ${correctCount} Doğru</span> &nbsp;
+        <span style="color:var(--accent)">✗ ${wrongCount} Yanlış</span>
+      </p>
+      <button class="resume-btn primary" id="btn-resume">Devam Et →</button>
+      <button class="resume-btn secondary" id="btn-fresh">Baştan Başla</button>
+    </div>`;
+  document.getElementById('prog').style.width=(current/TOTAL*100)+'%';
+  document.getElementById('prog-text').textContent='Soru '+(current+1)+' / '+TOTAL;
+  document.querySelector('#sc-correct .snum').textContent=correctCount;
+  document.querySelector('#sc-wrong .snum').textContent=wrongCount;
+  document.querySelector('#sc-remain .snum').textContent=TOTAL-current;
+  document.getElementById('btn-resume').addEventListener('click',()=>{
+    delete document.getElementById('qcard').dataset.answered;
+    render(current);window.scrollTo({top:0});
+  });
+  document.getElementById('btn-fresh').addEventListener('click',doRestart);
+}else if(saved&&saved.current>=TOTAL){clearState();render(0);}
+else{render(0);}
+</script>
+</body>
+</html>
