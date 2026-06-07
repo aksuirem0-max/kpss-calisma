@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çalıkuşu — Senaryo 4</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #064e3b, #10b981);
+    font-family: Georgia, serif;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ust-bar {
+    width: 100%;
+    max-width: 680px;
+    margin-bottom: 12px;
+  }
+  .etiket-satir {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .etiket {
+    background: #f59e0b;
+    color: #111;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: sans-serif;
+  }
+  .baslik-yazi {
+    color: #d1fae5;
+    font-size: 13px;
+    font-weight: bold;
+  }
+  .ilerleme-satir {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ilerleme-sayi {
+    color: #d1fae5;
+    font-size: 11px;
+    min-width: 44px;
+    font-family: sans-serif;
+    opacity: 0.8;
+  }
+  .ilerleme-bar-dis {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .ilerleme-bar-ic {
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 10px;
+    transition: width 0.3s;
+  }
+  .soru-kart {
+    width: 100%;
+    max-width: 680px;
+    background: white;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  }
+  .soru-ust {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .soru-no {
+    font-size: 16px;
+    font-weight: bold;
+    color: #064e3b;
+  }
+  .puan-rozet {
+    background: #064e3b;
+    color: white;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-family: sans-serif;
+  }
+  .tema-rozet {
+    font-size: 10px;
+    color: #064e3b;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-family: sans-serif;
+    background: #d1fae540;
+    padding: 3px 8px;
+    border-radius: 5px;
+    display: inline-block;
+    border: 1px solid #d1fae5;
+  }
+  .soru-metin {
+    font-size: 14px;
+    color: #1a1a2e;
+    line-height: 1.9;
+    white-space: pre-wrap;
+  }
+  .soru-metin u {
+    font-weight: 700;
+    text-decoration-thickness: 2px;
+  }
+  /* NORMAL CEVAP KUTUSU */
+  .cevap-kutu {
+    width: 100%;
+    max-width: 680px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+  }
+  .cevap-label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #064e3b;
+    margin-bottom: 7px;
+    font-family: sans-serif;
+  }
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #a7f3d0;
+    border-radius: 9px;
+    font-size: 14px;
+    font-family: Georgia, serif;
+    resize: vertical;
+    outline: none;
+    color: #1a1a2e;
+    line-height: 1.7;
+  }
+  textarea:focus {
+    border-color: #064e3b;
+  }
+  .alt-satir {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .karakter {
+    font-size: 11px;
+    color: #6b7280;
+    font-family: sans-serif;
+  }
+  .btn-ileri {
+    background: #064e3b;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: sans-serif;
+  }
+  .btn-ileri:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+  }
+  /* MİKRO-YAZMA ALANI */
+  .mikro-kutu {
+    width: 100%;
+    max-width: 680px;
+    background: rgba(255,255,255,0.97);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+    display: none;
+  }
+  .mikro-baslik {
+    font-size: 12px;
+    font-weight: bold;
+    color: #064e3b;
+    margin-bottom: 10px;
+    font-family: sans-serif;
+    border-bottom: 2px solid #6ee7b7;
+    padding-bottom: 6px;
+  }
+  .mikro-adim {
+    background: #ecfdf5;
+    border: 1px solid #34d399;
+    border-radius: 9px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .mikro-adim-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #064e3b;
+    margin-bottom: 4px;
+    font-family: sans-serif;
+  }
+  .mikro-adim-ipucu {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 6px;
+    font-family: sans-serif;
+    line-height: 1.5;
+  }
+  .mikro-adim textarea {
+    border: 1.5px solid #6ee7b7;
+    border-radius: 7px;
+    font-size: 13px;
+    padding: 8px;
+  }
+  .mikro-adim textarea:focus {
+    border-color: #064e3b;
+  }
+  .mikro-alt {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  /* BİTTİ EKRANI */
+  .bitti-ekran {
+    display: none;
+    width: 100%;
+    max-width: 580px;
+    background: white;
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-align: center;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.28);
+  }
+  .bitti-icon { font-size: 48px; margin-bottom: 8px; }
+  .bitti-baslik { font-size: 18px; color: #064e3b; margin-bottom: 4px; }
+  .bitti-alt { font-size: 12px; color: #6b7280; margin-bottom: 16px; font-family: sans-serif; }
+  .ozet-kutu {
+    background: #d1fae540;
+    border: 1px solid #d1fae5;
+    border-radius: 9px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .ozet-satir {
+    display: flex;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid #d1fae5;
+    font-family: sans-serif;
+    font-size: 12px;
+  }
+  .ozet-no { font-weight: bold; color: #064e3b; min-width: 22px; }
+  .ozet-metin { color: #374151; }
+  .btn-kopyala {
+    display: block;
+    width: 100%;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 11px;
+    padding: 13px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 8px;
+    font-family: sans-serif;
+  }
+  .btn-kopyala.kopyalandi { background: #166534; }
+  .btn-sifirla {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 11px;
+    padding: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: sans-serif;
+  }
+  .not { color: rgba(255,255,255,0.35); font-size: 10px; margin-top: 10px; font-family: sans-serif; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="ust-bar" id="ust-bar">
+  <div class="etiket-satir">
+    <span class="etiket">SENARYO 4</span>
+    <span class="baslik-yazi">Çalıkuşu — 2. Dönem 2. Yazılı</span>
+  </div>
+  <div class="ilerleme-satir">
+    <span class="ilerleme-sayi" id="ilerleme-sayi">0/7</span>
+    <div class="ilerleme-bar-dis">
+      <div class="ilerleme-bar-ic" id="ilerleme-bar" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="soru-kart" id="soru-kart">
+  <div class="soru-ust">
+    <span class="soru-no" id="soru-no">Soru 1</span>
+    <span class="puan-rozet" id="puan-rozet">15 puan</span>
+  </div>
+  <span class="tema-rozet" id="tema-rozet"></span>
+  <div class="soru-metin" id="soru-metin"></div>
+</div>
+
+<!-- Normal tek textarea -->
+<div class="cevap-kutu" id="cevap-kutu">
+  <label class="cevap-label">✏️ Cevabını yaz:</label>
+  <textarea id="cevap-alan" rows="5" placeholder="Cevabını buraya yaz..."></textarea>
+  <div class="alt-satir">
+    <span class="karakter" id="karakter-say">0 karakter</span>
+    <button class="btn-ileri" id="btn-ileri" onclick="ileri()" disabled>➡️ Sonraki</button>
+  </div>
+</div>
+
+<!-- Mikro-yazma alanı -->
+<div class="mikro-kutu" id="mikro-kutu">
+  <div class="mikro-baslik">✏️ Adım adım yaz — her kutuyu doldurunca İleri butonu aktif olur</div>
+  <div id="mikro-adimlar"></div>
+  <div class="alt-satir" style="margin-top:4px;">
+    <span class="karakter" id="mikro-karakter">Tüm alanları doldurun</span>
+    <button class="btn-ileri" id="btn-mikro-ileri" onclick="mikroIleri()" disabled>➡️ Sonraki</button>
+  </div>
+</div>
+
+<div class="bitti-ekran" id="bitti-ekran">
+  <div class="bitti-icon">🎉</div>
+  <h2 class="bitti-baslik">Tüm sorular tamamlandı!</h2>
+  <p class="bitti-alt">Senaryo 4 — 7 soru / 100 puan</p>
+  <div class="ozet-kutu" id="ozet-kutu"></div>
+  <button class="btn-kopyala" id="btn-kopyala" onclick="kopyala()">📋 Cevapları Kopyala (WhatsApp için)</button>
+  <button class="btn-sifirla" onclick="sifirla()">🔄 Yeni Sorularla Tekrar Çöz</button>
+</div>
+
+<p class="not" id="not-yazi">Sıfırlayınca yeni sorularla karşılaşırsın.</p>
+
+<script>
+var HAVUZ = [
+  [
+    {
+      "baslik": "Soru 1",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Okuma (TDE2.2.2 + TDE2.2.3)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Feride, sabah erken uyandı. Dışarısı hâlâ karanlıktı ama o okula gitmeye kararlıydı. Belki bugün bir şey değişirdi.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Feride'nin kişilik özellikleri hakkında <u>çıkarım</u> yapınız. Bu çıkarımı hangi ifadeler destekliyor?\n2. \"Belki bugün bir şey değişirdi\" cümlesinden hareketle Feride'nin umutları ve kaygıları hakkında <u>tahminler</u> yazınız."
+    },
+    {
+      "baslik": "Soru 1",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Okuma (TDE2.2.3 + TDE2.2.5)",
+      "metin": "Aşağıdaki iki cümleyi okuyunuz:\n\nA) \"O gün Feride hiç konuşmadı. Sınıfta çocuklara baktı, onların gözlerindeki masumiyeti gördü. Ve anladı: Burada kalmak zorundaydı.\"\n\nB) \"Çalıkuşu, sıradan bir aşk romanı değil; insanı derinden etkileyen, düşündüren eşsiz bir yapıttır.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. A parçasından Feride'nin bu karara nasıl ve neden vardığını gösteren <u>çıkarım</u> yapınız.\n2. Her iki parçayı <u>öznel / nesnel</u> olarak sınıflandırınız. Gerekçenizi yazınız."
+    },
+    {
+      "baslik": "Soru 1",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Okuma (TDE2.2.3 + TDE2.2.5)",
+      "metin": "Aşağıdaki iki metni okuyunuz:\n\nA) \"Feride'nin çantasında yalnızca birkaç kitap vardı. Ama o kitaplar, onun için bütün bir dünyaydı.\"\n\nB) \"Çalıkuşu romanı ilk kez 1922 yılında Vakit gazetesinde tefrika edilmiş, ardından kitap olarak yayımlanmıştır.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. \"Kitaplar, onun için bütün bir dünyaydı\" cümlesinden Feride'nin hayata bakışı hakkında <u>çıkarım</u> yapınız.\n2. Her iki metni <u>gerçek / kurgu</u> ve <u>öznel / nesnel</u> açısından sınıflandırınız."
+    },
+    {
+      "baslik": "Soru 1",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Okuma (TDE2.2.2 + TDE2.2.3)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Kâmran'ı düşünmemeye yemin etmişti. Ama o isim, farkında olmadan her gün aklına geliyordu.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Parçadaki <u>karşıtlığı</u> belirleyiniz ve bu karşıtlığın Feride'nin iç dünyası hakkında neler söylediğini açıklayınız.\n2. Feride'nin duygusal durumu hakkında <u>tahmin</u> yapınız. Bu tahmini parçanın hangi unsurları destekliyor?\n3. Parçanın <u>ana düşüncesini</u> bir cümleyle yazınız."
+    }
+  ],
+  [
+    {
+      "baslik": "Soru 2",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Yazma (TDE4.1+4.2+4.3+4.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "📝 Giriş: Tutumunuzu Belirtin (2 cümle)",
+          "ipucu": "\"Feride'nin en büyük fedakârlığı neydi?\" sorusuna tutumunuzu yazınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "💡 1. Argüman (3 cümle)",
+          "ipucu": "Romandan somut bir örnekle argümanınızı destekleyiniz.",
+          "satirlar": 4
+        },
+        {
+          "label": "💡 2. Argüman (3 cümle)",
+          "ipucu": "İkinci bir argümanı bağdaşıklık ögeleriyle bağlayarak yazınız.",
+          "satirlar": 4
+        },
+        {
+          "label": "🎯 Sonuç (2 cümle)",
+          "ipucu": "Görüşünüzü pekiştirerek yazınızı kapatınız.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 2",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Yazma (TDE4.1+4.2+4.3+4.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "📝 Giriş: Konuyu Tanıtın (2 cümle)",
+          "ipucu": "\"Öğretmenlik bir meslek midir, bir tutku mu?\" sorusunu tanıtınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "💡 Feride Üzerinden Yanıt (3 cümle)",
+          "ipucu": "Feride örneğinden yola çıkarak bu soruyu yanıtlayınız.",
+          "satirlar": 4
+        },
+        {
+          "label": "🌍 Kendi Görüşünüz (3 cümle)",
+          "ipucu": "Kendi gözlemlerinizden ya da deneyimlerinizden bir örnek vererek görüşünüzü destekleyiniz.",
+          "satirlar": 4
+        },
+        {
+          "label": "🎯 Sonuç (2 cümle)",
+          "ipucu": "Yazınızı güçlü bir değerlendirmeyle kapatınız.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 2",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Yazma (TDE4.1+4.2+4.3+4.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "🖼️ Betimleme (3 cümle)",
+          "ipucu": "\"Feride'nin köy okulunun bahçesinde sabah ışığı yükseliyordu\" cümlesinden betimleyici bir paragraf kurunuz.",
+          "satirlar": 4
+        },
+        {
+          "label": "💡 Sembolik Anlam (2 cümle)",
+          "ipucu": "Bu mekânın/sahnenin romanın temasıyla ilişkisini açıklayınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "🎯 Değerlendirme (2 cümle)",
+          "ipucu": "Betimleyici anlatımın okuyucuya kattığı değeri belirtiniz.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 2",
+      "puan": 15,
+      "tema": "3. Tema — Anlamın Yapı Taşları / Yazma (TDE4.1+4.2+4.3+4.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "📝 Giriş (2 cümle)",
+          "ipucu": "\"Köklerimizden kopmak bizi güçlendirir mi, yoksa zayıflatır mı?\" sorusuna görüşünüzü yazınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "💡 Romandan Örnek (3 cümle)",
+          "ipucu": "Çalıkuşu'ndan bu düşünceyle ilgili bir sahne ya da karakter özelliği anlatınız.",
+          "satirlar": 4
+        },
+        {
+          "label": "💡 2. Düşünce Geliştirme (3 cümle)",
+          "ipucu": "En az iki düşünce geliştirme yolu kullanarak ikinci argümanınızı yazınız.",
+          "satirlar": 4
+        },
+        {
+          "label": "🎯 Sonuç (2 cümle)",
+          "ipucu": "Görüşünüzü bağdaşıklık ögeleriyle sonuca bağlayınız.",
+          "satirlar": 3
+        }
+      ]
+    }
+  ],
+  [
+    {
+      "baslik": "Soru 3",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1 + TDE2.2.5)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Feride bir gün hastalandı. Yüksek ateşle yatağa düştü; yapayalnız. Komşu kadın kapıyı çaldı, elinde çorba. Feride anladı: İnsanlık en dar köşelerde bile yeşerir.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Bu parçanın <u>anlatım tekniğini</u> belirleyiniz ve dil özelliklerini göstererek kanıtlayınız.\n2. \"İnsanlık en dar köşelerde bile yeşerir\" cümlesinin <u>öznel mi nesnel mi</u> olduğunu belirleyiniz.\n3. Parçanın <u>ana düşüncesini</u> yazınız."
+    },
+    {
+      "baslik": "Soru 3",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1 + TDE2.2.5)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Feride köye ilk adım attığında insanlar şüpheyle baktı. Zamanla güvenleri kazanıldı. Yıllar sonra o köyün çocukları okumayı Feride sayesinde öğrendiklerini söyledi.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Bu parçanın <u>anlatım tekniğini</u> belirleyiniz.\n2. Zaman unsurlarını (\"ilk adım attığında, zamanla, yıllar sonra\") bulunuz. Bunların anlatıma kattığı <u>anlam değişimini</u> açıklayınız.\n3. Parçadan Feride'nin köy insanı üzerindeki etkisi hakkında <u>çıkarım</u> yapınız."
+    },
+    {
+      "baslik": "Soru 3",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1)",
+      "metin": "Aşağıdaki iki paragrafı okuyunuz:\n\nA) \"Acaba doğru mu yapıyorum? Keşke daha cesur olsaydım, belki her şey farklı olurdu.\"\n\nB) \"Gitsem mi kalsam mı... annem ne derdi acaba... neden bu kadar zor her şey...\"\n\n📌 Her iki parça için şunları yapınız:\n1. Kullanılan <u>anlatım tekniğini</u> adıyla belirleyiniz.\n2. İki teknik arasındaki <u>farkı</u> dil özellikleri açısından karşılaştırınız (cümle yapısı, noktalama, düşünce düzeni).\n3. Her tekniğin karakterin psikolojisini anlatmadaki <u>farklı etkisini</u> yazınız."
+    },
+    {
+      "baslik": "Soru 3",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1 + TDE2.2.5)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Yıllar önce dedemin anlattığı o günleri hiç unutamam. Köyde okul yoktu, çocuklar tarlada çalışırdı. Feride gibi öğretmenler gelmeseydi belki hiç okuyamazdık.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Kullanılan <u>anlatım tekniğini</u> belirleyiniz ve kanıtlayınız.\n2. Bu parça <u>öznel mi nesnel mi?</u> Gerekçenizi yazınız.\n3. Parçadaki <u>dil işlevini</u> belirleyiniz: konuşmacı ne yapmak istiyor?"
+    }
+  ],
+  [
+    {
+      "baslik": "Soru 4",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Çalıkuşu salt bireysel bir hikâye değildir. Her kasaba sahnesi eğitim sistemi üzerine bir <u>eleştiridir</u>. Her diyalog, toplumsal yapının yansımasıdır.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Bu parçanın <u>anlatım biçimini</u> belirleyiniz ve kanıtlayınız.\n2. Parçada <u>dilin hangi işlevi</u> ön plana çıkıyor? Açıklayınız.\n3. \"Eleştiri\" sözcüğü altı çizili verilmiştir. Bağlamdan hareketle bu sözcüğün metinde taşıdığı <u>anlamı</u> açıklayınız."
+    },
+    {
+      "baslik": "Soru 4",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Sosyal medya, doğru kullanıldığında eğitime katkı sağlar. Çünkü bilgiye ulaşmayı kolaylaştırır. Ancak bilinçsiz kullanım zaman kaybına yol açabilir.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Bu parçanın <u>anlatım biçimini</u> belirleyiniz. Bağlaçları göstererek kanıtlayınız.\n2. Parçadaki <u>dil ve anlatım özelliklerini</u> belirleyiniz: fiil kipleri, nesnel/öznel ifadeler.\n3. Bu parça ile Çalıkuşu'nda geçen bir eleştiri cümlesini karşılaştırarak <u>anlatım biçimleri</u> arasındaki farkı yazınız."
+    },
+    {
+      "baslik": "Soru 4",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1)",
+      "metin": "Aşağıdaki iki paragrafı okuyunuz:\n\nA) \"Acaba doğru mu yapıyorum? Keşke daha cesur olsaydım, belki her şey farklı olurdu.\"\n\nB) \"Gitsem mi kalsam mı... annem ne derdi acaba... neden bu kadar zor her şey...\"\n\n📌 Her iki parça için şunları yapınız:\n1. Kullanılan <u>anlatım tekniğini</u> adıyla belirleyiniz.\n2. Dil özellikleri açısından iki paragrafı karşılaştırınız (cümle yapısı, noktalama, sıralı/dağınık düşünce).\n3. Her tekniğin karakterin psikolojisini aktarmadaki <u>etkisini</u> yazınız."
+    },
+    {
+      "baslik": "Soru 4",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.3.1)",
+      "metin": "Aşağıdaki paragrafı okuyunuz:\n\n\"Yıllar önce dedemin anlattığı o günleri hiç unutamam. Köyde okul yoktu, çocuklar tarlada çalışırdı. Feride gibi öğretmenler gelmeseydi belki hiç okuyamazdık.\"\n\n📌 Aşağıdaki soruları yanıtlayınız:\n1. Kullanılan <u>anlatım tekniğini</u> belirleyiniz ve kanıtlayınız.\n2. Zaman unsurlarını (\"yıllar önce\") ve koşul yapılarını (\"gelmeseydi\") bulunuz. Bunların <u>anlatıma katkısını</u> açıklayınız.\n3. Bu parçanın <u>dil işlevini</u> belirleyiniz."
+    }
+  ],
+  [
+    {
+      "baslik": "Soru 5",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "💬 Görüşünüz (2 cümle)",
+          "ipucu": "\"Feride, bencilliği reddeden fedakâr bir kadın karakterdir\" değerlendirmesine katılıp katılmadığınızı belirtiniz.",
+          "satirlar": 3
+        },
+        {
+          "label": "📖 Romandan 2 Örnek (3 cümle)",
+          "ipucu": "Görüşünüzü destekleyen iki sahne ya da karakter özelliği veriniz.",
+          "satirlar": 4
+        },
+        {
+          "label": "🌍 Günümüzle Bağlantı (2 cümle)",
+          "ipucu": "Bu özelliğin günümüz gençliğine katkısını değerlendiriniz.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 5",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "💡 Güçlü Yanlar (2 cümle)",
+          "ipucu": "Feride'nin güçlü yönlerini romandan destekle yazınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "💔 Kırılgan Yanlar (2 cümle)",
+          "ipucu": "Feride'nin kırılgan yönlerini romandan destekle yazınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "🔍 Çelişkinin Gerçekçiliği (3 cümle)",
+          "ipucu": "Bu çelişkinin Feride'yi daha gerçekçi bir karakter yapıp yapmadığını ve okuyucu üzerindeki etkisini değerlendiriniz.",
+          "satirlar": 4
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 5",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "📖 2 Olgunlaşma Sahnesi (3 cümle)",
+          "ipucu": "Feride'nin Anadolu'da olgunlaşmasını gösteren iki sahneyi anlatınız.",
+          "satirlar": 4
+        },
+        {
+          "label": "🔄 Dönüşümün Özü (2 cümle)",
+          "ipucu": "Bu dönüşümün Feride'yi nasıl değiştirdiğini özetleyiniz.",
+          "satirlar": 3
+        },
+        {
+          "label": "🌱 Kendi Deneyiminiz (2 cümle)",
+          "ipucu": "Kendinizden ya da tanıdığınız birinden benzer bir büyüme anı paylaşınız.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 5",
+      "puan": 15,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "💬 Görüşünüz (2 cümle)",
+          "ipucu": "\"Feride sabırlı olduğu için değil, cesaretli olduğu için rol modeldir\" görüşüne katılıp katılmadığınızı yazınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "📖 2 Destek Örneği (3 cümle)",
+          "ipucu": "Görüşünüzü romandan iki örnekle destekleyiniz.",
+          "satirlar": 4
+        },
+        {
+          "label": "🎯 Rol Model Tanımınız (2 cümle)",
+          "ipucu": "Sizce rol model olmak için en önemli özellik nedir? Feride bu tanıma uyuyor mu?",
+          "satirlar": 3
+        }
+      ]
+    }
+  ],
+  [
+    {
+      "baslik": "Soru 6",
+      "puan": 20,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "📖 Romandan 2 Örnek (3 cümle)",
+          "ipucu": "\"Reşat Nuri, dili sadelikle kullanarak Anadolu'nun sesini okuyucuya duyurmuştur\" görüşünü destekleyen iki örnek veriniz.",
+          "satirlar": 4
+        },
+        {
+          "label": "🧠 Dilin Sadeliğinin Önemi (2 cümle)",
+          "ipucu": "Bu sade dil kullanımının okuyucu üzerindeki etkisini açıklayınız.",
+          "satirlar": 3
+        },
+        {
+          "label": "💭 Kendi Tepkiniz (2 cümle)",
+          "ipucu": "Bu dil anlayışının size ne kazandırdığını yazınız.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 6",
+      "puan": 20,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "⚔️ A Görüşü Örneği (2 cümle)",
+          "ipucu": "\"Çalıkuşu, bir kadının topluma rağmen ayakta durmasını anlatır\" görüşünü destekleyen bir örnek veriniz.",
+          "satirlar": 3
+        },
+        {
+          "label": "🔍 B Görüşü Örneği (2 cümle)",
+          "ipucu": "\"Çalıkuşu, Anadolu coğrafyasının bir destanıdır\" görüşünü destekleyen bir örnek veriniz.",
+          "satirlar": 3
+        },
+        {
+          "label": "💬 Sizin Görüşünüz (3 cümle)",
+          "ipucu": "Hangisine daha çok katıldığınızı ve bu romanın kalıcılığını neye bağladığınızı yazınız.",
+          "satirlar": 4
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 6",
+      "puan": 20,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "📖 En İzlek Analizi (3 cümle)",
+          "ipucu": "\"Vatanseverlik, sevgi, yalnızlık\" izleklerinden birini seçip romandan örnekleyiniz.",
+          "satirlar": 4
+        },
+        {
+          "label": "🔗 İzlek–Feride Bağlantısı (2 cümle)",
+          "ipucu": "Bu izleğin Feride'nin kişiliğiyle ilişkisini kurunuz.",
+          "satirlar": 3
+        },
+        {
+          "label": "💭 Kişisel Tepkiniz (2 cümle)",
+          "ipucu": "Bu romanın size en çok ne öğrettiğini yazınız.",
+          "satirlar": 3
+        }
+      ]
+    },
+    {
+      "baslik": "Soru 6",
+      "puan": 20,
+      "tema": "4. Tema — Dilin Zenginliği / Okuma (TDE2.4)",
+      "mikro": true,
+      "adimlar": [
+        {
+          "label": "🏞️ En Güçlü Sahne (2 cümle)",
+          "ipucu": "Romanda sizi en çok etkileyen sahneyi seçin ve neden seçtiğinizi belirtiniz.",
+          "satirlar": 3
+        },
+        {
+          "label": "🔗 Sahne–Tema Bağlantısı (2 cümle)",
+          "ipucu": "Bu sahnenin romanın genel temasıyla ilişkisini kurunuz.",
+          "satirlar": 3
+        },
+        {
+          "label": "💭 Kişisel Değerlendirme (3 cümle)",
+          "ipucu": "Bu sahnenin size ne hissettirdiğini ve neden akılda kaldığını yazınız.",
+          "satirlar": 4
+        }
+      ]
+    }
+  ],
+  [
+    {
+      "baslik": "Soru 7",
+      "puan": 10,
+      "tema": "4. Tema — Dil Bilgisi / Zarflar, Edatlar, Bağlaçlar, Ünlemler (TDE3.2)",
+      "metin": "Aşağıdaki metni okuyunuz:\n\n\"Feride yavaşça odaya girdi ve kapıyı sessizce kapattı. Dışarıda rüzgâr uğulduyor, ama o bunu duymak istemiyordu. Ah, keşke her şey farklı olsaydı!\"\n\n📌 Bu metindeki zarfları, edatları, bağlaçları ve ünlemleri bulunuz. Bulduklarınızdan en az ikisini seçerek bunların cümlenin anlamına veya Reşat Nuri'nin anlatımına nasıl bir katkı sağladığını kendi cümlelerinizle açıklayınız."
+    },
+    {
+      "baslik": "Soru 7",
+      "puan": 10,
+      "tema": "4. Tema — Dil Bilgisi / Zarflar, Edatlar, Bağlaçlar, Ünlemler (TDE3.2)",
+      "metin": "Aşağıdaki metni okuyunuz:\n\n\"Feride sabahları erken kalkar, doğruca okula giderdi. Öğrenciler için her şeyi göze almıştı; ne soğuk ne yağmur onu durduramıyordu.\"\n\n📌 Bu metindeki zarfları, edatları ve bağlaçları bulunuz. Bunlardan en az ikisini seçerek hangi türe girdiğini ve cümledeki anlam/anlatım işlevini açıklayınız."
+    },
+    {
+      "baslik": "Soru 7",
+      "puan": 10,
+      "tema": "4. Tema — Dil Bilgisi / Zarflar, Edatlar, Bağlaçlar, Ünlemler (TDE3.2)",
+      "metin": "Aşağıdaki metni okuyunuz:\n\n\"Vah vah! Bu kadar küçük bir çocuk bile okul özlemi çekiyordu. Feride hemen koştu, çünkü bu bakışa dayanamıyordu artık.\"\n\n📌 Metindeki ünlemleri, bağlaçları ve zarfları bulunuz. Bunlardan en az ikisini seçerek yazarın bu sözcükleri kullanma amacını ve anlatıma katkısını yorumlayınız."
+    },
+    {
+      "baslik": "Soru 7",
+      "puan": 10,
+      "tema": "4. Tema — Dil Bilgisi / Zarflar, Edatlar, Bağlaçlar, Ünlemler (TDE3.2)",
+      "metin": "Aşağıdaki metni okuyunuz:\n\n\"Feride, yorgunluğuna rağmen okula geldi; ancak içeri girince her şeyi unuttu. Çocukların neşesi için her şey değerdi zaten.\"\n\n📌 Metindeki edatları, bağlaçları ve zarfları bulunuz. En az iki tanesini seçerek bunların cümlelerin anlam ilişkilerine nasıl katkı sağladığını açıklayınız."
+    }
+  ]
+];
+
+var DEPO_KEY = "s4_gecmis";
+var adim = 0;
+var cevaplar = {};
+var secim = [];
+
+function gecmisCek() {
+  try { var v = localStorage.getItem(DEPO_KEY); if (v) return JSON.parse(v); } catch(e) {}
+  return [];
+}
+
+function gecmisKaydet(s) {
+  try {
+    var g = gecmisCek();
+    g.push(s);
+    if (g.length > 20) g = g.slice(g.length - 20);
+    localStorage.setItem(DEPO_KEY, JSON.stringify(g));
+  } catch(e) {}
+}
+
+function yeniSecimYap() {
+  var gecmis = gecmisCek();
+  var deneme = 0, yeni;
+  while (deneme < 50) {
+    yeni = [];
+    for (var i = 0; i < HAVUZ.length; i++) {
+      yeni.push(Math.floor(Math.random() * HAVUZ[i].length));
+    }
+    var ayni = false;
+    for (var g = 0; g < gecmis.length; g++) {
+      var esit = true;
+      for (var k = 0; k < yeni.length; k++) {
+        if (gecmis[g][k] !== yeni[k]) { esit = false; break; }
+      }
+      if (esit) { ayni = true; break; }
+    }
+    if (!ayni) break;
+    deneme++;
+  }
+  return yeni;
+}
+
+function soruGoster() {
+  var s = HAVUZ[adim][secim[adim]];
+  document.getElementById("soru-no").textContent = s.baslik;
+  document.getElementById("puan-rozet").textContent = s.puan + " puan";
+  document.getElementById("tema-rozet").textContent = s.tema;
+  document.getElementById("soru-metin").innerHTML = (s.metin || "").replace(/\n/g, "<br>");
+
+  var btnMetin = adim === 6 ? "✅ Bitir" : "➡️ Sonraki";
+
+  if (s.mikro) {
+    document.getElementById("cevap-kutu").style.display = "none";
+    document.getElementById("mikro-kutu").style.display = "block";
+    mikroOlustur(s.adimlar);
+    document.getElementById("btn-mikro-ileri").textContent = btnMetin;
+    document.getElementById("btn-mikro-ileri").disabled = true;
+  } else {
+    document.getElementById("mikro-kutu").style.display = "none";
+    document.getElementById("cevap-kutu").style.display = "block";
+    document.getElementById("cevap-alan").value = "";
+    document.getElementById("karakter-say").textContent = "0 karakter";
+    document.getElementById("btn-ileri").disabled = true;
+    document.getElementById("btn-ileri").textContent = btnMetin;
+    document.getElementById("cevap-alan").focus();
+  }
+
+  document.getElementById("ilerleme-sayi").textContent = adim + "/7";
+  document.getElementById("ilerleme-bar").style.width = Math.round((adim/7)*100) + "%";
+}
+
+function mikroOlustur(adimlar) {
+  var kap = document.getElementById("mikro-adimlar");
+  kap.innerHTML = "";
+  adimlar.forEach(function(a, idx) {
+    var div = document.createElement("div");
+    div.className = "mikro-adim";
+    div.innerHTML =
+      '<div class="mikro-adim-label">' + a.label + '</div>' +
+      '<div class="mikro-adim-ipucu">' + a.ipucu + '</div>' +
+      '<textarea id="mikro-' + idx + '" rows="' + (a.satirlar || 3) + '" placeholder="Burayı doldurun..." oninput="mikroDegisti()"></textarea>';
+    kap.appendChild(div);
+  });
+}
+
+function mikroDegisti() {
+  var s = HAVUZ[adim][secim[adim]];
+  var tamam = true;
+  for (var i = 0; i < s.adimlar.length; i++) {
+    var el = document.getElementById("mikro-" + i);
+    if (!el || !el.value.trim()) { tamam = false; break; }
+  }
+  document.getElementById("btn-mikro-ileri").disabled = !tamam;
+  document.getElementById("mikro-karakter").textContent = tamam ? "✓ Tüm alanlar dolu" : "Tüm alanları doldurun";
+}
+
+function mikroCevapBirlestir() {
+  var s = HAVUZ[adim][secim[adim]];
+  var parcalar = [];
+  s.adimlar.forEach(function(a, idx) {
+    var el = document.getElementById("mikro-" + idx);
+    parcalar.push("[" + a.label + "]\n" + (el ? el.value.trim() : ""));
+  });
+  return parcalar.join("\n\n");
+}
+
+function ileri() {
+  var yazi = document.getElementById("cevap-alan").value.trim();
+  if (!yazi) return;
+  cevaplar[adim] = yazi;
+  adimIlerle();
+}
+
+function mikroIleri() {
+  cevaplar[adim] = mikroCevapBirlestir();
+  adimIlerle();
+}
+
+function adimIlerle() {
+  if (adim >= 6) {
+    gecmisKaydet(secim.slice());
+    bittiGoster();
+  } else {
+    adim++;
+    soruGoster();
+  }
+}
+
+function bittiGoster() {
+  document.getElementById("ust-bar").style.display = "none";
+  document.getElementById("soru-kart").style.display = "none";
+  document.getElementById("cevap-kutu").style.display = "none";
+  document.getElementById("mikro-kutu").style.display = "none";
+  document.getElementById("not-yazi").style.display = "none";
+  document.getElementById("bitti-ekran").style.display = "block";
+
+  var ozet = "";
+  for (var i = 0; i < 7; i++) {
+    var c = cevaplar[i] || "";
+    var kisa = c.length > 50 ? c.slice(0,50) + "..." : c;
+    ozet += '<div class="ozet-satir"><span class="ozet-no">S' + (i+1) + '</span><span class="ozet-metin">' + (kisa || "—") + '</span></div>';
+  }
+  document.getElementById("ozet-kutu").innerHTML = ozet;
+}
+
+function kopyala() {
+  var txt = "CALIKUSU SENARYO 4 CEVAPLARI\n\n";
+  for (var i = 0; i < 7; i++) {
+    var s = HAVUZ[i][secim[i]];
+    txt += "SORU " + (i+1) + " (" + s.puan + " puan):\n";
+    txt += (cevaplar[i] || "(bos)") + "\n\n";
+  }
+  var el = document.createElement("textarea");
+  el.value = txt;
+  el.setAttribute("readonly","");
+  el.style.position = "fixed";
+  el.style.left = "-9999px";
+  document.body.appendChild(el);
+  el.focus(); el.select(); el.setSelectionRange(0, 99999);
+  try { document.execCommand("copy"); } catch(e) {}
+  document.body.removeChild(el);
+  var btn = document.getElementById("btn-kopyala");
+  btn.textContent = "✅ Kopyalandı! WhatsApp'a yapıştır.";
+  btn.classList.add("kopyalandi");
+  setTimeout(function() {
+    btn.textContent = "📋 Cevapları Kopyala (WhatsApp için)";
+    btn.classList.remove("kopyalandi");
+  }, 3000);
+}
+
+function sifirla() {
+  adim = 0;
+  cevaplar = {};
+  secim = yeniSecimYap();
+  document.getElementById("bitti-ekran").style.display = "none";
+  document.getElementById("ust-bar").style.display = "block";
+  document.getElementById("soru-kart").style.display = "block";
+  document.getElementById("not-yazi").style.display = "block";
+  soruGoster();
+}
+
+// Normal textarea event
+document.getElementById("cevap-alan").addEventListener("input", function() {
+  var v = this.value.trim();
+  document.getElementById("btn-ileri").disabled = !v;
+  document.getElementById("karakter-say").textContent = this.value.length + " karakter";
+});
+document.getElementById("cevap-alan").addEventListener("keydown", function(e) {
+  if (e.ctrlKey && e.key === "Enter") ileri();
+});
+
+// BAŞLAT
+secim = yeniSecimYap();
+soruGoster();
+</script>
+</body>
+</html>
