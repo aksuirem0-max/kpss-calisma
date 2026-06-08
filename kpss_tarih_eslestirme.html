@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Tarih — Eşleştirme</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --border: #2a2a2a;
+    --accent: #e8c547;
+    --accent3: #47c5e8;
+    --text: #f0ede8;
+    --muted: #777;
+    --green: #4caf78;
+    --red: #e85d47;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  #header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  #header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+  #progress-text { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  #progress-wrap { height: 4px; background: var(--border); }
+  #progress-bar { height: 4px; background: var(--accent); transition: width 0.4s; width: 0%; }
+
+  #app { max-width: 800px; margin: 0 auto; padding: 20px 14px 60px; }
+
+  /* MENÜ */
+  #menu { display: none; }
+  #menu.active { display: block; }
+  .menu-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.6rem; letter-spacing: 3px; color: var(--accent); margin-bottom: 4px; }
+  .menu-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 28px; }
+
+  .bolum-grid { display: grid; gap: 10px; }
+  .bolum-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 16px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.18s;
+    text-align: left;
+  }
+  .bolum-btn:hover { background: #1e1e1e; transform: translateX(3px); }
+  .bolum-icon { font-size: 1.4rem; }
+  .bolum-info { flex: 1; }
+  .bolum-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1px; color: var(--text); }
+  .bolum-desc { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .bolum-kart-say {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); background: rgba(232,197,71,0.1);
+    padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+  }
+
+  /* OYUN EKRANI */
+  #oyun { display: none; }
+  #oyun.active { display: block; }
+
+  .ust-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .geri-btn {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    padding: 6px 13px; border-radius: 4px; cursor: pointer; font-size: 0.78rem;
+    transition: all 0.18s;
+  }
+  .geri-btn:hover { color: var(--text); border-color: var(--text); }
+
+  .tur-bilgi {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem;
+    color: var(--accent3); margin-left: auto;
+  }
+
+  .oyun-baslik { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; letter-spacing: 2px; color: var(--accent); margin-bottom: 4px; }
+  .oyun-alt { font-size: 0.78rem; color: var(--muted); margin-bottom: 18px; }
+
+  /* SÜRE BAR */
+  .sure-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 18px; overflow: hidden; }
+  .sure-bar { height: 6px; border-radius: 3px; background: var(--green); transition: width 0.1s linear; width: 100%; }
+
+  /* GRID */
+  .eslestirme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .kart {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .kart:hover:not(.eslesti):not(.yanlis) { border-color: var(--accent); }
+
+  .kart.soru { border-left: 3px solid var(--accent3); }
+  .kart.cevap { border-left: 3px solid var(--accent); }
+
+  .kart.secili {
+    border-color: var(--accent3);
+    background: rgba(71,197,232,0.12);
+    transform: scale(1.02);
+  }
+  .kart.eslesti {
+    border-color: var(--green) !important;
+    background: rgba(76,175,120,0.12) !important;
+    cursor: default;
+    opacity: 0.7;
+  }
+  .kart.yanlis {
+    border-color: var(--red) !important;
+    background: rgba(232,93,71,0.15) !important;
+    animation: titret 0.4s ease;
+  }
+  @keyframes titret {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  .kart-ic { width: 100%; }
+  .kart-tip { font-size: 0.6rem; font-family: 'IBM Plex Mono', monospace; color: var(--muted); margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .kart-metin { font-size: 0.82rem; color: var(--text); line-height: 1.4; }
+
+  /* SKOR BAR */
+  .skor-bar {
+    display: flex; gap: 16px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 16px; margin-bottom: 16px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+  }
+  .skor-item { display: flex; gap: 6px; align-items: center; }
+  .skor-sayi { font-size: 1rem; font-weight: 700; }
+  .skor-sayi.dogru { color: var(--green); }
+  .skor-sayi.yanlis { color: var(--red); }
+  .skor-sayi.kalan { color: var(--accent); }
+
+  /* TUR SONU */
+  #tur-sonu { display: none; }
+  #tur-sonu.active { display: block; }
+
+  .tur-sonu-baslik { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--accent); margin-bottom: 8px; }
+  .tur-sonu-stats { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; line-height: 1.8; }
+  .tur-sonu-stats span { color: var(--text); }
+
+  .aksiyon-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+  .btn-prim {
+    background: var(--accent); color: #000; border: none;
+    padding: 13px 26px; border-radius: 4px; font-weight: 700;
+    font-size: 0.9rem; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-prim:hover { background: #f0d060; }
+  .btn-sek {
+    background: none; border: 1px solid var(--border); color: var(--text);
+    padding: 13px 20px; border-radius: 4px; font-size: 0.85rem; cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .btn-sek:hover { border-color: var(--text); }
+
+  /* YANLIŞ LİSTESİ */
+  .yanlis-liste { margin-top: 12px; }
+  .yanlis-baslik { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--red); letter-spacing: 2px; margin-bottom: 10px; }
+  .yanlis-kart {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--red); border-radius: 4px;
+    padding: 10px 14px; margin-bottom: 8px; font-size: 0.8rem;
+  }
+  .yanlis-soru { color: var(--muted); margin-bottom: 4px; }
+  .yanlis-cevap { color: var(--green); font-weight: 600; }
+
+  /* SÜRE BİTTİ */
+  .sure-bitti-badge {
+    display: inline-block; background: rgba(232,93,71,0.2);
+    border: 1px solid var(--red); color: var(--red);
+    padding: 4px 12px; border-radius: 20px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    margin-bottom: 16px;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 480px) {
+    .eslestirme-grid { gap: 6px; }
+    .kart { padding: 10px 10px; min-height: 52px; }
+    .kart-metin { font-size: 0.76rem; }
+    .menu-title { font-size: 2rem; }
+  }
+
+  /* MÜZİK ÇALAR */
+  #muzik-calar { position:fixed; bottom:16px; right:16px; z-index:999; background:#1a1a1a; border:1px solid #333; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 20px rgba(0,0,0,0.5); min-width:220px; }
+  .mc-btn { background:none; border:none; cursor:pointer; font-size:1.1rem; padding:0; line-height:1; }
+  .mc-bilgi { flex:1; }
+  .mc-parca { font-size:0.68rem; color:#e8c547; font-family:'IBM Plex Mono',monospace; }
+  .mc-durum { font-size:0.6rem; color:#666; }
+  .mc-ses { width:55px; accent-color:#e8c547; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>⚔ KPSS EŞLEŞTİRME</h1>
+  <span id="progress-text">Bölüm seç</span>
+</div>
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<div id="app">
+
+  <!-- MENÜ -->
+  <div id="menu" class="active">
+    <div class="menu-title">EŞLEŞTİRME OYUNU</div>
+    <div class="menu-sub">Sol: soru · Sağ: cevap · Doğru çifti bul · 6'lı gruplar halinde</div>
+    <div class="bolum-grid" id="bolum-grid"></div>
+  </div>
+
+  <!-- OYUN -->
+  <div id="oyun">
+    <div class="ust-bar">
+      <button class="geri-btn" onclick="anaMenuye()">← Geri</button>
+      <button class="geri-btn" onclick="turBaslat()">↺ Yenile</button>
+      <span class="tur-bilgi" id="tur-bilgi"></span>
+    </div>
+    <div class="oyun-baslik" id="oyun-baslik"></div>
+    <div class="oyun-alt" id="oyun-alt"></div>
+
+    <div class="skor-bar">
+      <div class="skor-item">✓ <span class="skor-sayi dogru" id="s-dogru">0</span></div>
+      <div class="skor-item">✗ <span class="skor-sayi yanlis" id="s-yanlis">0</span></div>
+      <div class="skor-item">Kalan: <span class="skor-sayi kalan" id="s-kalan">0</span></div>
+      <div style="margin-left:auto; font-size:0.72rem; color:var(--muted);" id="s-sure"></div>
+    </div>
+
+    <div class="sure-wrap"><div class="sure-bar" id="sure-bar"></div></div>
+
+    <div class="eslestirme-grid" id="eslestirme-grid"></div>
+  </div>
+
+  <!-- TUR SONU -->
+  <div id="tur-sonu">
+    <div class="ust-bar">
+      <button class="geri-btn" onclick="anaMenuye()">← Geri</button>
+    </div>
+    <div class="tur-sonu-baslik" id="ts-baslik"></div>
+    <div class="sure-bitti-badge" id="ts-sure-badge" style="display:none">⏱ Süre doldu</div>
+    <div class="tur-sonu-stats" id="ts-stats"></div>
+    <div class="aksiyon-btns">
+      <button class="btn-prim" id="ts-btn-devam" onclick="sonrakiTur()">Sonraki Tur →</button>
+      <button class="btn-sek" onclick="bolumBastan()">↺ Baştan</button>
+      <button class="btn-sek" onclick="anaMenuye()">Ana Menü</button>
+    </div>
+    <div class="yanlis-liste" id="yanlis-liste"></div>
+  </div>
+
+</div>
+
+<script>
+const BOLUMLER = [
+  {
+    id: 'ilk-turkler',
+    icon: '🏹',
+    ad: 'İlk Türk Devletleri',
+    aciklama: 'Asya Hun → Göktürk → Uygur · İlkler ve kurucular',
+    mantik: 'Sayısalcı mantığıyla bak: Her devlet bir öncekinin <strong>çöküş nedeninin çözümü</strong> olarak kurulmuştur. Hunlar bozkır → Göktürkler yazıyı buldular (kalıcılık için) → Uygurlar yerleşik hayata geçtiler (süreklilik için). Lineer bir evrim zinciri.',
+    kartlar: [
+      { s: 'İlk Türk topluluğu kimdir?', c: 'İskitler (Sakalar)', a: 'MÖ 7. yy. "Bozkırın Kuyumcuları" lakabıyla bilinir.' },
+      { s: 'İlk Türk devleti hangisidir?', c: 'Asya Hun Devleti', a: 'Kurucusu Teoman, parlak dönemi Mete Han dönemleridir.' },
+      { s: 'İlk Türk siyasi birliğini sağlayan kim?', c: 'Mete Han (Asya Hun)', a: 'Komşu boyları tek çatı altında topladı. İlk düzenli ordu organizasyonu.' },
+      { s: 'İlk Türk hükümdar unvanı nedir?', c: 'Alp Er Tunga', a: 'Asya Hun Devleti\'nin ilk hükümdarı olarak kabul edilir.' },
+      { s: 'İlk Türk kadın hükümdar kim?', c: 'Tomris Hatun', a: 'Asya Hun döneminde hüküm sürdü.' },
+      { s: 'Yazıyı ilk kullanan Türk devleti?', c: 'Göktürkler', a: 'Orhun Abideleri — Türk tarihinin ilk yazılı metinleri. 8. yy.da yazıldı.' },
+      { s: 'Bizans\'a elçi gönderen ilk Türk devleti?', c: 'I. Göktürkler', a: 'Bizans ile diplomatik ilişki kuran ilk Türk devleti.' },
+      { s: 'İstanbul\'u ilk kez kuşatan Türk devleti?', c: 'Avarlar', a: 'Osmanlıdan çok önce, 626\'da Bizans başkentini kuşattılar.' },
+      { s: 'Yerleşik hayata geçen ilk Türk devleti?', c: 'Uygurlar', a: 'Tarım ve ticaret yaptılar. Manihaizm\'i benimsediler. Kâğıt para kullandılar.' },
+      { s: 'İlk Türk kültür merkezi neresi?', c: 'Afanasyevo', a: 'Sibirya\'da, MÖ 3000\'lere tarihlenen en eski Türk kültür alanı.' },
+      { s: 'Müslümanlığı kabul eden ilk Türk boyu?', c: 'Karluklar', a: 'Talas Savaşı (751) sonrasında İslam\'ı benimsediler.' },
+      { s: 'Hristiyanlığı kabul eden ilk Türk devleti?', c: 'Avarlar', a: 'Batıya göç eden Türk kavmi, Hristiyan kültürüyle etkileşime girdi.' },
+      { s: 'Museviliği kabul eden tek Türk devleti?', c: 'Hazarlar', a: 'Tek devlet olma özelliğiyle dikkat çeker.' },
+      { s: 'I. Göktürk devletinin kurucusu?', c: 'Bumin Kağan', a: 'Parlak dönem hükümdarı ise Mukan Kağan\'dır.' },
+      { s: 'II. Göktürk devletinin parlak dönemi?', c: 'Bilge Kağan', a: 'İlteriş Kağan kurdu, Bilge Kağan döneminde zirveye çıktı.' },
+      { s: '"Türk" adının "Güç-Kuvvet" anlamını veren kaynak?', c: 'Uygur Metinleri', a: '"Miğfer" anlamı Çin kaynaklarında, "olgunluk çağı" ise Kaşgarlı Mahmut\'tadır.' },
+    ]
+  },
+  {
+    id: 'destan-yazit',
+    icon: '📜',
+    ad: 'Destan ve Yazıtlar',
+    aciklama: 'Hangi kavim → hangi destan · Orhun Abideleri',
+    mantik: 'Destanlar = o toplumun <strong>hafıza kartıdır</strong>. Her kavim kendi kökenini, kahramanını ve idealini destana yüklemiştir. Göktürkler yazıyı kullandığı için <strong>taşa kazıdı</strong> (Orhun), diğerleri sözlü aktardı.',
+    kartlar: [
+      { s: 'İskitlerin destanları nelerdir?', c: 'Alp Er Tunga ve Şu Destanı', a: 'En eski Türk destanları arasında sayılır.' },
+      { s: 'Asya Hun Devleti\'nin destanı?', c: 'Oğuz Kağan Destanı', a: 'Mete Han\'ı anlattığı düşünülür.' },
+      { s: 'Göktürklerin destanları?', c: 'Ergenekon ve Bozkurt Destanı', a: 'Yazıtlar: Orhun ve Bugut Yazıtları.' },
+      { s: 'Uygurların destanı?', c: 'Türeyiş ve Göç Destanı', a: 'Yazıtlar: Sine Uşi ve Karabalgasun.' },
+      { s: 'Kırgızların destanı?', c: 'Manas Destanı', a: 'Yenisey Kitabeleri de Kırgızlara aittir.' },
+      { s: 'Oğuzların destanı?', c: 'Dede Korkut Hikayeleri', a: 'Türk edebiyatının temel kaynaklarından.' },
+      { s: 'Türk tarihinin ilk yazılı metinleri?', c: 'Orhun Abideleri', a: '8. yy. Göktürk döneminde taşa kazındı. Bilge Kağan ve Kül Tigin adına dikildi.' },
+      { s: 'Türk tarihinin ilk yazılı antlaşması?', c: 'Kuzey Şansi Antlaşması (Asya Hunları)', a: 'Çin ile yapıldı.' },
+    ]
+  },
+  {
+    id: 'islamiyet-oncesi-ilkler',
+    icon: '⚔️',
+    ad: 'İslamiyet Öncesi İlkler',
+    aciklama: 'Devlet ilkleri, kavram ilkleri · Soru tarzı sorular',
+    mantik: '"İlkler" listesi aslında <strong>gelişim sıralamasıdır</strong>. Sırası: Topluluk → Devlet → Birlik → Yönetim araçları (para, yazı, antlaşma). Her "ilk" bir ihtiyacı karşılamak için ortaya çıkmıştır.',
+    kartlar: [
+      { s: 'Parayı kullanan ilk Türk devleti?', c: 'Göktürkler', a: 'Ticaret için para sistemine geçtiler.' },
+      { s: 'Kendi adına para basan ilk Türk hükümdarı?', c: 'Baga Tarkan (Türgişler)', a: 'Bağımsızlığın simgesi: kendi adına para basmak.' },
+      { s: 'Anadolu\'da para basan ilk Türk devleti?', c: 'Danişmentliler', a: 'Anadolu\'da kurulan ilk beyliklerden biri.' },
+      { s: 'Anadolu Selçuklularında kendi adına para basan ilk hükümdar?', c: 'I. Mesut', a: '' },
+      { s: '"İlk bağımsızlık mücadelesi" veren Türk?', c: 'Kürşad', a: 'Göktürk esaretine karşı 639\'da isyan etti.' },
+      { s: 'İlk Türk kadın hükümdar?', c: 'Tomris Hatun', a: 'Pers Kralı Kiros\'u yendi.' },
+      { s: '"Juan Juan Türkleri" olarak bilinen devlet?', c: 'Avarlar', a: 'Batı kaynaklarında bu adla anılır.' },
+      { s: 'İlk Türk topluluğu?', c: 'İskitler', a: 'MÖ 7. yüzyıla tarihlenir.' },
+    ]
+  },
+  {
+    id: 'hukumdar-unvanlari',
+    icon: '👑',
+    ad: 'Hükümdar Unvanları',
+    aciklama: 'Attila → Orhan Bey · Lakaplar ve anlamları',
+    mantik: 'Unvan = o hükümdarın <strong>ne yaptığının özeti</strong>. Selahattin "Kudüs Fatihi" çünkü Haçlılardan Kudüs\'ü aldı. Gazneli Mahmut "Put Kırıcı" çünkü Hindistan\'daki tapınakları yıktı. Unvanı ezberlemek değil, <strong>olayı anlamak</strong> yeterli.',
+    kartlar: [
+      { s: 'Attila\'nın unvanı?', c: 'Cesur Kavimlerin Efendisi / Etzel', a: 'Avrupa Hunlarının lideri. Batı Roma\'yı titretti.' },
+      { s: 'Gazneli Mahmut\'un unvanı?', c: 'Put Kırıcı / Hindistan Fatihi', a: '17 kez Hindistan seferi düzenledi.' },
+      { s: 'Selahattin Eyyubi\'nin unvanı?', c: 'Kudüs Fatihi', a: '1187\'de Haçlılardan Kudüs\'ü geri aldı.' },
+      { s: 'Tuğrul Bey\'in unvanı?', c: 'Doğu\'nun ve Batı\'nın Sultanı', a: 'Büyük Selçuklu\'nun kurucusu.' },
+      { s: 'Alp Arslan\'ın unvanı?', c: 'Ebu\'l Feth / Fetihlerin Babası', a: '1071 Malazgirt — Anadolu\'nun kapıları açıldı.' },
+      { s: 'Orhan Bey\'in unvanı?', c: 'Türkmen Hükümdarlarının En Ulusu', a: 'Osmanlı\'yı devletleştiren padişah.' },
+      { s: 'III. Mehmet\'in unvanı?', c: 'Eğri Fatihi', a: 'Macaristan seferinde Eğri Kalesi\'ni aldı.' },
+      { s: 'Malazgirt Savaşı\'nın diğer adı?', c: 'Yurt Açan Savaşı', a: 'Anadolu Türklere açıldı.' },
+      { s: 'Miryokefalon Savaşı\'nın önemi?', c: 'Yurt Tutan Savaşı', a: 'Bizans\'ın Anadolu\'yu geri alma hayali bitti.' },
+      { s: 'Büyük Taarruz\'un diğer adı?', c: 'Yurt Kurtaran Savaşı', a: 'Türk ordusunun son büyük taarruzu.' },
+    ]
+  },
+  {
+    id: 'turk-islam-devletleri',
+    icon: '🕌',
+    ad: 'Türk-İslam Devletleri',
+    aciklama: 'Kurucular, parlak dönemler · Mısır\'daki devletler',
+    mantik: 'Tablo mantığı: Her sütun birbiriyle bağlı. <strong>Kurucu → kim kurdu</strong>, <strong>Parlak dönem → kim zirveye çıkardı</strong>. Karahanlılar\'da "Bilge Kül Kadir Han" kurdu, "Yusuf Kadir Han" zirvesi — isimlerin içindeki "Bilge" ve "Kadir" pattern\'ı (örüntüsü) var.',
+    kartlar: [
+      { s: 'Asya Hun\'un kurucusu ve parlak dönemi?', c: 'Kurucu: Teoman | Parlak: Mete Han', a: 'Mete Han 209 MÖ\'de tahta çıktı, bozkır imparatorluğu kurdu.' },
+      { s: 'Avrupa Hun\'un kurucusu ve parlak dönemi?', c: 'Kurucu: Balamir | Parlak: Attila', a: 'Attila döneminde Roma\'yı tehdit etti.' },
+      { s: 'I. Göktürk\'ün kurucusu ve parlak dönemi?', c: 'Kurucu: Bumin Kağan | Parlak: Mukan Kağan', a: '' },
+      { s: 'Gaznelilerin kurucusu ve parlak dönemi?', c: 'Kurucu: Alp Tigin-Sebük Tigin | Parlak: Gazneli Mahmut', a: 'Gazneli Mahmut en meşhur hükümdar.' },
+      { s: 'Karahanlıların kurucusu ve parlak dönemi?', c: 'Kurucu: Bilge Kül Kadir Han | Parlak: Yusuf Kadir Han', a: 'İlk Müslüman Türk devleti.' },
+      { s: 'Büyük Selçuklu\'nun kurucusu ve parlak dönemi?', c: 'Kurucu: Tuğrul Bey | Parlak: Melikşah', a: 'Melikşah döneminde en geniş sınırlara ulaşıldı.' },
+      { s: 'Anadolu Selçuklu\'nun kurucusu ve parlak dönemi?', c: 'Kurucu: Süleyman Şah | Parlak: Alaaddin Keykubat', a: '' },
+      { s: 'Mısır\'da kurulan Türk-İslam devletleri (TEMA şifresi)?', c: 'Tolunoğulları, Eyyubiler, Memlükler, Akşitler', a: 'Şifre: TEMA. Mısır\'da sırayla hüküm sürdüler.' },
+    ]
+  },
+  {
+    id: 'turk-islam-edebi',
+    icon: '📚',
+    ad: 'Türk-İslam Edebi Eserleri',
+    aciklama: 'Kutadgu Bilig → Şehname · Yazar ve içerik',
+    mantik: 'Her eserin adı içeriğini anlatır. <strong>Kutadgu Bilig = "Mutluluk Veren Bilgi"</strong> — devlet yönetimi hakkında. <strong>Divan-ı Hikmet</strong> = tasavvuf şiirleri. İsimleri Türkçeye çevir, içeriği kendiliğinden anlaşılır.',
+    kartlar: [
+      { s: 'Kutadgu Bilig\'in yazarı ve konusu?', c: 'Yazar: Yusuf Has Hacip | Konu: Devlet yönetimi, "Mutluluk Veren Bilgi"', a: 'İlk Türk-İslam eseri. Karahanlılar döneminde yazıldı.' },
+      { s: 'Divan-ı Hikmet\'in yazarı ve önemi?', c: 'Ahmet Yesevi — Tasavvuf edebiyatının ilk örneği', a: 'Orta Asya\'daki Türklerin İslamlaşmasında büyük rol oynadı.' },
+      { s: 'Atabetü\'l Hakayık nedir?', c: 'Yazar: Edip Ahmet Yükneki | "Gerçeklerin Eşiği" — ahlaki öğütler', a: '' },
+      { s: 'Divan-ı Lügati\'t Türk kim yazdı, önemi?', c: 'Kaşgarlı Mahmut — İlk Türkçe-Arapça sözlük, ansiklopedik', a: 'Türkçenin Farsçadan üstün olduğunu kanıtlamak için yazıldı.' },
+      { s: 'Muhakemetü\'l Lugateyn kime ait?', c: 'Ali Şir Nevai — Türkçenin Farsçadan üstün olduğunu savunur', a: '' },
+      { s: 'Şehname kime ait, konusu?', c: 'Firdevsi — Türk-İran savaşlarını anlatan destan', a: 'Gazneli Mahmut\'u eleştirmesi ile ünlüdür.' },
+      { s: 'Tarih-i Yemin kime ait?', c: 'Utbi — Gazne hükümdarlarının yaşamını anlatır', a: '' },
+      { s: 'Hicviye türünün özelliği ve örneği?', c: 'Hiciv (yergi) şiiri — Firdevsi bu türde Gazneli Mahmut\'u eleştirdi', a: '' },
+    ]
+  },
+  {
+    id: 'osmanli-kuruluş',
+    icon: '🏰',
+    ad: 'Osmanlı Kuruluş Dönemi',
+    aciklama: '1299–1453 · Padişahlar ve teşkilat · İlkler',
+    mantik: 'Kuruluş dönemi = <strong>aşiretten devlete geçiş süreci</strong>. Her padişah bir öncekinin eksikliğini kapattı: Osman (hukuk yok → ilk kadı atadı), Orhan (ordu yok → Yaya teşkilatı kurdu), I. Murat (merkez yok → Yeniçeri kurdu). Domino taşları gibi.',
+    kartlar: [
+      { s: 'Osmanlı Devleti\'nin ilk veziri?', c: 'Alaaddin Paşa', a: 'Orhan Bey döneminde atandı.' },
+      { s: 'Osmanlı\'nın ilk kadısı?', c: 'Dursun Fakih', a: 'Osman Bey döneminde atandı — hukuk sistemi başladı.' },
+      { s: 'İlk Osmanlı medresesi nerede?', c: 'İznik', a: 'Orhan Bey kurdu.' },
+      { s: 'Osmanlı\'nın ilk sarayı?', c: 'Bey Sarayı (Bursa)', a: 'Orhan Gazi döneminde yapıldı.' },
+      { s: 'Osmanlı\'da sancak sistemini başlatan padişah?', c: 'Orhan Bey', a: 'Şehzadeleri sancağa gönderme sistemi.' },
+      { s: 'Sancak sistemiyle tahta çıkan ilk padişah?', c: 'I. Murat', a: '' },
+      { s: 'Sancak sistemini yasallaştıran padişah?', c: 'II. Mehmet (Fatih)', a: 'Kanunname-i Ali Osman ile resmileştirdi.' },
+      { s: 'Sancağa çıkmadan tahta geçen ilk padişah?', c: 'I. Ahmet', a: 'Bu padişahla birlikte veraset sistemi de değişti.' },
+      { s: 'Yeniçeri Ocağı\'nı kuran padişah?', c: 'I. Murat', a: 'Devşirme sistemiyle oluşturulan profesyonel ordu.' },
+      { s: 'Yeniçerilerin çıkardığı ilk isyan?', c: 'Buçuktepe İsyanı (II. Murat dönemi)', a: 'İlk Yeniçeri isyanı.' },
+      { s: 'Osmanlı ile Bizans arasındaki ilk savaş?', c: 'Koyunhisar', a: 'Osman Bey döneminde.' },
+      { s: 'Fetret Devri\'ne giren Osmanlı padişahı?', c: 'I. Bayezid (Yıldırım)', a: 'Ankara Savaşı\'nda Timur\'a yenildi, 1402.' },
+      { s: 'Osmanlı\'nın ikinci kurucusu?', c: 'Çelebi Mehmed (I. Mehmed)', a: 'Fetret Devri\'ni sona erdirdi.' },
+      { s: 'Osmanlı Devleti merkezleri sırası?', c: 'Karacahisar → Söğüt → İznik → Bilecik → Bursa → Edirne → İstanbul', a: 'Batıya doğru sürekli genişleme.' },
+    ]
+  },
+  {
+    id: 'osmanli-veraset',
+    icon: '⚖️',
+    ad: 'Osmanlı Veraset Sistemi',
+    aciklama: '4 farklı kural, 4 farklı padişah · Neden değişti?',
+    mantik: '<strong>Neden 4 kez değişti?</strong> Her değişim bir sorunun çözümüydü: Hanedanın ortak mülkiyeti → şehzadeler savaşıyor. I. Murat bunu kısmen çözdü. Fatih "tek hükümdar" dedi, ama bu sefer en yaşlı değil en güçlü kazanıyor. I. Ahmet "israf bitsin, öldürme" dedi = Ekber ve Erşed.',
+    kartlar: [
+      { s: 'Osman Bey döneminde veraset anlayışı?', c: 'Ülke hükümdar ve ailesinin ortak malıdır', a: 'Tüm aile üyeleri ülkeye ortak — bu iç savaşa yol açtı.' },
+      { s: 'I. Murat döneminde veraset değişimi?', c: 'Ülke hükümdar ve oğullarının malıdır', a: 'Diğer akrabalar devre dışı bırakıldı.' },
+      { s: 'Fatih döneminde veraset kuralı?', c: 'Ülke padişahın malıdır (kardeş katli kanunu)', a: 'En güçlü şehzade tahta çıkar, diğerleri öldürülebilir.' },
+      { s: 'I. Ahmet döneminde veraset değişimi?', c: 'Ekber ve Erşed (en yaşlı ve en akıllı) sistemi', a: 'Şehzade katline son verildi. Kafes usulü başladı.' },
+      { s: 'II. Mahmut döneminde padişah yetkilerini ilk kez sınırlayan belge?', c: 'Sened-i İttifak (1808)', a: 'Ayanlarla yapılan anlaşma.' },
+      { s: 'Padişah yetkilerini ilk kez kanunla sınırlayan?', c: 'Tanzimat Fermanı (Abdülmecit, 1839)', a: 'Batılı hukuk anlayışı girdi.' },
+      { s: 'Padişah yetkilerini anayasayla sınırlayan?', c: 'Kanun-i Esasi (II. Abdülhamit, 1876)', a: 'İlk Osmanlı anayasası.' },
+    ]
+  },
+  {
+    id: 'osmanli-yükselme',
+    icon: '🌙',
+    ad: 'Osmanlı Yükselme Dönemi',
+    aciklama: 'Fatih (1453) → III. Murad (1595) · Büyük icraatlar',
+    mantik: 'Yükselme döneminde her padişah bir öncekinin bıraktığı ivmeyle ilerledi. Fatih İstanbul\'u aldı → II. Bayezid sakinleşti (iç denge) → Yavuz Mısır ve halifeliği aldı → Kanuni Avrupa\'yı sarstı. <strong>Zincirleme büyüme</strong>.',
+    kartlar: [
+      { s: 'Fatih Sultan Mehmet\'in en önemli icraatları?', c: 'İstanbul\'un Fethi (1453), Kanunname-i Ali Osman, ilk altın para', a: 'Divan-ı Hümayun\'a sadrazamın başkanlık etmesi de Fatih dönemi.' },
+      { s: 'II. Bayezid döneminin özelliği?', c: 'Sakin dönem, iç çekişmeler (Cem Sultan Olayı), ilk Şeyhülislamlık', a: 'Akkoyunlu-Safevi ilişkilerine karşı önlemler aldı.' },
+      { s: 'Yavuz Sultan Selim\'in icraatları?', c: 'Halifeliğin Osmanlı\'ya geçmesi, Safevi savaşı (Çaldıran), Mısır-Suriye fethi', a: 'Mukaddes Emanetler Topkapı Sarayı\'na getirildi.' },
+      { s: 'Kanuni Sultan Süleyman döneminin özellikleri?', c: 'En büyük sınır genişlemesi, Süleymaniye Külliyesi, deniz gücü zirvesi', a: 'Barbaros Hayreddin Paşa döneminde Akdeniz\'de hakimiyet sağlandı.' },
+      { s: 'Preveze Deniz Savaşı (1538) kimin döneminde?', c: 'Kanuni Sultan Süleyman', a: 'Osmanlı Akdeniz\'de üstünlük kurdu.' },
+      { s: 'İlk kapitülasyonlar hangi padişah döneminde?', c: 'Fatih — Venedik\'e', a: 'Sıra: Fatih→Venedik, Kanuni→Fransa, III.Murat→İngiltere, I.Ahmet→Hollanda' },
+      { s: 'Osmanlı\'da Topkapı Sarayı hangi padişah döneminde yapıldı?', c: 'Fatih', a: 'Önceki saray: Orhan Gazi\'nin Bey Sarayı.' },
+      { s: 'Dolmabahçe Sarayı hangi padişah döneminde?', c: 'Abdülmecit', a: 'Batılı mimari tarzda inşa edildi.' },
+    ]
+  },
+  {
+    id: 'osmanli-duraklama',
+    icon: '⏸',
+    ad: 'Duraklama Dönemi Islahatları',
+    aciklama: '17. yüzyıl · TOMAK şifresi · Kişiye bağlı ıslahat',
+    mantik: '<strong>Neden başarısız oldular?</strong> Bir formülle anla: <strong>Sorun = sistematik, Çözüm = kişisel</strong>. Padişah öldü → ıslahat bitti. Batı\'yı örnek almadılar, sadece eski "Kanuni dönemine dönelim" dediler. Yazılım sistemindeki bir bug\'ı (hata) sadece o satırı değil, tüm kodu güncellemeden yamalamaları gibiydi.',
+    kartlar: [
+      { s: 'XVII. yüzyıl duraklama dönemi ıslahatçıları (TOMAK şifresi)?', c: 'Tarhuncu Ahmet, Osman (Genç), Kuyucu Murat, Murat (IV), Ahmet (I), Köprülüler', a: 'Baskı ve şiddete dayalı, kişisel ıslahatlar.' },
+      { s: 'IV. Murat döneminin özellikleri?', c: 'İçki, tütün, kahve yasakları; Yeniçeri disiplini; Koçi Bey Risalesi', a: 'Sert tedbirlerle düzeni sağladı ama kalıcı olmadı.' },
+      { s: 'I. Ahmet döneminde ne yapıldı?', c: 'Ekber ve Erşed sistemi + Kanuni Kadim\'e dönüş çabaları', a: '' },
+      { s: 'Köprülüler Dönemi\'nin önemi?', c: 'İstikrar sağlandı, maliye ve ordu disipline edildi', a: 'IV. Mehmed döneminde sadrazam olarak görev yaptılar.' },
+      { s: 'Duraklama dönemi ıslahatlarının genel özelliği?', c: 'Kişilere bağlı, süreklilik yok, yüzeysel, Avrupa örnek alınmadı, tepkiyle karşılaştı', a: 'Gerileme döneminde Avrupa örnek alınmaya başlandı.' },
+    ]
+  },
+  {
+    id: 'osmanli-gerileme',
+    icon: '📉',
+    ad: 'Gerileme Dönemi Islahatları',
+    aciklama: '18. yüzyıl · Lale Devri → III. Selim',
+    mantik: '<strong>Gerileme dönemi ile duraklama dönemi farkı:</strong> Gerileme\'de Avrupa\'dan uzman getirildi, Batılı yöntemler denendi. Ama her seferinde <strong>ulema ve saray engelledi</strong>. Neden? Kendi iktidarlarını kaybetmekten korktular. Bugünkü analoji: Dijital dönüşüme direnen geleneksel kurumlar.',
+    kartlar: [
+      { s: 'III. Ahmet (Lale Devri) ıslahatları?', c: 'İlk matbaa (İbrahim Müteferrika), Tulumbacı Ocağı, Lale Devri çeşmeleri', a: '1703–1730. Patrona Halil İsyanı ile sona erdi.' },
+      { s: 'I. Mahmut dönemi ıslahatları?', c: 'Humbaracı Ocağı (Bonneval Paşa), Mühendishane-i Bahr-i Hümayun temelleri', a: 'Fransız uzman getirildi — Batılı uzman geleneği başladı.' },
+      { s: 'III. Mustafa dönemi ıslahatları?', c: 'Baron de Tott ile topçu ocağı ıslahı, iç borçlanma (Esham Sistemi)', a: '1757–1774.' },
+      { s: 'III. Selim dönemi ıslahatları?', c: 'Nizam-ı Cedit ordusu, yerli mal kullanımı teşviki, daimi elçilikler', a: 'Kabakçı Mustafa İsyanı ile tahttan indirildi.' },
+      { s: 'II. Mahmut dönemi ıslahatları (SEVDAM şifresi)?', c: 'Sekban-ı Cedit, Eşkinci Ocağı, Vaka-i Hayriye, Dar-ı Şurayı Askeriye, Asakir-i Muhammediye, Mızıka-i Humayun', a: 'Vaka-i Hayriye = Yeniçeri Ocağı\'nın kaldırılması (1826).' },
+      { s: 'Yeniçeri Ocağı\'nı kaldıran padişah?', c: 'II. Mahmut (1826 — Vaka-i Hayriye)', a: 'Yerine Asakiri Mansurei Muhammediye kuruldu.' },
+      { s: 'Gerileme dönemi ıslahatlarının genel özelliği?', c: 'Avrupa örnek alındı, Batılı uzmanlar getirildi, askeri+mali ıslahatlar ağırlıklı', a: 'Ulema ve saray tarafından bazen engellendi.' },
+    ]
+  },
+  {
+    id: 'osmanli-vergiler',
+    icon: '💰',
+    ad: 'Osmanlı\'da Vergi Sistemi',
+    aciklama: '12+ vergi türü · Kim öder, ne için',
+    mantik: '<strong>Sistemin mantığı:</strong> Osmanlı toplumu 2 kategoriye ayrılır: Müslüman ve Gayrimüslim. Gayrimüslimlerden fazladan vergi alınır (askerlik yapmadıkları için). Her verginin adı fonksiyonunu anlatır: Çiftbozan → çiftliği bozan kişi, Derbent → derbend (geçit).',
+    kartlar: [
+      { s: 'Öşür vergisi kime uygulanır?', c: 'Müslümanlardan alınan ürün vergisi (1/10)', a: 'Hasat üzerinden alınan dini vergi.' },
+      { s: 'Haraç vergisi nedir?', c: 'Gayrimüslimlerden alınan ürün/arazi vergisi', a: 'Öşür\'ün Gayrimüslim karşılığı.' },
+      { s: 'Cizye vergisi kime uygulanır?', c: 'Gayrimüslim erkeklerden alınan askerlik muafiyeti vergisi', a: 'Askerlik yapmayan Gayrimüslim erkekler cizye öder.' },
+      { s: 'İspençe vergisi nedir?', c: 'Gayrimüslim çiftçilerden alınan toprak vergisi', a: '' },
+      { s: 'Çiftbozan vergisi nedir?', c: 'Toprağını 3 yıl üst üste ekmeyenlerden alınan vergi', a: 'Tarımı sürekli kılmak amacıyla uygulandı.' },
+      { s: 'Arusane vergisi nedir?', c: 'Evlilik sırasında kız tarafından tımar sahibine ödenir', a: 'Gelin tarafı ödediği geleneksel vergi.' },
+      { s: 'Derbent vergisi nedir?', c: 'Yol, geçit ve köprülerden alınan vergi', a: 'Geçiş güvencesi karşılığı.' },
+      { s: 'Amediye vergisi nedir?', c: 'Gümrük vergisi', a: 'Dış ticaretten alınan vergi.' },
+      { s: 'Agnam vergisi nedir?', c: 'Küçükbaş hayvanlardan alınan vergi', a: '' },
+      { s: 'Mücerred vergisi nedir?', c: 'Evlenme çağına gelmiş bekar çiftçilerden alınan vergi', a: '' },
+    ]
+  },
+  {
+    id: 'osmanli-savalar',
+    icon: '⚔',
+    ad: 'Önemli Osmanlı Savaşları',
+    aciklama: 'Kronolojik savaşlar · Kim kazandı, kim kaybetti',
+    mantik: 'Savaşları ezberlemek değil, <strong>akıbetini hatırlamak</strong> yeterli. Genel kural: Kuruluş-Yükselme döneminde Osmanlı kazanır. Gerileme-Dağılma döneminde Osmanlı kaybeder. İstisnalar: Ankara Savaşı (Timur ile), I. Kosova (kazandı ama padişah şehit), Varna (kazandı).',
+    kartlar: [
+      { s: 'I. Kosova Savaşı (1389) — kim kazandı ve önemi?', c: 'Osmanlı kazandı — I. Murat şehit, Balkanlarda Osmanlı hakimiyeti güçlendi', a: '' },
+      { s: 'Ankara Savaşı (1402) — sonucu?', c: 'Osmanlı yenildi — I. Bayezid esir düştü, Fetret Devri başladı', a: 'Timur ile yapıldı. Haçlılarla değil!' },
+      { s: 'Varna Savaşı (1444) — kim kazandı?', c: 'Osmanlı kazandı (II. Murad)', a: 'Haçlıların son büyük Osmanlı saldırısı.' },
+      { s: 'İstanbul\'u kuşatan ilk Osmanlı padişahı?', c: 'I. Bayezid (Yıldırım) — Anadolu Hisarı yapıldı', a: 'Anadolu Hisarı\'nı İstanbul\'u kuşatmak için yaptırdı.' },
+      { s: 'Turnadağ Savaşı (1514) — önemi?', c: 'I. Selim (Yavuz) ile Safeviler arası — Osmanlı kazandı', a: 'Osmanlı Doğu Anadolu\'da kesin hakimiyet kurdu.' },
+      { s: 'Preveze Deniz Savaşı (1538) — önemi?', c: 'Kanuni dönemi — Osmanlı Akdeniz\'de üstünlük kurdu', a: 'Barbaros Hayreddin Paşa komutasında.' },
+      { s: 'İnebahti (Lepanto) Deniz Savaşı (1571) — sonucu?', c: 'II. Selim — Haçlılara yenildi, Akdeniz üstünlüğü sarsıldı', a: 'Osmanlı\'nın ilk büyük deniz yenilgisi.' },
+      { s: 'Osmanlı-Haçlı savaşları şifresi (SINAV II)?', c: 'Sırp Sındığı, I. Kosova, Niğbolu, Ankara (Timur!), Varna, II. Kosova', a: 'DİKKAT: Ankara Savaşı Haçlılarla değil Timur ile!' },
+    ]
+  },
+  {
+    id: 'kurtuluş-savaşı',
+    icon: '🇹🇷',
+    ad: 'Kurtuluş Savaşı',
+    aciklama: 'Kongreler · Cepheler · Antlaşmalar · Atatürk\'ün rolü',
+    mantik: 'Kurtuluş Savaşı\'nı <strong>4 faz</strong> olarak gör: 1) Örgütlenme (kongreler), 2) Siyasi zemin (antlaşmalar, tanımalar), 3) Askeri zafer (savaşlar), 4) Barış (Lozan). Her faz bir öncekinin olmadan gerçekleşemezdi. Mühendislik projesi gibi sıralı.',
+    kartlar: [
+      { s: 'Atatürk\'ün I. Dünya Savaşı\'nda savaştığı cepheler (ÇAY-KAHVE-SU şifresi)?', c: 'Çanakkale, Kafkasya, Suriye', a: 'Çay→Çanakkale, Kahve→Kafkasya, Su→Suriye.' },
+      { s: 'Atatürk\'ün Kurtuluş Savaşı\'ndaki rütbeleri sırası?', c: '31 Mart: Yüzbaşı → Trablusgarp: Binbaşı → Çanakkale: Albay → Sakarya: Başkomutan → Büyük Taarruz: Başkomutan + Gazi ve Mareşal', a: '' },
+      { s: 'Milli Mücadele\'nin ilk yazılı belgesi?', c: 'Samsun Raporu', a: 'Atatürk\'ün Samsun\'a çıkışından sonra hazırladığı ilk rapor.' },
+      { s: 'Milli Mücadele\'nin ilk genelgesi?', c: 'Havza Genelgesi', a: '28 Mayıs 1919. İşgallere karşı protesto ve miting kararı da Havza.' },
+      { s: 'Kurtuluş savaşının amacı, gerekçesi ve yöntemini belirleyen belge?', c: 'Amasya Genelgesi', a: '"Milletin bağımsızlığını yine milletin azim ve kararı kurtaracaktır."' },
+      { s: 'Milli sınırlardan ilk bahsedilen kongre?', c: 'Erzurum Kongresi', a: 'Aynı zamanda manda ve himayenin gündeme ilk geldiği kongre.' },
+      { s: 'Her açıdan ulusal olan kongre?', c: 'Sivas Kongresi', a: 'Manda ve himayenin kesin reddedildiği kongre.' },
+      { s: 'Atatürk\'ün katılmadığı kongreler?', c: 'Lüleburgaz, Alaşehir, Balıkesir, Nazilli, Edirne', a: 'Batı Anadolu\'daki bu yerel kongreler merkezi örgütlenmeden önce toplandı.' },
+      { s: 'I. İnönü Savaşı\'nın sonuçları (MİLAT şifresi)?', c: 'Moskova Antlaşması, İstiklal Marşı kabulü, Londra Konferansı, Afganistan Antlaşması, Teşkilat-ı Esasiye', a: 'Şifre: MİLAT.' },
+      { s: 'TBMM\'yi tanıyan ilk devlet?', c: 'Ermenistan', a: 'İlk itilaf: Fransa, İlk Müslüman: Afganistan, İlk Avrupalı: Rusya.' },
+      { s: 'Doğu sınırımızı çizen antlaşmalar (Gazi Mustafa Kemal şifresi)?', c: 'Gümrü Antlaşması, Moskova Antlaşması, Kars Antlaşması', a: '' },
+      { s: 'Lozan\'da lehimize çözülen konular (Bİ\'KESYA şifresi)?', c: 'Borçlar, İstanbul\'un boşaltılması, Kapitülasyonlar, Ermeni Yurdu, Savaş Tazminatı, Yabancı Okullar, Azınlıklar', a: 'Şifre: Bİ\'KESYA.' },
+      { s: 'Sakarya Savaşı\'nın diğer adları?', c: 'Subaylar Savaşı, Melhame-i Kübra, Büyük Kıyım', a: '' },
+      { s: 'Büyük Taarruz\'un diğer adları?', c: 'Başkomutanlık Meydan Savaşı, Dumlupınar Meydan Savaşı, Rum Sındığı Savaşı', a: '' },
+    ]
+  },
+  {
+    id: 'saltanat-sonu',
+    icon: '🕯️',
+    ad: 'Osmanlı\'nın Sonu',
+    aciklama: 'Mondros → Mudanya → Lozan · Saltanatın kaldırılması',
+    mantik: '<strong>3 aşama:</strong> Mondros = fiilen bitti, Mudanya = hukuken bitti, Saltanatın Kaldırılması = resmen bitti. Bu sıra önemli — sınav bu farkı sorar.',
+    kartlar: [
+      { s: 'Mondros ile ne oldu?', c: 'Osmanlı fiilen sona erdi', a: '30 Ekim 1918. İtilaf devletleri Anadolu\'yu işgale başladı.' },
+      { s: 'Mudanya ile ne oldu?', c: 'Osmanlı hukuken sona erdi', a: '11 Ekim 1922. Ateşkes antlaşması.' },
+      { s: 'Saltanatın kaldırılmasıyla ne oldu?', c: 'Osmanlı resmen sona erdi', a: '1 Kasım 1922.' },
+      { s: 'I. Balkan Savaşı\'na katılan devletler (BüYüSeK şifresi)?', c: 'Bulgaristan, Yunanistan, Sırbistan, Karadağ', a: '' },
+      { s: 'I. Balkan Savaşı\'nda kaybedilen yerler (BADEM şifresi)?', c: 'Batı Trakya, Arnavutluk, Doğu Trakya, Ege Adaları, Makedonya', a: '' },
+      { s: 'Osmanlı\'dan ayrılan son Balkan devleti?', c: 'Arnavutluk', a: 'Kuzey Afrika\'da kaybedilen ilk toprak: Cezayir, son toprak: Trablusgarp.' },
+      { s: 'I. Dünya Savaşı\'nda İttifak Devletleri (OBAMA şifresi)?', c: 'Osmanlı, Bulgaristan, Almanya, Macaristan, Avusturya', a: 'İtilaf: ARİF = ABD, Rusya, İngiltere, Fransa.' },
+      { s: 'Zararlı cemiyetler (MEHTAP şifresi)?', c: 'Mavri Mira, Etnik-i Eterya, Hınçak, Taşnak, Alyans İsrail, Pontus Rum', a: 'Bunlar Osmanlı\'yı parçalamayı hedefleyen cemiyetler.' },
+      { s: 'Balkan Antantı\'na katılan ülkeler (TaYYaR şifresi)?', c: 'Türkiye, Yugoslavya, Yunanistan, Romanya', a: '' },
+      { s: 'Berlin Antlaşması ile bağımsız olan devletler (SaKaR şifresi)?', c: 'Sırbistan, Karadağ, Romanya', a: '' },
+    ]
+  },
+  {
+    id: 'devrimler-kongreler',
+    icon: '🌍',
+    ad: 'Dünya Tarihi İlkleri',
+    aciklama: 'Dünya devrimleri · I. Dünya Savaşı · Yeni devletler',
+    mantik: 'Devrimler = <strong>mevcut düzenin çökmesi + yeni bir düzenin kurulması</strong>. İsim = renk veya sıfat (Kadife = kansız, Yasemin = barışçıl). Bu pattern ile ülkeyi bul: Şiddetli devrim → Ekim (Rusya). Kansız → Kadife (Çekoslovakya).',
+    kartlar: [
+      { s: 'Turuncu Devrim — hangi ülke?', c: 'Ukrayna', a: '2004. Hileli seçime karşı barışçıl isyan.' },
+      { s: 'Beyaz Devrim — hangi ülke?', c: 'İran', a: 'Şah döneminde Batılılaşma reformları.' },
+      { s: 'Ekim Devrimi — hangi ülke?', c: 'SSCB (Rusya)', a: '1917. Bolşevikler iktidara geldi.' },
+      { s: 'Yasemin Devrimi — hangi ülke?', c: 'Tunus', a: '2010-11. Arap Baharı\'nın başlangıcı.' },
+      { s: 'Gül Devrimi — hangi ülke?', c: 'Gürcistan', a: '2003.' },
+      { s: 'Kadife Devrim — hangi ülke ve özelliği?', c: 'Çekoslovakya — kansız devrim', a: '1989. Komünist yönetim barışçıl şekilde sona erdi.' },
+      { s: 'I. Dünya Savaşı\'nda ABD\'nin rolü?', c: 'Savaşın süresini kısalttı', a: '1917\'de savaşa girdi.' },
+      { s: 'I. Dünya Savaşı\'nda İtalya\'nın rolü?', c: 'Savaşta taraf değiştirdi', a: 'Önce İttifak\'ta, sonra İtilaf\'a geçti.' },
+      { s: 'I. Dünya Savaşı\'nda Japonya\'nın rolü?', c: 'İlk çekilen', a: 'Uzak Doğu cephesini bıraktı.' },
+      { s: 'I. Dünya Savaşı sonunda kurulan yeni devletler (PALYaÇoM şifresi)?', c: 'Polonya, Avusturya, Letonya, Yugoslavya, Çekoslovakya, Macaristan', a: '' },
+      { s: 'BM Daimi Üyeleri (FIRÇA şifresi)?', c: 'Fransa, İngiltere, Rusya, Çin, ABD', a: '' },
+    ]
+  },
+  {
+    id: 'yasalar-isyanlar',
+    icon: '🔥',
+    ad: 'Önemli İsyanlar',
+    aciklama: 'İlk isyanlar · Kronolojik sıra',
+    mantik: 'Her isyanın "ilk" olduğu bir kategori var. Bunu pattern olarak gör: Hangi dönem → hangi tür → hangi isyan. Selçuklu döneminde sosyal-dini isyan. Osmanlı\'da Yeniçeri isyanı. Cumhuriyet döneminde rejim karşıtı isyan. <strong>3 boyut: dönem-tür-isyan</strong>.',
+    kartlar: [
+      { s: 'Anadolu\'daki ilk dini ve sosyal isyan?', c: 'Baba İshak İsyanı (1240) — Anadolu Selçuklu', a: '' },
+      { s: 'Osmanlı\'daki ilk dini ve sosyal isyan?', c: 'Şeyh Bedrettin İsyanı (1416) — I. Çelebi Mehmed dönemi', a: '' },
+      { s: 'İlk Yeniçeri isyanı?', c: 'Buçuktepe İsyanı (1446) — II. Murat - II. Mehmed dönemi', a: '' },
+      { s: 'İlk Şii isyanı?', c: 'Şahkulu İsyanı (1511) — II. Bayezid dönemi', a: 'Safevi etkisiyle başladı.' },
+      { s: 'Rejimi yıkmak için çıkarılan ilk isyan?', c: '31 Mart Vakası (1909) — II. Abdülhamit dönemi', a: '' },
+      { s: 'Cumhuriyet\'e karşı ilk isyan?', c: 'Şeyh Sait İsyanı (1925)', a: '' },
+      { s: 'Cumhuriyet\'e karşı ikinci isyan?', c: 'Menemen İsyanı (1930)', a: 'Kubilay Öğretmen bu isyanda şehit edildi.' },
+      { s: 'Osmanlı\'da isyan eden ilk azınlık?', c: 'Sırplar', a: 'Kuzey Afrika\'da kaybedilen ilk toprak: Cezayir.' },
+    ]
+  },
+  {
+    id: 'sosyal-kurumlar',
+    icon: '🏥',
+    ad: 'Osmanlı Sosyal Kurumları ve İlkler',
+    aciklama: 'Darülaceze → Darülfünun · Atatürk ve kadınlar ilkleri',
+    mantik: '"Darü-" ön eki Arapçada "ev/kurum" demek. <strong>Darülaceze</strong> = acizlerin evi (yoksullar), <strong>Darülbedayi</strong> = güzel sanatlar evi (tiyatro). İsimleri çevir, kurumu hatırla.',
+    kartlar: [
+      { s: 'Darülaceze nedir?', c: 'Yoksullar evi', a: '' },
+      { s: 'Darülbedayi nedir?', c: 'Tiyatro', a: '' },
+      { s: 'Darüleytam nedir?', c: 'Yetimler Yurdu', a: '' },
+      { s: 'Darülelhan nedir?', c: 'Konservatuvar', a: '' },
+      { s: 'Darülfünun nedir?', c: 'İstanbul Üniversitesi', a: 'Bugünkü İstanbul Üniversitesi\'nin temeli.' },
+      { s: 'Hilal-i Ahmer nedir?', c: 'Kızılay', a: '' },
+      { s: 'Hilal-i Ahdar nedir?', c: 'Yeşilay', a: '' },
+      { s: 'Türkiye\'nin ilk kadın bakanı?', c: 'Türkan Akyol', a: 'Sağlık Bakanlığı.' },
+      { s: 'Türkiye\'nin ilk kadın başbakanı?', c: 'Tansu Çiller', a: '' },
+      { s: 'Türkiye\'nin ilk kadın avukatı?', c: 'Süreyya Ağaoğlu', a: '' },
+      { s: 'Türkiye\'nin ilk kadın pilotu?', c: 'Bedriye Tahir Gökmen', a: '' },
+      { s: 'Türkiye\'nin ilk kadın savaş pilotu?', c: 'Sabiha Gökçen', a: 'Atatürk\'ün manevi kızı.' },
+      { s: 'Atatürk\'ün ilk görev yeri?', c: '5. Ordu (Şam)', a: '' },
+      { s: 'Atatürk\'ün ilk siyasi başarısı?', c: '31 Mart Olayı', a: '' },
+      { s: 'Atatürk\'ün ilk askeri başarısı?', c: 'Trablusgarp Savaşı', a: '' },
+    ]
+  },
+  {
+    id: 'atatürk-soyledi',
+    icon: '💬',
+    ad: 'Atatürk Nerede Ne Söyledi?',
+    aciklama: 'Hangi olay → hangi söz',
+    mantik: 'Bu sözleri <strong>bağlamla</strong> öğren: Sakarya Savaşı\'nda cephe hattı yok, her yer cephe → "Hattı müdafaa yoktur, sathı müdafaa vardır." Çanakkale\'de düşman güçlü ama asker ölümden korkmayacak → "Ben size ölmeyi emrediyorum." Söz = o anın zorunluluğu.',
+    kartlar: [
+      { s: 'Çanakkale Savaşı\'nda ne söyledi?', c: '"Ben size taarruzu değil! Ölmeyi emrediyorum!"', a: 'Askerlerini ölümüne savunmaya teşvik etti.' },
+      { s: 'Büyük Taarruz\'da ne söyledi?', c: '"Ordular! İlk hedefiniz Akdeniz\'dir. İleri!"', a: '' },
+      { s: 'Sakarya Savaşı\'nda söylediği strateji?', c: '"Hattı müdafaa yoktur, sathı müdafaa vardır!"', a: 'Her noktayı savunma stratejisi.' },
+      { s: 'Sivas Kongresi\'nde ne söyledi?', c: '"Ya istiklal ya ölüm!"', a: '' },
+      { s: 'Amasya Genelgesi\'nde temel mesaj?', c: '"Vatanın bütünlüğü, milletin bağımsızlığı tehlikededir!"', a: '' },
+      { s: 'Amasya Genelgesi sonrasında ne dedi?', c: '"Artık İstanbul Anadolu\'ya hakim değil, tabi olmak zorundadır!"', a: '' },
+      { s: 'Bursa Olayı\'nda ne söyledi?', c: '"Bu bir din meselesi değil, dil meselesidir."', a: 'Ezanın Türkçe okunması meselesinde.' },
+      { s: 'Hatay Sorunu\'nda ne söyledi?', c: '"Hatay, benim şahsi meselemdir."', a: '' },
+    ]
+  },
+];
+
+
+// ── OYUN STATE ──
+let aktifBolum = null;
+let aktifBolumIdx = -1;
+let tumKartlar = [];      // tüm soru-cevap çiftleri
+let turKartlar = [];      // bu turdaki çiftler (6'lı)
+let turNo = 0;
+let toplamTur = 0;
+let secilenSoru = null;
+let secilenCevap = null;
+let dogruSayisi = 0;
+let yanlisSayisi = 0;
+let eslenenSayisi = 0;
+let yanlislar = [];       // { s, c } yanlış yapılanlar
+let turYanlislar = [];
+let sureInterval = null;
+let sureSaniye = 0;
+let sureToplam = 0;
+let sureBitti = false;
+
+const TUR_BOYUTU = 6; // her turda 6 çift
+const SURE_SANIYE = 60; // 60 saniye
+
+// ── MENÜ ──
+function init() {
+  const grid = document.getElementById('bolum-grid');
+  grid.innerHTML = '';
+  BOLUMLER.forEach((b, i) => {
+    const turSayisi = Math.ceil(b.kartlar.length / TUR_BOYUTU);
+    const btn = document.createElement('button');
+    btn.className = 'bolum-btn';
+    btn.onclick = () => bolumAc(i);
+    btn.innerHTML = `
+      <span class="bolum-icon">${b.icon}</span>
+      <div class="bolum-info">
+        <div class="bolum-name">${b.ad}</div>
+        <div class="bolum-desc">${b.aciklama}</div>
+      </div>
+      <span class="bolum-kart-say">${b.kartlar.length} çift · ${turSayisi} tur</span>
+    `;
+    grid.appendChild(btn);
+  });
+}
+
+function anaMenuye() {
+  temizleSure();
+  document.getElementById('menu').classList.add('active');
+  document.getElementById('oyun').classList.remove('active');
+  document.getElementById('tur-sonu').classList.remove('active');
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-text').textContent = 'Bölüm seç';
+}
+
+// ── BÖLÜM AÇ ──
+function bolumAc(i) {
+  aktifBolumIdx = i;
+  aktifBolum = BOLUMLER[i];
+  tumKartlar = shuffle([...aktifBolum.kartlar]);
+  turNo = 0;
+  toplamTur = Math.ceil(tumKartlar.length / TUR_BOYUTU);
+  dogruSayisi = 0;
+  yanlisSayisi = 0;
+  yanlislar = [];
+
+  document.getElementById('menu').classList.remove('active');
+  document.getElementById('oyun').classList.add('active');
+  document.getElementById('tur-sonu').classList.remove('active');
+  document.getElementById('oyun-baslik').textContent = aktifBolum.ad;
+
+  turBaslat();
+}
+
+function bolumBastan() {
+  bolumAc(aktifBolumIdx);
+}
+
+// ── TUR ──
+function turBaslat() {
+  temizleSure();
+  sureBitti = false;
+  eslenenSayisi = 0;
+  secilenSoru = null;
+  secilenCevap = null;
+  turYanlislar = [];
+
+  // Bu turdaki kartlar
+  const baslangic = turNo * TUR_BOYUTU;
+  turKartlar = tumKartlar.slice(baslangic, baslangic + TUR_BOYUTU);
+
+  document.getElementById('tur-sonu').classList.remove('active');
+  document.getElementById('oyun').classList.add('active');
+  document.getElementById('tur-bilgi').textContent = `Tur ${turNo + 1} / ${toplamTur}`;
+  document.getElementById('oyun-alt').textContent =
+    `${turKartlar.length} çift · Sol: soru, Sağ: cevap · Doğru çifti seç`;
+
+  guncelleSkor();
+  gridCiz();
+  sureyiBaslat();
+  progressGuncelle();
+}
+
+function gridCiz() {
+  const grid = document.getElementById('eslestirme-grid');
+  grid.innerHTML = '';
+
+  // Sorular ve cevapları ayrı ayrı karıştır
+  const sorular = shuffle(turKartlar.map((k, i) => ({ ...k, idx: i, tip: 'soru' })));
+  const cevaplar = shuffle(turKartlar.map((k, i) => ({ ...k, idx: i, tip: 'cevap' })));
+
+  // İki sütun: sol=sorular, sağ=cevaplar, satır satır ekle
+  for (let i = 0; i < turKartlar.length; i++) {
+    const s = sorular[i];
+    const c = cevaplar[i];
+
+    const soruEl = yapKart(s, 'soru');
+    const cevapEl = yapKart(c, 'cevap');
+    grid.appendChild(soruEl);
+    grid.appendChild(cevapEl);
+  }
+}
+
+function yapKart(veri, tip) {
+  const el = document.createElement('div');
+  el.className = `kart ${tip}`;
+  el.dataset.idx = veri.idx;
+  el.dataset.tip = tip;
+  el.innerHTML = `
+    <div class="kart-ic">
+      <div class="kart-tip">${tip === 'soru' ? '▶ SORU' : '◆ CEVAP'}</div>
+      <div class="kart-metin">${tip === 'soru' ? veri.s : veri.c}</div>
+    </div>
+  `;
+  el.addEventListener('click', () => kartTiklandi(el, veri, tip));
+  return el;
+}
+
+// ── MANTIK ──
+function kartTiklandi(el, veri, tip) {
+  if (el.classList.contains('eslesti') || el.classList.contains('yanlis')) return;
+  if (sureBitti) return;
+
+  if (tip === 'soru') {
+    // Önceki seçimi kaldır
+    if (secilenSoru) secilenSoru.el.classList.remove('secili');
+    secilenSoru = { el, veri };
+    el.classList.add('secili');
+  } else {
+    if (secilenCevap) secilenCevap.el.classList.remove('secili');
+    secilenCevap = { el, veri };
+    el.classList.add('secili');
+  }
+
+  // Her iki taraf seçildiyse kontrol et
+  if (secilenSoru && secilenCevap) {
+    setTimeout(kontrol, 100);
+  }
+}
+
+function kontrol() {
+  const sIdx = secilenSoru.veri.idx;
+  const cIdx = secilenCevap.veri.idx;
+
+  if (sIdx === cIdx) {
+    // DOĞRU
+    secilenSoru.el.classList.remove('secili');
+    secilenCevap.el.classList.remove('secili');
+    secilenSoru.el.classList.add('eslesti');
+    secilenCevap.el.classList.add('eslesti');
+    dogruSayisi++;
+    eslenenSayisi++;
+  } else {
+    // YANLIŞ
+    secilenSoru.el.classList.remove('secili');
+    secilenCevap.el.classList.remove('secili');
+    secilenSoru.el.classList.add('yanlis');
+    secilenCevap.el.classList.add('yanlis');
+    yanlisSayisi++;
+
+    // Yanlışları kaydet (tekrar göstermek için)
+    const soruKarti = turKartlar[sIdx];
+    const cevapKarti = turKartlar[cIdx];
+    if (!turYanlislar.find(y => y.s === soruKarti.s)) {
+      turYanlislar.push(soruKarti);
+    }
+    if (!yanlislar.find(y => y.s === soruKarti.s)) {
+      yanlislar.push(soruKarti);
+    }
+
+    // 700ms sonra yanliş rengi kaldır
+    const sEl = secilenSoru.el;
+    const cEl = secilenCevap.el;
+    setTimeout(() => {
+      sEl.classList.remove('yanlis');
+      cEl.classList.remove('yanlis');
+    }, 700);
+  }
+
+  secilenSoru = null;
+  secilenCevap = null;
+  guncelleSkor();
+
+  // Tur bitti mi?
+  if (eslenenSayisi === turKartlar.length) {
+    temizleSure();
+    setTimeout(turSonu, 300);
+  }
+}
+
+// ── SÜRE ──
+function sureyiBaslat() {
+  sureToplam = SURE_SANIYE;
+  sureSaniye = SURE_SANIYE;
+  guncelleSureBar();
+  sureInterval = setInterval(() => {
+    sureSaniye--;
+    guncelleSureBar();
+    if (sureSaniye <= 0) {
+      temizleSure();
+      sureBitti = true;
+      turSonu(true);
+    }
+  }, 1000);
+}
+
+function guncelleSureBar() {
+  const bar = document.getElementById('sure-bar');
+  const pct = (sureSaniye / sureToplam) * 100;
+  bar.style.width = pct + '%';
+  if (pct < 30) bar.style.background = 'var(--red)';
+  else if (pct < 60) bar.style.background = 'var(--accent)';
+  else bar.style.background = 'var(--green)';
+  document.getElementById('s-sure').textContent = `${sureSaniye}s`;
+}
+
+function temizleSure() {
+  if (sureInterval) { clearInterval(sureInterval); sureInterval = null; }
+}
+
+// ── TUR SONU ──
+function turSonu(sureDoldu) {
+  document.getElementById('oyun').classList.remove('active');
+  document.getElementById('tur-sonu').classList.add('active');
+
+  const sonTurMu = turNo + 1 >= toplamTur;
+  const badge = document.getElementById('ts-sure-badge');
+  badge.style.display = sureDoldu ? 'inline-block' : 'none';
+
+  if (sonTurMu && !sureDoldu) {
+    document.getElementById('ts-baslik').textContent = 'BÖLÜM TAMAM! 🏆';
+    document.getElementById('ts-btn-devam').style.display = 'none';
+  } else if (sureDoldu) {
+    document.getElementById('ts-baslik').textContent = 'SÜRE DOLDU!';
+    document.getElementById('ts-btn-devam').style.display = '';
+    document.getElementById('ts-btn-devam').textContent = 'Turu Tekrar →';
+  } else {
+    document.getElementById('ts-baslik').textContent = `TUR ${turNo + 1} TAMAM!`;
+    document.getElementById('ts-btn-devam').style.display = '';
+    document.getElementById('ts-btn-devam').textContent = `Tur ${turNo + 2} →`;
+  }
+
+  const turDogru = eslenenSayisi;
+  const turYanlis = yanlisSayisi - (yanlislar.length - turYanlislar.length);
+
+  document.getElementById('ts-stats').innerHTML = `
+    Bu turda: <span>${turDogru} doğru</span> · <span style="color:var(--red)">${turYanlislar.length} hatalı çift</span><br>
+    Toplam: <span>${dogruSayisi} doğru</span> · <span style="color:var(--red)">${yanlisSayisi} yanlış</span><br>
+    Tur: <span>${turNo + 1} / ${toplamTur}</span>
+  `;
+
+  // Yanlış yapılanları listele
+  const yl = document.getElementById('yanlis-liste');
+  if (turYanlislar.length > 0) {
+    yl.innerHTML = `<div class="yanlis-baslik">✗ BU TURDA HATA YAPTIĞIN ÇİFTLER</div>`;
+    turYanlislar.forEach(y => {
+      yl.innerHTML += `
+        <div class="yanlis-kart">
+          <div class="yanlis-soru">${y.s}</div>
+          <div class="yanlis-cevap">→ ${y.c}</div>
+        </div>
+      `;
+    });
+  } else {
+    yl.innerHTML = '<div style="color:var(--green); font-size:0.85rem;">✓ Bu turda sıfır hata!</div>';
+  }
+
+  progressGuncelle();
+}
+
+function sonrakiTur() {
+  if (sureBitti) {
+    // Aynı turu tekrar yap
+    turBaslat();
+    return;
+  }
+  turNo++;
+  if (turNo >= toplamTur) {
+    turNo = 0;
+    tumKartlar = shuffle([...aktifBolum.kartlar]);
+  }
+  turBaslat();
+}
+
+// ── YARDIMCI ──
+function guncelleSkor() {
+  document.getElementById('s-dogru').textContent = dogruSayisi;
+  document.getElementById('s-yanlis').textContent = yanlisSayisi;
+  document.getElementById('s-kalan').textContent = turKartlar.length - eslenenSayisi;
+}
+
+function progressGuncelle() {
+  if (!aktifBolum) return;
+  const pct = ((turNo) / toplamTur) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent =
+    `${aktifBolum.ad} · Tur ${turNo + 1}/${toplamTur}`;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+init();
+</script>
+<!-- MÜZİK ÇALAR -->
+<div id="muzik-calar">
+  <button class="mc-btn" onclick="oncekiParca()">⏮️</button>
+  <button class="mc-btn" id="mc-pp" onclick="muzikToggle()">▶️</button>
+  <button class="mc-btn" onclick="sonrakiParca()">⏭️</button>
+  <div class="mc-bilgi">
+    <div class="mc-parca" id="mc-parca">Yükleniyor...</div>
+    <div class="mc-durum" id="mc-durum">Sessiz — sesi aç →</div>
+  </div>
+  <input class="mc-ses" type="range" min="0" max="1" step="0.05" value="0" id="mc-ses" oninput="sesAyarla(this.value)">
+  <span style="font-size:0.9rem;cursor:pointer;" onclick="var s=document.getElementById('mc-ses');s.value=s.value==0?0.5:0;sesAyarla(s.value);">🔊</span>
+</div>
+<audio id="muzik-player" preload="none"></audio>
+<script>
+// ── MÜZİK — GitHub API otomatik ──
+let PARCALAR = [];
+let mevcutParca = 0;
+let muzikBasladi = false;
+const player = document.getElementById('muzik-player');
+player.volume = 0;
+player.addEventListener('ended', () => { mevcutParca = (mevcutParca + 1) % PARCALAR.length; parcaYukle(true); });
+async function muzikListesiYukle() {
+  try {
+    const res = await fetch('https://api.github.com/repos/aksuirem0-max/kpss-calisma/contents/');
+    const dosyalar = await res.json();
+    PARCALAR = dosyalar.filter(d => d.type === 'file' && /\.(mp3|mpeg|ogg|wav|m4a)$/i.test(d.name)).map(d => ({ url: 'https://raw.githubusercontent.com/aksuirem0-max/kpss-calisma/main/' + d.name, ad: d.name.replace(/\.[^.]+$/, '') }));
+    if (PARCALAR.length > 0) { document.getElementById('mc-parca').textContent = PARCALAR[0].ad + ' · 1 / ' + PARCALAR.length; document.getElementById('mc-durum').textContent = PARCALAR.length + ' parça — sesi aç →'; parcaYukle(false); }
+    else { document.getElementById('mc-durum').textContent = 'Müzik bulunamadı'; }
+  } catch(e) { document.getElementById('mc-durum').textContent = 'Bağlantı hatası'; }
+}
+function parcaYukle(oyna) {
+  if (PARCALAR.length === 0) return;
+  player.src = PARCALAR[mevcutParca].url;
+  document.getElementById('mc-parca').textContent = PARCALAR[mevcutParca].ad + ' · ' + (mevcutParca + 1) + ' / ' + PARCALAR.length;
+  if (oyna) { player.play().catch(()=>{}); document.getElementById('mc-pp').textContent = '⏸️'; document.getElementById('mc-durum').textContent = 'Çalıyor'; }
+}
+function muzikToggle() {
+  if (!muzikBasladi) { muzikBasladi = true; parcaYukle(true); return; }
+  if (player.paused) { player.play().catch(()=>{}); document.getElementById('mc-pp').textContent = '⏸️'; document.getElementById('mc-durum').textContent = player.volume === 0 ? 'Sessiz — sesi aç →' : 'Çalıyor'; }
+  else { player.pause(); document.getElementById('mc-pp').textContent = '▶️'; document.getElementById('mc-durum').textContent = 'Duraklatıldı'; }
+}
+function sesAyarla(val) {
+  player.volume = parseFloat(val);
+  if (!muzikBasladi && parseFloat(val) > 0) { muzikBasladi = true; parcaYukle(true); }
+  document.getElementById('mc-durum').textContent = parseFloat(val) === 0 ? 'Sessiz — sesi aç →' : 'Çalıyor';
+}
+function oncekiParca() { if (PARCALAR.length === 0) return; mevcutParca = (mevcutParca - 1 + PARCALAR.length) % PARCALAR.length; muzikBasladi = true; parcaYukle(true); }
+function sonrakiParca() { if (PARCALAR.length === 0) return; mevcutParca = (mevcutParca + 1) % PARCALAR.length; muzikBasladi = true; parcaYukle(true); }
+window.addEventListener('load', () => { muzikListesiYukle(); });
+</script>
+</body>
+</html>
