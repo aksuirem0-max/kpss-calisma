@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Çalışma Merkezi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;600&display=swap');
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#0d0d0d; color:#f0ede8; font-family:'IBM Plex Sans',sans-serif; min-height:100vh; padding:24px 16px 60px; }
+
+  .baslik { font-family:'Bebas Neue',sans-serif; font-size:2.6rem; letter-spacing:4px; color:#e8c547; margin-bottom:4px; }
+  .alt { color:#555; font-size:0.78rem; margin-bottom:32px; }
+
+  .bolum-baslik {
+    font-family:'Bebas Neue',sans-serif; font-size:0.85rem;
+    letter-spacing:3px; color:#e8c547;
+    margin:24px 0 10px; padding-left:4px;
+  }
+
+  .grid { display:grid; gap:10px; }
+
+  a.kart {
+    display:flex; align-items:center; gap:14px;
+    background:#161616; border:1px solid #222;
+    border-left:4px solid #e8c547;
+    padding:16px 16px; border-radius:6px;
+    text-decoration:none; color:#f0ede8;
+    transition:all 0.18s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  a.kart:active { background:#1e1e1e; transform:translateX(4px); }
+  a.kart.yesil { border-left-color:#4caf78; }
+  a.kart.kirmizi { border-left-color:#e85d47; }
+  a.kart.mavi { border-left-color:#47c5e8; }
+  a.kart.mor { border-left-color:#c547e8; }
+  a.kart.turuncu { border-left-color:#e8a047; }
+  a.kart.pembe { border-left-color:#e847a0; }
+
+  .kart-icon { font-size:1.6rem; flex-shrink:0; }
+  .kart-bilgi { flex:1; }
+  .kart-ad { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:1px; }
+  .kart-acik { font-size:0.72rem; color:#666; margin-top:2px; }
+  .kart-ok { font-size:1rem; color:#333; }
+
+  .versiyon { text-align:center; margin-top:40px; font-size:0.65rem; color:#333; font-family:monospace; }
+</style>
+</head>
+<body>
+
+<div class="baslik">KPSS MERKEZİ</div>
+<div class="alt">Tüm materyaller · Tıkla aç · Müzik her sayfada</div>
+
+<div class="bolum-baslik">⚔ TARİH — ÖĞRENME</div>
+<div class="grid">
+  <a class="kart" href="kpss_tarih_ogretici.html" target="_blank">
+    <span class="kart-icon">🃏</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">Tarih Öğretici Kartlar</div>
+      <div class="kart-acik">19 bölüm · Mantık + flashcard · Kaldığı yerden devam</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+  <a class="kart mavi" href="kpss_tarih_foyu-1.html" target="_blank">
+    <span class="kart-icon">📄</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">Tarih Föyü</div>
+      <div class="kart-acik">Özet notlar · Hızlı tekrar</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+</div>
+
+<div class="bolum-baslik">🎮 TARİH — OYUNLAR</div>
+<div class="grid">
+  <a class="kart yesil" href="kpss_tarih_eslestirme.html" target="_blank">
+    <span class="kart-icon">🔗</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">Eşleştirme Oyunu</div>
+      <div class="kart-acik">Soru-cevap eşleştir · 60 saniye · Tur sistemi</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+  <a class="kart kirmizi" href="kpss_tarih_balon.html" target="_blank">
+    <span class="kart-icon">🎈</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">Balon Oyunu</div>
+      <div class="kart-acik">Doğru balona vur · 3 can · Tip bazlı şıklar</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+  <a class="kart mor" href="kpss_tarih_sifre_testi.html" target="_blank">
+    <span class="kart-icon">🔐</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">Şifreli Ezber Testi</div>
+      <div class="kart-acik">ARİF · OBAMA · KABSAR · 21 şifre · Müzikli</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+</div>
+
+<div class="bolum-baslik">📝 TEST & ÇALIŞMA</div>
+<div class="grid">
+  <a class="kart turuncu" href="kpss_tarih_calisma-1.html" target="_blank">
+    <span class="kart-icon">✏️</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">Tarih Çalışma Testi</div>
+      <div class="kart-acik">İnteraktif test · Anlık geri bildirim</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+  <a class="kart pembe" href="kpss_test_v3.html" target="_blank">
+    <span class="kart-icon">✅</span>
+    <div class="kart-bilgi">
+      <div class="kart-ad">KPSS Test v3</div>
+      <div class="kart-acik">Genel test · Çoktan seçmeli</div>
+    </div>
+    <span class="kart-ok">›</span>
+  </a>
+</div>
+
+<div class="versiyon">aksuirem0-max · github.io/kpss-calisma</div>
+
+</body>
+</html>
