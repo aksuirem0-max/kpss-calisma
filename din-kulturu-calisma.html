@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Din Kültürü - Yazılıya Hazırlık</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f1b2d;color:#e8edf3;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.container{max-width:600px;margin:0 auto;padding:16px}
+.accent{color:#2ecc71}
+.dim{color:#8899aa}
+.card{background:#162640;border-radius:12px;border:1px solid #253b56;margin-bottom:10px;overflow:hidden}
+.btn{border:none;border-radius:8px;padding:12px 20px;cursor:pointer;font-size:15px;font-weight:600;transition:all .15s;display:inline-block;text-align:center}
+.btn-accent{background:#2ecc71;color:#000}
+.btn-border{background:#253b56;color:#e8edf3}
+.btn-ghost{background:transparent;color:#2ecc71;padding:8px 0;font-size:13px}
+.btn-gradient{background:linear-gradient(135deg,#2ecc71,#1a8c4e);color:#000;font-size:16px;padding:14px 20px}
+.btn:active{transform:scale(0.97)}
+.flex{display:flex;gap:10px}
+.flex-1{flex:1}
+.w-full{width:100%}
+.text-center{text-align:center}
+.mb-4{margin-bottom:4px}
+.mb-8{margin-bottom:8px}
+.mb-16{margin-bottom:16px}
+.mb-20{margin-bottom:20px}
+.mb-32{margin-bottom:32px}
+.section-btn{width:100%;text-align:left;background:transparent;border:none;color:#e8edf3;padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.section-btn:hover{background:rgba(46,204,113,0.05)}
+.section-heading{font-size:14px;font-weight:700;color:#2ecc71}
+.section-arrow{font-size:18px;color:#8899aa;transition:transform .2s}
+.section-arrow.open{transform:rotate(180deg)}
+.section-body{padding:0 18px 14px}
+.point{font-size:14px;line-height:1.65;padding:6px 0 6px 14px;border-left:2px solid #253b56;margin-bottom:6px}
+.option-btn{display:block;width:100%;text-align:left;border:2px solid #253b56;border-radius:10px;padding:12px 14px;margin-bottom:10px;color:#e8edf3;font-size:14px;cursor:pointer;font-weight:500;transition:all .15s;background:#0f1b2d}
+.option-btn:hover:not(.confirmed){background:rgba(46,204,113,0.05)}
+.option-btn.selected{background:rgba(46,204,113,0.1);border-color:#2ecc71}
+.option-btn.correct{background:rgba(46,204,113,0.15);border-color:#2ecc71;color:#2ecc71;font-weight:700}
+.option-btn.wrong{background:rgba(231,76,60,0.15);border-color:#e74c3c;color:#e74c3c}
+.option-btn.confirmed{cursor:default}
+.progress-bar{height:4px;background:#253b56;border-radius:2px;margin-bottom:20px}
+.progress-fill{height:100%;background:#2ecc71;border-radius:2px;transition:width .3s}
+.wrong-card{background:#162640;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #253b56;font-size:14px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+const UNITS={4:{title:"İslam'da Ahlak İlkeleri",sections:[{heading:"4.1 İslam'da Ahlakın Mahiyeti",points:["Ahlak; insanın iyi veya kötü olarak vasıflandırılmasına yol açan manevi nitelikleri, huyları ve bunların etkisiyle irade göstererek ortaya koyduğu davranışların bütünüdür.","Ahlak doğuştan gelen bir özellik olsa da dinî inançlar, toplum, aile, örfler, âdetler, gelenek ve görenekler, hukuk, sosyal ve ekonomik şartlar insanın ahlaki yapısını belirler.","Akıl, irade ve vicdan, kişinin ahlakına kaynaklık eden unsurlardır.","Toplumlarca benimsenen ahlak kuralları sosyal düzenin sağlanması açısından önemlidir.","İslam ahlakının temelinde insanın Allah'a (cc), kendisine, topluma, diğer canlılara, maddi ve manevi değerlere karşı sorumluluklarına uygun davranışlar sergilemesi vardır.","İnsanın kendisiyle, çevresiyle ve Rabbiyle doğru ilişkiler kurması için İslam'da ahlak çok önemli bir unsurdur."]},{heading:"4.1 İslam'da Ahlakın Kaynağı",points:["Kur'an-ı Kerim ve sünnet, Allah'ın (cc) razı olduğu ahlaki tutum, davranışları ve değerleri belirleyip açıklayan temel kaynaklardır.","İslam'da ahlakın kaynağı Yüce Allah'tır.","Yüce Allah insana akıl, irade, hürriyet vermiş ve onu ahlaki bir fıtrat üzere yaratmıştır.","Akıl iyiyi kötüden ayırt etmeye, irade ise iyiliği tercih etmeye yönelir.","Vicdan kötüden sakınmayı ve öz denetimi sağlar.","Nefis ise bencillik, kibir, heva ve hevese uyma gibi özellikleriyle kişiyi kötülüğe meyillendirebilir.","İnsan hem iyiliği hem de kötülüğü tercih edebilen bir varlıktır. Bu, dünya hayatındaki imtihanın bir gereğidir."]},{heading:"4.1 İslam Ahlakının Amacı",points:["İnsanları güzel ahlaki vasıflarla donatmak ve onları manevi bakımdan olgunlaştırmaktır.","Ahlaklı bireylerden oluşan erdemli bir toplum meydana getirmektir.","Güzel ahlakın topluma yayılması, erdemli davranışların sosyal, siyasi ve ekonomik hayata hâkim olması toplumu güçlü, mutlu ve huzurlu kılar."]},{heading:"4.1 İslam Ahlakında Örneklik",points:["İslam ahlakının en güzel ve ideal örneği Hz. Muhammed'dir (sav). O, üstün ahlakı yaşayarak bizlere göstermiştir.","Hz. Peygamber'in (sav) sünnetine tabi olmak, onun ahlaki vasıflarıyla vasıflanmak Müslümanlar için son derece önemlidir.","Ahlak, terbiye edilebilen ve neticesinde güzelleşebilen bir özelliktir."]},{heading:"4.2 Ahlakın Temel Unsurları",points:["İslam ahlakının temelini oluşturan dört ana unsur vardır. Bu ilkeler diğer erdemlere ölçü ve düzen verir."]},{heading:"4.2 — ADALET",points:["Doğruluk, denge, gerçeğe uygun hükmetmek, dürüstlük, tarafsızlık, her şeyi yerli yerine koymaktır.","Toplumsal düzenin, haklara riayetin ve hukuka uygun yaşamın temelidir.","Aşırılıklardan uzak, dengeli ve ölçülü bir kişilik yapısıdır.","İTİDAL: Duygu, düşünce ve davranışlarda dengeli, ölçülü ve tutarlı olmaktır. Öfke, arzu ve akıl gibi kuvvetlerin dengelemesiyle adalet erdemi elde edilir.","Adalet iç dünyada itidal sağlar."]},{heading:"4.2 — ŞECAAT (Cesaret)",points:["Cesaret, yiğitlik, kahramanlıktır.","Korkaklık ve saldırganlık arasındaki orta yolu ifade eder.","İyiliği yaymak, kötülüğe engel olmak ve adaleti sağlamak için gereklidir.","Aşırı uçları korkaklık ve saldırganlıktır. İslam ölçülü cesareti ve haddi aşmayan bir mücadele anlayışını esas alır.","Şecaat, adaleti sağlamak ve kötülüğe engel olmak için cesaret gösterilmesidir."]},{heading:"4.2 — İFFET",points:["Yeme, içme, cinsellik gibi bedeni ve maddi ihtiyaçlarda ölçülü olmak.","Aşırıya kaçmamak, namus, şeref ve haysiyeti korumaktır.","Kişi, çeşitli arzularını dinin ve aklın rehberliğinde kontrol altına alır.","İffet, insanın maddi ve manevi arzu ve dürtülerini dengeli ve meşru şekilde karşılamasıdır.","İffet, bedeni ihtiyaçların ölçülü ve meşru şekilde karşılanmasıdır."]},{heading:"4.2 — HİKMET (Bilgelik)",points:["Bilgelik demektir. Aklın iman nuruyla aydınlanmasıdır.","Varlıkların, olay ve olguların hakikatini idrak etmektir.","İnsanı cahilce davranışlardan, bağnazlıktan ve aşırılıklardan korur.","Akli olgunluk, düşüncelerde denge ve tutarlılık sağlar; kişinin kulluğunu güzelleştirir.","Hikmet, aklın gücü ve dürtüleri kontrol ederek nefsine hâkim olmasını sağlar."]},{heading:"4.2 — Unsurlar Arası Akış Zinciri",points:["Adalet iç dünyada itidal sağlar →","Şecaat, adaleti sağlamak ve kötülüğe engel olmak için cesaret gösterilmesidir →","İffet, bedeni ihtiyaçların ölçülü ve meşru şekilde karşılanmasıdır →","Hikmet, aklın gücü ve dürtüleri kontrol ederek nefsine hâkim olmasını sağlar."]},{heading:"4.3 Ahlaki Tutum ve Davranışlar — DÜRÜSTLÜK",points:["İnsanın özünde, sözünde ve davranışlarında dosdoğru olmasıdır.","Yalan söylememek, aldatmamak, verilen sözde durmak, anlaşmalara uymak, güvenilir olmak ve emanetleri korumak gibi nitelikleri içerir.","İnsanın Rabbine, kendisine, ailesine ve topluma karşı dürüst olması hayatını huzurlu kılar."]},{heading:"4.3 — AHİLİK",points:["Dürüstlük, iyilik ve cömertlik üzerine kurulu bir esnaf teşkilatıdır.","Kuralları fütüvvetnamelerde yer alır.","Vefa, doğruluk, emniyet, cömertlik, tevazu önemlidir.","Yalan, hile, gıybet, içki, zina gibi davranışları yasaklar."]},{heading:"4.3 — YARDIM SEVERLİK",points:["Başkalarına yardım etme isteği ve eylemidir. İslam'da infak, zekât, sadaka, hibe, karzıhasen, hayır ve hasenatla teşvik edilir.","Yardım; gösterişten uzak, karşılıksız ve sadece Allah'ın (cc) rızasını kazanma amacıyla yapılır.","Vakıflar, İslam'daki infak emrinin bir sonucu olarak ortaya çıkmış ve toplumsal yardımlaşmayı güçlendirmiştir."]},{heading:"4.3 — SABIR",points:["Zor ve hoş olmayan durumlar karşısında dayanma gücüdür.","Sabır, insana direnç kazandırır, ümitsizliğe düşmekten korur.","Müslüman, dünya hayatının bir imtihan alanı olduğunu bilir ve bu bilinçle sabırla hareket eder."]},{heading:"4.3 — ÂDÂB-I MUAŞERET (Görgü Kuralları)",points:["Toplumda benimsenen nezaket, terbiye, ahlak ve görgü kurallarıdır.","Toplumsal düzen, huzur ve mutluluk için gereklidir."]},{heading:"4.4 Kur'an'dan Mesajlar — İsra Suresi 23-29",points:["Rabbin sadece kendisine kulluk etmenizi ve anne babanıza iyi davranmanızı emretti.","Onlardan biri veya ikisi senin yanında yaşlanırsa onlara 'öf' bile deme, onlara güzel söz söyle.","Onlara merhamet ve alçak gönüllülükle kol kanat ger. 'Rabbim! Onları beni küçüklükte şefkatle yetiştirdikleri gibi onlara merhamet göster' diyerek dua et.","Kalplerinizdekin en iyi bilen Rabbinizdir. Eğer iyi olursanız bilesiniz ki Allah kendisine yönelenleri bağışlayıcıdır.","Akrabaya, yoksula ve yolcuya hakkını ver. Gereksiz yere de saçıp savurma!","Çünkü savurganlar şeytanların dostlarıdır. Şeytan da Rabbine karşı çok nankördür.","Eğer sen kendin dahi Rabbinden umduğun bir lütfu beklemek durumunda (ihtiyaç içinde) olduğun için onlara ilgi gösteremiyorsan, hiç değilse kendilerine rahatlık veren bir söz söyle!","Eli sıkı olma, ölçüsüzce eli açık da olma; sonra kınanacak, kendine hayıflanacak duruma düşersin!","Anne babaya iyi davranmak ve onlara merhamet göstermek büyük bir sorumluluktur.","Akrabayı, yoksulu ve yolcuyu gözetmek; haklarını vermek bir erdemdir.","Cimrilik ve israf yasaktır. Orta yol; dengeli ve ölçülü olmayı gerektirir."]}],quiz:[{q:"İslam ahlakının iki temel kaynağı nedir?",a:"Kur'an-ı Kerim ve Sünnet",options:["Kur'an-ı Kerim ve Sünnet","Akıl ve Vicdan","Fıkıh ve Kelam","Hadis ve İcma"]},{q:"Ahlakın temel unsurları hangileridir?",a:"Adalet, Şecaat, İffet, Hikmet",options:["Adalet, Şecaat, İffet, Hikmet","Sabır, Şükür, Tevekkül, Dua","İman, İbadet, Ahlak, Muamelat","Doğruluk, Cesaret, Merhamet, Bilgi"]},{q:"Şecaat (cesaret) neyin orta yoludur?",a:"Korkaklık ve saldırganlık",options:["Cimrilik ve israf","Korkaklık ve saldırganlık","Kibir ve zillet","Öfke ve kayıtsızlık"]},{q:"İffet kavramı neyi ifade eder?",a:"Bedeni ve maddi ihtiyaçlarda ölçülü olmak",options:["Bedeni ve maddi ihtiyaçlarda ölçülü olmak","Cesaretle kötülüğe engel olmak","Hakikati idrak etmek","Toplumsal düzeni korumak"]},{q:"Hikmet ne demektir?",a:"Aklın iman nuruyla aydınlanması, bilgelik",options:["Kötülükten sakınmak","Aklın iman nuruyla aydınlanması, bilgelik","Cesaretle mücadele etmek","Sabrı elden bırakmamak"]},{q:"İtidal kavramı hangi unsurla ilişkilidir?",a:"Adalet",options:["Şecaat","İffet","Adalet","Hikmet"]},{q:"İsra Suresi 23-29'a göre savurganlar kimin dostlarıdır?",a:"Şeytanın",options:["Nefsin","Şeytanın","Dünyanın","Cahillerin"]},{q:"Ahlaka kaynaklık eden üç unsur nedir?",a:"Akıl, irade ve vicdan",options:["İman, ibadet ve ahlak","Akıl, irade ve vicdan","Kur'an, sünnet ve icma","Sabır, şükür ve dua"]},{q:"Nefis insanı ne yönde etkiler?",a:"Bencillik, kibir, heva ve hevese yöneltir",options:["İyiliğe teşvik eder","Bencillik, kibir, heva ve hevese yöneltir","Vicdanı güçlendirir","Aklı aydınlatır"]},{q:"İslam ahlakının en güzel ve ideal örneği kimdir?",a:"Hz. Muhammed (sav)",options:["Hz. İbrahim (as)","Hz. Muhammed (sav)","Hz. Musa (as)","Hz. İsa (as)"]},{q:"Yardımseverlik hangi amaçla yapılmalıdır?",a:"Sadece Allah'ın (cc) rızasını kazanmak için",options:["Toplumsal statü kazanmak için","İnsanların beğenisini almak için","Sadece Allah'ın (cc) rızasını kazanmak için","Karşılık bekleyerek"]},{q:"Vakıflar İslam'daki hangi emrin sonucu olarak ortaya çıkmıştır?",a:"İnfak emri",options:["Zekât emri","İnfak emri","Hac emri","Oruç emri"]},{q:"İnsanın hem iyiliği hem kötülüğü tercih edebilmesi neyin gereğidir?",a:"Dünya hayatındaki imtihanın gereğidir",options:["Aklın gereğidir","Dünya hayatındaki imtihanın gereğidir","Nefsin gereğidir","Vicdanın gereğidir"]},{q:"Ahilik nedir?",a:"Dürüstlük, iyilik ve cömertlik üzerine kurulu bir esnaf teşkilatı",options:["Bir tarikat","Dürüstlük, iyilik ve cömertlik üzerine kurulu bir esnaf teşkilatı","Bir ahlak felsefesi","Bir savaş düzeni"]},{q:"Ahiliğin kuralları nerede yer alır?",a:"Fütüvvetnamelerde",options:["Kur'an-ı Kerim'de","Fütüvvetnamelerde","Mesnevi'de","Hadis kitaplarında"]},{q:"Ahilikte yasaklanan davranışlar hangileridir?",a:"Yalan, hile, gıybet, içki, zina",options:["Yalan, hile, gıybet, içki, zina","Ticaret, seyahat, savaş","Müzik, dans, eğlence","Yalnızca yalan ve hile"]},{q:"Ahlak terbiye edilebilir mi?",a:"Evet, terbiye edilebilen ve neticesinde güzelleşebilen bir özelliktir",options:["Hayır, doğuştan sabittir","Evet, terbiye edilebilen ve neticesinde güzelleşebilen bir özelliktir","Sadece çocuklukta değişir","Sadece ibadet ile değişir"]},{q:"Akıl ve irade ahlaki açıdan ne işlev görür?",a:"Akıl iyiyi kötüden ayırır, irade iyiliği tercih etmeye yönelir",options:["İkisi de kötülüğe yöneltir","Akıl iyiyi kötüden ayırır, irade iyiliği tercih etmeye yönelir","Akıl düşünür, irade durdurur","İkisi de vicdanı destekler"]},{q:"İslam ahlakının amacının toplumsal boyutu nedir?",a:"Ahlaklı bireylerden oluşan erdemli bir toplum meydana getirmek",options:["Zengin bir toplum oluşturmak","Ahlaklı bireylerden oluşan erdemli bir toplum meydana getirmek","Güçlü bir ordu kurmak","Bilimde ilerleme sağlamak"]},{q:"Unsurlar arası akış zincirinde sıralama nasıldır?",a:"Adalet → Şecaat → İffet → Hikmet",options:["Hikmet → İffet → Şecaat → Adalet","Şecaat → Adalet → Hikmet → İffet","Adalet → Şecaat → İffet → Hikmet","İffet → Hikmet → Adalet → Şecaat"]},{q:"İsra Suresi'ne göre anne babaya nasıl davranılmalıdır?",a:"Öf bile denmemeli, güzel söz söylenmeli, merhamet gösterilmeli",options:["Sadece maddi destek verilmeli","Öf bile denmemeli, güzel söz söylenmeli, merhamet gösterilmeli","Uzaktan dua edilmeli","Sadece yaşlandıklarında bakılmalı"]},{q:"Müslüman sabırla neden hareket eder?",a:"Dünya hayatının bir imtihan alanı olduğunu bildiği için",options:["Başka çaresi olmadığı için","Dünya hayatının bir imtihan alanı olduğunu bildiği için","Toplum baskısı nedeniyle","Ödül beklediği için"]}]},5:{title:"Kur'an'a Göre Hz. Muhammed",sections:[{heading:"5.1 Hz. Muhammed'in Yaşadığı Çevre",points:["Arap Yarımadasının en önemli şehri Hz. Peygamber'in dünyaya geldiği Mekke'dir.","Kâbe'nin bu şehirde bulunması, hac ve umre ibadetinin burada yapılması, coğrafi konumu ve ticari bir merkez oluşu gibi özellikleri dolayısıyla Mekke diğer şehirlerden ayrı bir öneme sahipti.","Mekke ve çevresinde bedevilik ve hadarilik olmak üzere iki farklı yaşam tarzı vardı. Bedeviler; göçebe olarak yaşar, daha çok hayvancılık ve ticaretle uğraşırdı. Hadariler; yerleşik olarak yaşar, ticaret ve tarımla uğraşırdı.","Araplarda kabile üyeleri arasındaki bağlar çok güçlüydü, genellikle birlikte hareket eder, kabileden birine yapılan kötülük tüm üyelere yapılmış sayılırdı. Bu bağa asabiyet denirdi.","Arap toplumunda insanlar hür, köle ve mevali olmak üzere üç sınıfa ayrılırdı. Hürler; temel haklara sahip kimselerdi. Köleler ticari bir eşya gibi alınıp satılırdı. Azat edilen veya bir kabilenin himayesine giren kölelere mevali adı verilirdi.","Toplumda belli bir statüye sahip olmayan kadınlara değer verilmez, kız çocuğuna sahip olmaktan ise utanç duyulurdu.","Mekke'de Hz. İbrahim'in tebliğ ettiği tevhid inancını benimseyen az sayıda hanif de vardı.","Batıl inanç, tutum ve davranışların hâkim olduğu İslam öncesi dönem Cahiliye Dönemi olarak isimlendirilir. Bu dönemde cahiliye denmesinin bazı sebepleri: Allah'a (cc) şirk koşulması, putlara tapılması, kız çocuklarının diri diri gömülmesi, çapulculuk ve yağmacılığın geçim tarzı hâline getirilmesidir."]},{heading:"5.1 Hz. Muhammed'in Beşerî Yönü",points:["Peygamberler her beşer gibi doğmuş, belli bir süre yaşamış ve ardından bu dünyadan göçmüşlerdir. Hz. Muhammed (sav) de doğmuş, büyümüş ve vefat etmiştir.","Öksüz ve yetim kalmıştır.","Geçimini sağlamak için çalışmıştır.","Evlenmiş, çocukları olmuştur.","Zaman zaman hastalanmıştır.","Bu dünyanın çeşitli zorluklarıyla karşılaşmıştır.","Yaşadığı olaylar karşısında duyduğu sevinç ve üzüntü onun da herkes gibi insani duygulara sahip olduğunu göstermektedir.","Allah, insanlar örnek alabilsinler diye peygamberleri insanlar arasından seçmiştir."]},{heading:"5.1 Hz. Muhammed'in Peygamberlik Yönü",points:["Hz. Muhammed (sav) için Allah (cc), Kur'an-ı Kerim'de hatemu'l-enbiya (peygamberlerin sonuncusu) ifadesini kullanır.","Hz. Peygamber için yine aynı anlama gelen hatemülenbiya sıfatı da kullanılır. Bu peygamberliğin kendisi ile son bulduğu ve bir daha peygamber gelmeyeceğini ifade eder.","Hz. Âdem ile başlayan tevhid inancı, İslam'la kıyamete kadar devam edecek olan son hâlini almıştır.","Yüce Allah'ın gönderdiği vahyi, emir ve yasakları insanlara duyurma; söz, tutum ve davranışlarıyla açıklama makamı olan peygamberlik vazifesine nübüvvet denir."]},{heading:"5.1 Peygamberlik Görevleri",points:["1. TEBLİĞ: Hz. Muhammed'in (sav), Allah'tan (cc) gelen ilahi hükümleri hiçbir değişiklik yapmadan, eksilmeden ve herhangi bir ilavede bulunmadan insanlara bildirmesidir.","2. TEBYİN: Bir şeyin açıklığa kavuşturulması, anlatılması, delil getirilerek ispatlanmasıdır. İslam dininin birinci kaynağı olan Kur'an-ı Kerim'in açıklanması anlamına gelen tebyin, Hz. Muhammed'in (sav) vahiyle ilgili peygamberlik görevlerindendir.","3. TEŞRİ: Kanun koymak, hüküm koymak anlamına gelir. İslam'a göre Hz. Peygamber'in (sav), Müslümanların uyması gereken hususlarda ilgili dini hüküm koyma yetkisi vardır. Helal-haram, sevap-günah vb.","4. TEMSİL: Hz. Muhammed (sav), İslam'ı anlama ve yaşama konusunda insanlar için en güzel örnek olmasıdır. Hz. Muhammed (sav), vahyin ilk muhatabı olarak İslam'ı en iyi şekilde anlamış ve yaşamıştır."]},{heading:"5.2 Hz. Muhammed'in Örnekliği",points:["İnsanlara belli inanç ve değerlerin benimsetilmesinde soyut anlatımdan çok somut örneklerin etkili olduğu bilinmektedir. Bu sebeple ilahi kitaplardaki emir ve yasakların nasıl uygulanacağını göstermek için bir rehbere ihtiyaç vardır.","Peygamberler kendilerine vahiy yoluyla bildirilen inanç, ibadet, ahlak ve sosyal hayatla ilgili ilkeleri insanlara tebliğ ederler. Ayrıca bu ilkelerin anlaşılması ve uygulanması hususunda da insanlara örnek olurlar.","Hz. Muhammed'in (sav) güzel örnekliği Kur'an-ı Kerim'de üsveihesane olarak ifade edilir.","Üsveihesane: İnanç, ibadet, ticaret, eğitim, öğretim ve ahlak başta olmak üzere hayatın her alanında Müslümanların kendilerine örnek almaları gereken en güzel örnektir.","Hz. Peygamber, bireysel ve toplumsal hayatlarında nasıl davranmaları gerektiği konusunda söz ve filleriyle Müslümanlara rehberlik etmiştir.","Sünnet: Hz. Peygamber'in söz, fiil ve onaylarını içeren örnek davranışlarıdır.","Hadis: Söz ve haber anlamına gelir. Hz. Peygamber'in (sav) söylediği sözlerdir.","Kur'an-ı Kerim'de açıklanması gereken yerleri açıklama (tebyin), Kur'an-ı Kerim'de hükmü olmayan konularda hüküm koyma (teşri), bireysel ve toplumsal hayatın tüm alanlarında kişileri ahlaken geliştirme (temsil) amacıyla Hz. Muhammed'in (sav) söylediği sözlerdir.","Hz. Peygamber (sav): 'Size iki şey bıraktım, onlara tutunduğunuz sürece sapmazsınız: Allah'ın kitabı ve peygamberinin sünneti.'"]},{heading:"5.2 Hz. Muhammed'in (SAV) Ahlaki Özellikleri",points:["Çocukluğundan itibaren dürüstlük ve güvenilirlik özellikleriyle tanınmıştır. Mekke'liler Hz. Muhammed'e Muhammedü'l-Emin ismini vermişlerdir.","Affedici ve merhametli olma gibi özelliklerle tanınmış örnek bir şahsiyettir.","Kendisine iman edip etmediğine bakmaksızın herkese adil davranmıştır.","Çevresindeki insanlara merhamet ve şefkat göstermiş, onları sevmiş ve onların sıkıntılarına ortak olmuştur.","Dini, ırk, sosyal statü veya maddi durumu ne olursa olsun her bireye Allah'ın (cc) yarattığı bir kul olduğu için değer vermiştir.","Yaratılış özelliklerinden dolayı insanları hakir görmemiş, hakir görmenin müminlere yakışmadığını Hz. Peygamber tarafından dile getirilmiştir."]},{heading:"Hz. Muhammed ve Gençler",points:["Hz. Peygamber, gençlere değer vermiş ve güvenmiştir. Hz. Peygamber en güzel örnektir.","Gençlerle iletişiminin temelinde güven, sevgi, saygı, dostluk, dayanışma, merhamet ve samimiyet yerleştirmiştir.","Onların duygularını dikkate alarak son derece makul ve dengeli davranmıştır.","Onun ince ruhlu ve anlayışlı olduğunu gören gençler, ona olan muhabbetleri daha da artardı.","Gençlerin eğitimine özel bir önem vermiş ve mescidinin yanında bulunan Suffe isimli bölümde, Ebu Hureyre (ra) gibi birçok genç sahabiye dini öğretmiştir.","Hz. Peygamber gençlere çeşitli sorumluluklar vermiştir."]},{heading:"5.3 Kültürümüzde Hz. Muhammed ve Ehlibeyt Sevgisi",points:["Peygamber sevgisi imanın gereğidir. Hz. Peygamber'in ismi anıldığında ona salavat getirmek, peygamber sevgisine ve ona duyulan saygının tezahürüdür.","Kültürümüzde peygamber sevgisi edebiyat ve sanatta önemli bir yer tutar: Naat, mevlit, siyer, kırk hadis, hilye gibi eserlerle bu sevgi işlenir.","Toplumumuzda, Hz. Peygamber'in emaneti olarak kabul edilen Ehlibeyte büyük bir teveccüh gösterilir.","Ehlibeyt: Hz. Muhammed'in (sav) eşini, çocuklarını, torunlarını ve yakın akrabalarını kapsar.","Hz. Ali, Hz. Fatma, Hz. Hasan, Hz. Hüseyin ön plana çıkan isimlerdir."]},{heading:"5.4 Ahzab Suresi 45-46 ve Nahl Suresi 43-44 Ayetleri",points:["Ahzab 33/45-46: Hz. Peygamber 'tank (müjdeci), beşir (uyarıcı), nezir (Allah'a çağırıcı) ve etrafını aydınlatan bir ışık' olarak nitelendirilir.","Hz. Peygamber iman edenleri ebedi mutlulukla (cennetle) müjdelemiş, inkâr ve isyan edenleri ise ilahi azapla (cehennemle) uyarmıştır.","Ayete göre Hz. Peygamber'in görevleri arasında vahyi insanlara tebliğ etmek ve açıklamak yer alır.","İnsanların düşünmeleri ve doğru yolu bulmaları için bu açıklamalar gereklidir.","Nahl 16/43-44: Bu ayette, Hz. Muhammed'den (sav) önce de başka peygamberler gönderildiği ve bu peygamberlerin de insanlar arasından seçildiği beyan edilir.","Ayetle Mekke müşrikleri vahiy ve peygamber konularında bilgi sahibi kimselere yönlendirilir.","Bu ayeti bilimin bilgiye verdiği değer, doğru bilginin ve öğrenmenin önemi kapsamında da yorumlayabiliriz."]}],quiz:[{q:"Hatemu'l-enbiya ne demektir?",a:"Peygamberlerin sonuncusu",options:["İlk peygamber","Peygamberlerin sonuncusu","En büyük peygamber","Peygamberlerin önderi"]},{q:"Hz. Muhammed'in (sav) peygamberlik görevlerinden TEBYİN ne anlama gelir?",a:"Açıklama, anlatma ve delil getirerek ispatlama",options:["İlahi hükümleri bildirme","Açıklama, anlatma ve delil getirerek ispatlama","Kanun ve hüküm koyma","Güzel örnek olma"]},{q:"TEŞRİ kavramı neyi ifade eder?",a:"Hüküm koyma yetkisi",options:["Vahyi tebliğ etme","Kur'an'ı açıklama","Hüküm koyma yetkisi","Örnek olma"]},{q:"Üsveihesane ne demektir?",a:"En güzel örnek",options:["Son peygamber","En güzel örnek","Güvenilir kişi","Allah'ın elçisi"]},{q:"Hz. Muhammed'e (sav) verilen 'Muhammedü'l-Emin' lakabı ne anlama gelir?",a:"Güvenilir Muhammed",options:["Merhametli Muhammed","Güvenilir Muhammed","Adil Muhammed","Sabırlı Muhammed"]},{q:"Sünnet neyi ifade eder?",a:"Hz. Peygamber'in söz, fiil ve onayları",options:["Yalnızca Hz. Peygamber'in sözleri","Hz. Peygamber'in söz, fiil ve onayları","Kur'an ayetleri","Sahabenin uygulamaları"]},{q:"Suffe nedir?",a:"Hz. Peygamber'in mescidinin yanındaki eğitim meclisi",options:["Bir savaş alanı","Hz. Peygamber'in mescidinin yanındaki eğitim meclisi","Mekke'deki bir pazar yeri","Bir antlaşma adı"]},{q:"Ehlibeyt kimleri kapsar?",a:"Hz. Muhammed'in eşi, çocukları, torunları ve yakın akrabaları",options:["Tüm Müslümanlar","Sahabeler","Hz. Muhammed'in eşi, çocukları, torunları ve yakın akrabaları","Dört halife"]},{q:"Naat ne tür bir eserdir?",a:"Hz. Peygamber'i öven şiir",options:["Hz. Peygamber'in hayatını anlatan eser","Hz. Peygamber'i öven şiir","Kırk hadis derlemesi","Hz. Peygamber'in fiziksel özelliklerini anlatan eser"]},{q:"Hilye ne tür bir eserdir?",a:"Hz. Peygamber'in fiziksel ve ahlaki özelliklerini anlatan eser",options:["Hz. Peygamber'i öven şiir","Hz. Peygamber'in hayatını anlatan eser","Hz. Peygamber'in fiziksel ve ahlaki özelliklerini anlatan eser","Kırk hadis derlemesi"]},{q:"Ahzab Suresi 45-46'da Hz. Peygamber nasıl nitelendirilir?",a:"Müjdeci, uyarıcı, Allah'a çağırıcı ve aydınlatan bir ışık",options:["Müjdeci, uyarıcı, Allah'a çağırıcı ve aydınlatan bir ışık","Hâkim, lider ve komutan","Öğretmen, rehber ve danışman","Şahit, hafız ve müfessir"]},{q:"Cahiliye Dönemi'nde 'asabiyet' ne demektir?",a:"Kabile bağı / kabile taassubu",options:["Din düşmanlığı","Kabile bağı / kabile taassubu","Puta tapıcılık","Ticari rekabet"]},{q:"Nahl Suresi 43-44'e göre peygamberler nereden seçilmiştir?",a:"İnsanlar arasından",options:["Melekler arasından","İnsanlar arasından","Kureyş kabilesinden","Arap toplumundan"]},{q:"Hanif ne demektir?",a:"Hz. İbrahim'in tebliğ ettiği tevhid inancını benimseyen kişi",options:["Putlara tapan kişi","Hz. İbrahim'in tebliğ ettiği tevhid inancını benimseyen kişi","Mekke'nin ileri gelenlerinden","Kâhin veya falcı"]},{q:"Cahiliye Dönemi'nin özelliklerinden hangisi DEĞİLDİR?",a:"Tevhid inancının yaygın olması",options:["Allah'a şirk koşulması","Kız çocuklarının diri diri gömülmesi","Tevhid inancının yaygın olması","Putlara tapılması"]},{q:"Arap toplumunda 'mevali' kimlerdir?",a:"Azat edilen veya bir kabilenin himayesine giren köleler",options:["Kabile reisleri","Azat edilen veya bir kabilenin himayesine giren köleler","Tüccarlar","Din adamları"]},{q:"Bedeviler ve hadariler arasındaki temel fark nedir?",a:"Bedeviler göçebe, hadariler yerleşik yaşar",options:["Bedeviler zengin, hadariler fakirdir","Bedeviler göçebe, hadariler yerleşik yaşar","Bedeviler Müslüman, hadariler değildir","Aralarında fark yoktur"]},{q:"Nübüvvet ne demektir?",a:"Peygamberlik vazifesi",options:["Vahiy alma","Peygamberlik vazifesi","Kur'an okuma","İbadet etme"]},{q:"Hz. Âdem ile başlayan tevhid inancı ne zaman son hâlini almıştır?",a:"İslam ile",options:["Hristiyanlık ile","Yahudilik ile","İslam ile","Hz. İbrahim ile"]},{q:"Hz. Peygamber insanlara değer verirken neye bakmamıştır?",a:"Dini, ırk, sosyal statü veya maddi durumuna",options:["Yaşına","Dini, ırk, sosyal statü veya maddi durumuna","Mesleğine","Yaşadığı şehre"]},{q:"TEMSİL görevi ne anlama gelir?",a:"İslam'ı anlama ve yaşama konusunda en güzel örnek olma",options:["Vahyi iletme","İslam'ı anlama ve yaşama konusunda en güzel örnek olma","Hüküm koyma","Kur'an'ı açıklama"]},{q:"Hz. Peygamber'in gençlere verdiği önem nasıl gösterilmiştir?",a:"Suffe'de eğitim vermiş, sorumluluk vermiş, duygularını dikkate almıştır",options:["Sadece vaaz vermiştir","Suffe'de eğitim vermiş, sorumluluk vermiş, duygularını dikkate almıştır","Onları savaşa göndermiştir","Yalnızca dua etmiştir"]},{q:"Mekke'nin öneminin sebepleri nelerdir?",a:"Kâbe'nin bulunması, hac ve umre ibadeti, ticari merkez oluşu",options:["Sadece Hz. Peygamber'in doğduğu yer olması","Kâbe'nin bulunması, hac ve umre ibadeti, ticari merkez oluşu","En büyük şehir olması","Deniz kenarında olması"]}]}};
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+let state={unit:null,mode:null,quiz:null,expanded:{}};
+const app=document.getElementById('app');
+
+function render(){
+  if(!state.unit) return renderHome();
+  if(state.mode==='summary') return renderSummary();
+  if(state.mode==='quiz') return renderQuiz();
+}
+
+function renderHome(){
+  let h='<div class="text-center">';
+  h+='<div style="font-size:14px;letter-spacing:2px;font-weight:700" class="accent mb-8">DİN KÜLTÜRÜ</div>';
+  h+='<h1 style="font-size:26px;font-weight:800" class="mb-4">Yazılıya Hazırlık</h1>';
+  h+='<p class="dim mb-32" style="font-size:14px">Ünite seç, özet oku veya test çöz</p>';
+  [4,5].forEach(u=>{
+    const d=UNITS[u];
+    h+=`<div class="card" style="padding:20px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700" class="accent mb-4">ÜNİTE ${u}</div>
+      <div style="font-size:18px;font-weight:700" class="mb-4">${d.title}</div>
+      <div class="dim" style="font-size:12px;margin-bottom:14px">${d.sections.length} bölüm · ${d.quiz.length} test sorusu</div>
+      <div class="flex">
+        <button class="btn btn-border flex-1" onclick="goSummary(${u})">📖 Özet</button>
+        <button class="btn btn-accent flex-1" onclick="startQuiz(${u})">✍️ Test</button>
+      </div>
+    </div>`;
+  });
+  const total=UNITS[4].quiz.length+UNITS[5].quiz.length;
+  h+=`<button class="btn btn-gradient w-full" onclick="startMixed()">🎯 Karışık Test — ${total} soru</button>`;
+  h+='</div>';
+  app.innerHTML=h;
+}
+
+function goSummary(u){state.unit=u;state.mode='summary';state.expanded={};render();}
+function goHome(){state={unit:null,mode:null,quiz:null,expanded:{}};render();}
+
+function renderSummary(){
+  const d=UNITS[state.unit];
+  let h=`<button class="btn btn-ghost" onclick="goHome()">← Ana Sayfa</button>`;
+  h+=`<div style="font-size:13px;letter-spacing:1px;font-weight:700" class="accent">ÜNİTE ${state.unit} — ÖZET</div>`;
+  h+=`<h2 style="font-size:22px;font-weight:800;margin:4px 0 20px">${d.title}</h2>`;
+  d.sections.forEach((sec,si)=>{
+    const isOpen=state.expanded[si]!==false;
+    h+=`<div class="card">
+      <button class="section-btn" onclick="toggleSec(${si})">
+        <span class="section-heading">${sec.heading}</span>
+        <span class="section-arrow ${isOpen?'open':''}">▾</span>
+      </button>
+      <div class="section-body" style="display:${isOpen?'block':'none'}">
+        ${sec.points.map(p=>`<div class="point">${p}</div>`).join('')}
+      </div>
+    </div>`;
+  });
+  h+=`<button class="btn btn-accent w-full" style="margin-top:8px;padding:14px;font-size:16px" onclick="startQuiz(${state.unit})">✍️ Şimdi Test Çöz (${d.quiz.length} soru)</button>`;
+  app.innerHTML=h;
+}
+
+function toggleSec(i){
+  state.expanded[i]=state.expanded[i]===false?true:( state.expanded[i]===undefined?false:!state.expanded[i]);
+  render();
+}
+
+function startQuiz(u){
+  const qs=shuffle(UNITS[u].quiz).map(q=>({...q,options:shuffle(q.options),selected:null,confirmed:false}));
+  state={unit:u,mode:'quiz',quiz:{questions:qs,current:0,score:0,done:false},expanded:{}};
+  render();
+}
+
+function startMixed(){
+  const allQs=shuffle([...UNITS[4].quiz,...UNITS[5].quiz]).map(q=>({...q,options:shuffle(q.options),selected:null,confirmed:false}));
+  state={unit:'all',mode:'quiz',quiz:{questions:allQs,current:0,score:0,done:false},expanded:{}};
+  render();
+}
+
+function renderQuiz(){
+  const qz=state.quiz;
+  if(qz.done) return renderResult();
+  const cur=qz.questions[qz.current];
+  const total=qz.questions.length;
+  const pct=((qz.current)/total*100).toFixed(1);
+
+  let h=`<div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+    <button class="btn btn-ghost" style="padding:0;font-size:13px" onclick="goHome()">✕ Çık</button>
+    <span class="dim" style="font-size:13px">${qz.current+1} / ${total}</span>
+    <span class="accent" style="font-size:13px;font-weight:700">Doğru: ${qz.score}</span>
+  </div>`;
+  h+=`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+  h+=`<div class="card" style="padding:20px">
+    <div style="font-size:16px;font-weight:700;line-height:1.5;margin-bottom:20px">${cur.q}</div>`;
+  cur.options.forEach((opt,i)=>{
+    let cls='option-btn';
+    if(cur.confirmed){
+      cls+=' confirmed';
+      if(opt===cur.a) cls+=' correct';
+      else if(i===cur.selected) cls+=' wrong';
+    } else if(i===cur.selected) cls+=' selected';
+    h+=`<button class="${cls}" onclick="selectOpt(${i})">${opt}</button>`;
+  });
+  if(!cur.confirmed && cur.selected!==null){
+    h+=`<button class="btn btn-accent w-full" style="margin-top:6px;padding:14px" onclick="confirmAns()">Cevabı Kontrol Et</button>`;
+  }
+  if(cur.confirmed){
+    const label=qz.current+1>=total?'Sonuçları Gör':'Sonraki Soru →';
+    h+=`<button class="btn btn-accent w-full" style="margin-top:6px;padding:14px" onclick="nextQ()">${label}</button>`;
+  }
+  h+=`</div>`;
+  app.innerHTML=h;
+}
+
+function selectOpt(i){
+  if(state.quiz.questions[state.quiz.current].confirmed) return;
+  state.quiz.questions[state.quiz.current].selected=i;
+  render();
+}
+
+function confirmAns(){
+  const cur=state.quiz.questions[state.quiz.current];
+  cur.confirmed=true;
+  if(cur.options[cur.selected]===cur.a) state.quiz.score++;
+  render();
+}
+
+function nextQ(){
+  if(state.quiz.current+1>=state.quiz.questions.length){state.quiz.done=true;}
+  else{state.quiz.current++;}
+  render();
+}
+
+function renderResult(){
+  const qz=state.quiz;
+  const total=qz.questions.length;
+  const pct=Math.round((qz.score/total)*100);
+  const emoji=pct>=80?'🎉':pct>=60?'👍':'📚';
+  const msg=pct>=80?'Harika! Çok iyi biliyorsun!':pct>=60?'Fena değil, biraz daha tekrar yap.':'Özeti tekrar okuyup dene.';
+  const wrongs=qz.questions.filter(q=>q.options[q.selected]!==q.a);
+
+  let h=`<div class="text-center">
+    <div style="font-size:48px" class="mb-8">${emoji}</div>
+    <h2 style="font-size:24px" class="mb-8">Sonuç: ${qz.score}/${total}</h2>
+    <div style="font-size:36px;font-weight:800;color:${pct>=60?'#2ecc71':'#e74c3c'}" class="mb-8">%${pct}</div>
+    <p class="dim" style="margin-bottom:24px">${msg}</p>`;
+  if(wrongs.length>0){
+    h+=`<div style="text-align:left;margin-bottom:20px">
+      <div style="font-size:14px;font-weight:700;color:#e74c3c;margin-bottom:10px">Yanlış Cevapların:</div>`;
+    wrongs.forEach(wq=>{
+      h+=`<div class="wrong-card">
+        <div style="font-weight:600;margin-bottom:6px">${wq.q}</div>
+        <div style="color:#e74c3c">Senin: ${wq.options[wq.selected]}</div>
+        <div style="color:#2ecc71">Doğru: ${wq.a}</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+  h+=`<div class="flex">
+    <button class="btn btn-border flex-1" onclick="goHome()">Ana Sayfa</button>
+    <button class="btn btn-accent flex-1" onclick="${state.unit==='all'?'startMixed()':'startQuiz('+state.unit+')'}">Tekrar Çöz</button>
+  </div></div>`;
+  app.innerHTML=h;
+}
+
+render();
+</script>
+</body>
+</html>
