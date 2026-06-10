@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biyoloji 9. Sınıf | 2. Dönem 2. Yazılı</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Fira+Mono&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3e;
+    --accent1: #4ade80;
+    --accent2: #38bdf8;
+    --accent3: #f472b6;
+    --accent4: #fb923c;
+    --accent5: #a78bfa;
+    --accent6: #facc15;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --correct: #4ade80;
+    --wrong: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 2px solid var(--accent1);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--accent1);
+  }
+
+  header p {
+    color: var(--muted);
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+  }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    justify-content: center;
+  }
+
+  .nav-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover, .nav-btn.active {
+    background: var(--accent1);
+    color: #000;
+    border-color: var(--accent1);
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .konu-baslik {
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card p, .card li {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+  }
+
+  .card ul { padding-left: 1.2rem; }
+  .card ul li { margin-bottom: 0.3rem; }
+
+  .tag {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tablo {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+  }
+
+  .tablo th {
+    background: rgba(255,255,255,0.08);
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tablo td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: #cbd5e1;
+  }
+
+  .tablo tr:last-child td { border-bottom: none; }
+
+  /* Quiz */
+  .quiz-soru {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .quiz-soru p {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .secenekler {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .secenek {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text);
+    text-align: left;
+    transition: all 0.2s;
+  }
+
+  .secenek:hover:not(:disabled) {
+    border-color: var(--accent2);
+    background: rgba(56,189,248,0.08);
+  }
+
+  .secenek.dogru {
+    background: rgba(74,222,128,0.15);
+    border-color: var(--correct);
+    color: var(--correct);
+    font-weight: 700;
+  }
+
+  .secenek.yanlis {
+    background: rgba(248,113,113,0.15);
+    border-color: var(--wrong);
+    color: var(--wrong);
+  }
+
+  .aciklama {
+    margin-top: 0.8rem;
+    padding: 0.8rem 1rem;
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    display: none;
+  }
+
+  .aciklama.goster { display: block; }
+
+  .skor-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .skor-sayac {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--accent1);
+  }
+
+  .skor-sayac span {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .btn-reset {
+    background: var(--border);
+    border: none;
+    color: var(--text);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+  }
+
+  .btn-reset:hover { background: var(--accent4); color: #000; }
+
+  .ozet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .ozet-kart {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .ozet-kart:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent2);
+  }
+
+  .ozet-kart .num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.4rem;
+  }
+
+  .ozet-kart h3 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  .sablon-kutu {
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.8rem;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .sablon-satir {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+
+  .sablon-satir:last-child { border-bottom: none; }
+
+  .etiket {
+    font-weight: 700;
+    min-width: 180px;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .deger { color: var(--text); }
+
+  .c1 { color: var(--accent1); border-color: var(--accent1); }
+  .c2 { color: var(--accent2); border-color: var(--accent2); }
+  .c3 { color: var(--accent3); border-color: var(--accent3); }
+  .c4 { color: var(--accent4); border-color: var(--accent4); }
+  .c5 { color: var(--accent5); border-color: var(--accent5); }
+  .c6 { color: var(--accent6); border-color: var(--accent6); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧬 Biyoloji 9. Sınıf</h1>
+  <p>2. Dönem 2. Yazılı Konuları — Çalışma Rehberi</p>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="goster('anasayfa', this)">Ana Sayfa</button>
+  <button class="nav-btn" onclick="goster('hucre', this)">Prokaryot & Ökaryot</button>
+  <button class="nav-btn" onclick="goster('mitokondri', this)">Mitokondri & Kloroplast</button>
+  <button class="nav-btn" onclick="goster('zar', this)">Hücre Zarı</button>
+  <button class="nav-btn" onclick="goster('organeller', this)">Organeller</button>
+  <button class="nav-btn" onclick="goster('enzim', this)">Enzimler</button>
+  <button class="nav-btn" onclick="goster('molekuller', this)">Moleküller</button>
+  <button class="nav-btn" onclick="goster('vitaminler', this)">Vitaminler</button>
+  <button class="nav-btn" onclick="goster('madde', this)">Madde Geçişi</button>
+  <button class="nav-btn" onclick="goster('ayiraclar', this)">🧪 Ayıraçlar (Deney)</button>
+  <button class="nav-btn" onclick="goster('quiz', this)">📝 Test</button>
+</nav>
+
+<div class="container">
+
+  <!-- ANA SAYFA -->
+  <div id="anasayfa" class="section active">
+    <div class="konu-baslik c1">📋 Yazılı Konuları</div>
+    <div class="ozet-grid">
+      <div class="ozet-kart" onclick="gosterKonu('hucre')">
+        <div class="num">Konu 1</div>
+        <h3>Prokaryot & Ökaryot Hücreler</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('mitokondri')">
+        <div class="num">Konu 2</div>
+        <h3>Mitokondri & Kloroplast</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('zar')">
+        <div class="num">Konu 3</div>
+        <h3>Hücre Zarı Modelleri</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('organeller')">
+        <div class="num">Konu 4</div>
+        <h3>Organeller</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('enzim')">
+        <div class="num">Konu 5</div>
+        <h3>Enzim Aktivitesini Etkileyen Koşullar</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('molekuller')">
+        <div class="num">Konu 6</div>
+        <h3>Organik & İnorganik Moleküller</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('vitaminler')">
+        <div class="num">Konu 7</div>
+        <h3>Vitaminler</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('madde')">
+        <div class="num">Konu 8</div>
+        <h3>Hücre Zarında Madde Geçişi</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('ayiraclar')">
+        <div class="num" style="color:var(--accent4)">Konu 9</div>
+        <h3>🧪 Organik Molekül Ayıraçları (Deney)</h3>
+      </div>
+      <div class="ozet-kart" onclick="gosterKonu('quiz')">
+        <div class="num" style="color:var(--accent3)">SINAV</div>
+        <h3>📝 Test — Tüm Konular</h3>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>⚠️ Yazılı İpuçları</h3>
+      <ul>
+        <li>Prokaryot ile ökaryot arasındaki <strong>zarla çevrili çekirdek</strong> farkını bil.</li>
+        <li>Mitokondri ve kloroplastta <strong>çift zar</strong> ve <strong>endo-sembiyon (iç-birlikte yaşam) teorisi</strong> çıkabilir.</li>
+        <li>Hücre zarı modeli olarak <strong>Akışkan Mozaik Model</strong> öğren — adı ve özellikleri sorulacak.</li>
+        <li>Enzimde <strong>sıcaklık, pH, substrat konsantrasyonu</strong> üç ana etken.</li>
+        <li>Madde geçişinde <strong>aktif</strong> ve <strong>pasif</strong> taşıma farkını iyi bil; <strong>endositoz</strong> ve <strong>egzositoz</strong> dahil.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PROKARYOT - ÖKARYOT -->
+  <div id="hucre" class="section">
+    <div class="konu-baslik c2">Prokaryot (İlkel Çekirdekli) & Ökaryot (Gerçek Çekirdekli) Hücreler</div>
+
+    <div class="card">
+      <h3>⚡ Temel Fark</h3>
+      <p>Prokaryot hücrelerde <strong>zarla çevrili çekirdek yoktur</strong>. DNA sitoplazmada serbest bulunur. Ökaryot hücrelerde çekirdek zarı vardır.</p>
+    </div>
+
+    <div class="card">
+      <h3>📊 Karşılaştırma Tablosu</h3>
+      <table class="tablo">
+        <tr><th>Özellik</th><th>Prokaryot</th><th>Ökaryot</th></tr>
+        <tr><td>Çekirdek zarı</td><td>❌ Yok</td><td>✅ Var</td></tr>
+        <tr><td>DNA şekli</td><td>Halkasal (dairesel)</td><td>Doğrusal (zincir)</td></tr>
+        <tr><td>Mitokondri</td><td>❌ Yok</td><td>✅ Var (hayvan+bitki)</td></tr>
+        <tr><td>Ribozom boyutu</td><td>70S</td><td>80S (sitoplazmada)</td></tr>
+        <tr><td>Hücre duvarı</td><td>Peptidoglikan</td><td>Bitkide selüloz, mantarda kitin</td></tr>
+        <tr><td>Örnekler</td><td>Bakteri, Arkea</td><td>Bitki, hayvan, mantar, protista</td></tr>
+        <tr><td>Büyüklük</td><td>1–10 µm</td><td>10–100 µm</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>🔬 Ökaryot: Bitki vs Hayvan Hücresi</h3>
+      <table class="tablo">
+        <tr><th>Özellik</th><th>Bitki Hücresi</th><th>Hayvan Hücresi</th></tr>
+        <tr><td>Hücre duvarı (selüloz)</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Kloroplast</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Büyük koful (vakuol)</td><td>✅ (merkezi)</td><td>❌ (küçük/yok)</td></tr>
+        <tr><td>Sentrozom</td><td>❌ (çoğunda)</td><td>✅</td></tr>
+        <tr><td>Lizozom</td><td>Az / yok</td><td>✅</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- MİTOKONDRİ - KLOROPLAST -->
+  <div id="mitokondri" class="section">
+    <div class="konu-baslik c3">Mitokondri & Kloroplast</div>
+
+    <div class="card">
+      <h3 style="color:var(--accent4)">🔋 Mitokondri — Hücrenin Enerji Santrali</h3>
+      <div class="sablon-kutu">
+        <div class="sablon-satir"><div class="etiket">Görev</div><div class="deger">Aerobik (oksijenli) solunum → ATP üretimi</div></div>
+        <div class="sablon-satir"><div class="etiket">Zar</div><div class="deger">Çift zarlı; iç zar kıvrımlıdır (krista)</div></div>
+        <div class="sablon-satir"><div class="etiket">İçi</div><div class="deger">Matris: döngü reaksiyonları burada olur</div></div>
+        <div class="sablon-satir"><div class="etiket">DNA & Ribozom</div><div class="deger">✅ Kendi DNA'sı ve 70S ribozom vardır</div></div>
+        <div class="sablon-satir"><div class="etiket">Hangi hücrede?</div><div class="deger">Tüm ökaryot hücreler (bitki + hayvan)</div></div>
+        <div class="sablon-satir"><div class="etiket">Endo-sembiyon teorisi</div><div class="deger">Atalarının serbest yaşayan bakteri olduğu öne sürülür</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--accent1)">🌿 Kloroplast — Fotosentez Organeli</h3>
+      <div class="sablon-kutu">
+        <div class="sablon-satir"><div class="etiket">Görev</div><div class="deger">Fotosentez → ışık enerjisini kimyasal enerjiye dönüştürür</div></div>
+        <div class="sablon-satir"><div class="etiket">Zar</div><div class="deger">Çift zarlı; iç yapısında tilakoid yığınları (grana) vardır</div></div>
+        <div class="sablon-satir"><div class="etiket">Klorofil</div><div class="deger">Tilakoide gömülü — ışığı bu pigment yakalar</div></div>
+        <div class="sablon-satir"><div class="etiket">DNA & Ribozom</div><div class="deger">✅ Kendi DNA'sı ve 70S ribozom vardır</div></div>
+        <div class="sablon-satir"><div class="etiket">Hangi hücrede?</div><div class="deger">Sadece fotosentez yapan bitkiler ve alglar</div></div>
+        <div class="sablon-satir"><div class="etiket">Stroma</div><div class="deger">Kloroplastın iç sıvısı — Calvin döngüsü burada</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔁 Ortak Özellikleri</h3>
+      <ul>
+        <li>İkisi de <strong>çift zarlı</strong></li>
+        <li>İkisinde de <strong>kendi DNA'sı</strong> vardır</li>
+        <li>İkisinde de <strong>70S ribozom</strong> var (prokaryot ribozu gibi)</li>
+        <li>İkisi de <strong>bölünerek çoğalabilir</strong></li>
+        <li>Endo-sembiyon teorisine göre ikisi de ata canlıda <strong>bağımsız bakteri</strong>ydi</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- HÜCRE ZARI -->
+  <div id="zar" class="section">
+    <div class="konu-baslik c4">Hücre Zarı Modelleri</div>
+
+    <div class="card">
+      <h3>⭐ Akışkan Mozaik Model (1972 — Singer & Nicolson)</h3>
+      <p style="margin-bottom:0.8rem">Günümüzde kabul gören modeldir. Yazılıda <strong>adı</strong> ve <strong>özellikleri</strong> sorulacak.</p>
+      <div class="sablon-kutu">
+        <div class="sablon-satir"><div class="etiket">Temel yapı</div><div class="deger">Fosfolipid (yağ-fosfat) çift katmanı</div></div>
+        <div class="sablon-satir"><div class="etiket">"Akışkan"</div><div class="deger">Fosfolipidler ve proteinler yatay hareket edebilir</div></div>
+        <div class="sablon-satir"><div class="etiket">"Mozaik"</div><div class="deger">Proteinler zara gömülü — mozaik taş gibi dağılmış</div></div>
+        <div class="sablon-satir"><div class="etiket">İntegral protein</div><div class="deger">Zarın içine gömülü, kanallar oluşturur</div></div>
+        <div class="sablon-satir"><div class="etiket">Periferik protein</div><div class="deger">Zarın yüzeyinde, kolayca ayrılabilir</div></div>
+        <div class="sablon-satir"><div class="etiket">Kolesterol</div><div class="deger">Zarın akışkanlığını düzenler</div></div>
+        <div class="sablon-satir"><div class="etiket">Karbonhidrat zincirleri</div><div class="deger">Hücre tanıma ve haberleşme için dış yüzde</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📜 Diğer Tarihsel Modeller (bilgi için)</h3>
+      <table class="tablo">
+        <tr><th>Model</th><th>Yıl</th><th>Önerilen Yapı</th></tr>
+        <tr><td>Davson-Danielli (Sandviç)</td><td>1935</td><td>Lipid + protein tabakası, sabah proteini dışta</td></tr>
+        <tr><td>Birim Zar Modeli</td><td>1959</td><td>Robertson — elektron mikroskobuyla üç tabakalı görünüm</td></tr>
+        <tr><td>Akışkan Mozaik</td><td>1972</td><td>✅ Kabul gören, güncel model</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ORGANELLER -->
+  <div id="organeller" class="section">
+    <div class="konu-baslik c5">Organeller (Küçük Organlar)</div>
+
+    <div class="card">
+      <h3>📋 Hızlı Özet Tablosu</h3>
+      <table class="tablo">
+        <tr><th>Organel</th><th>Görev</th><th>Zar</th></tr>
+        <tr><td>Çekirdek (Nukleus)</td><td>DNA saklar, hücreyi yönetir</td><td>Çift</td></tr>
+        <tr><td>Ribozom</td><td>Protein sentezi</td><td>❌ Zarsız</td></tr>
+        <tr><td>Endoplazmik retikulum (ER)</td><td>Madde taşıma; pürüzlü → protein, düz → yağ</td><td>Tek</td></tr>
+        <tr><td>Golgi aygıtı</td><td>Salgı paketleme, değiştirme</td><td>Tek</td></tr>
+        <tr><td>Lizozom</td><td>Sindirim (hücre içi temizlik)</td><td>Tek</td></tr>
+        <tr><td>Koful (Vakuol)</td><td>Depolama, bitki hücresinde büyük</td><td>Tek</td></tr>
+        <tr><td>Mitokondri</td><td>ATP üretimi (enerji)</td><td>Çift</td></tr>
+        <tr><td>Kloroplast</td><td>Fotosentez</td><td>Çift</td></tr>
+        <tr><td>Sentrozom</td><td>Hücre bölünmesinde iğ iplikleri oluşturur</td><td>❌ Zarsız</td></tr>
+        <tr><td>Peroksizom</td><td>Zararlı H₂O₂'yi parçalar</td><td>Tek</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>🧠 Ezberleme Yöntemi: Protein Yolu</h3>
+      <p>Protein nerede yapılır → nereye gider?</p>
+      <br>
+      <p style="font-size:1rem; letter-spacing:0.5px;">
+        <strong style="color:var(--accent2)">Ribozom</strong>
+        → <strong style="color:var(--accent4)">Pürüzlü ER</strong>
+        → <strong style="color:var(--accent1)">Golgi</strong>
+        → <strong style="color:var(--accent3)">Lizozom / Salgı</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- ENZİM -->
+  <div id="enzim" class="section">
+    <div class="konu-baslik c6">Enzim Aktivitesini Etkileyen Koşullar</div>
+
+    <div class="card">
+      <h3>🔑 Enzim Nedir?</h3>
+      <p>Biyolojik katalizör (hızlandırıcı). Çoğu protein yapılıdır. Reaksiyonu hızlandırır ama kendisi değişmez. Substrat (hedef madde) ile aktif bölgede birleşir → <strong>anahtar-kilit modeli</strong>.</p>
+    </div>
+
+    <div class="card">
+      <h3>1️⃣ Sıcaklık</h3>
+      <ul>
+        <li>Sıcaklık artar → enzim aktivitesi artar (belirli noktaya kadar)</li>
+        <li><strong>Optimum (en uygun) sıcaklık</strong>: İnsan için ~37°C</li>
+        <li>Çok yüksek sıcaklık → enzim <strong>denatüre (yapısı bozulur)</strong> olur → kalıcı hasar</li>
+        <li>Düşük sıcaklıkta yavaşlar ama denatüre olmaz</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>2️⃣ pH (Asitlik-Bazlık)</h3>
+      <ul>
+        <li>Her enzimin <strong>optimum pH</strong> değeri farklıdır</li>
+        <li>Pepsin (mide): pH ~2 (asit ortam)</li>
+        <li>Tripsin (ince bağırsak): pH ~8 (bazik ortam)</li>
+        <li>Salivary amylase (tükürük amilazı): pH ~7 (nötr)</li>
+        <li>Optimum pH dışında aktivite düşer, çok uzak değerlerde denatüre olur</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>3️⃣ Substrat (Hedef Madde) Konsantrasyonu</h3>
+      <ul>
+        <li>Substrat artarsa enzim aktivitesi artar</li>
+        <li>Tüm aktif bölgeler dolunca <strong>doygunluk noktasına</strong> ulaşılır</li>
+        <li>Bu noktadan sonra substrat artışının etkisi yoktur</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>4️⃣ Enzim Miktarı & İnhibitörler (Baskılayıcılar)</h3>
+      <ul>
+        <li>Enzim miktarı arttıkça hız artar</li>
+        <li><strong>Kompetitif (rekabetçi) inhibitör</strong>: Aktif bölgeye rakip olarak girer → enzimi bloke eder</li>
+        <li><strong>Non-kompetitif inhibitör</strong>: Farklı noktadan bağlanır → enzim şeklini bozar</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MOLEKÜLLER -->
+  <div id="molekuller" class="section">
+    <div class="konu-baslik c1">Organik & İnorganik Moleküller</div>
+
+    <div class="card">
+      <h3>💧 İnorganik Moleküller</h3>
+      <p style="margin-bottom:0.8rem">Karbon iskeleti <strong>yoktur</strong>. Su ve mineraller en önemli örnekler.</p>
+      <table class="tablo">
+        <tr><th>Madde</th><th>Özellik / Görev</th></tr>
+        <tr><td>Su (H₂O)</td><td>En iyi çözücü, ısı tamponlayıcı, %70–95 hücre içeriği</td></tr>
+        <tr><td>Mineraller (tuzlar)</td><td>Enzim kofaktörü, kemik yapısı, sinir iletimi</td></tr>
+        <tr><td>O₂ ve CO₂</td><td>Solunum ve fotosentezde taşınır</td></tr>
+        <tr><td>Asit-baz tamponları</td><td>pH dengesini korur</td></tr>
+      </table>
+      <br>
+      <p><strong>Suyun özel özellikleri:</strong></p>
+      <ul style="margin-top:0.5rem">
+        <li>Yüksek özgül ısı → sıcaklık değişimine karşı tampon</li>
+        <li>Yüzey gerilimi yüksek</li>
+        <li>Polar (kutuplu) molekül → iyonik ve polar maddeleri çözer</li>
+        <li>Buzun yoğunluğu sudan azdır (buz üste çıkar)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🧪 Organik Moleküller — 4 Ana Grup</h3>
+      <table class="tablo">
+        <tr><th>Grup</th><th>Monomer (Yapı Taşı)</th><th>Görev</th></tr>
+        <tr><td>Karbonhidrat</td><td>Monosakkarit (glikoz vb.)</td><td>Enerji kaynağı, hücre duvarı</td></tr>
+        <tr><td>Lipit (yağ)</td><td>Yağ asidi + gliserol</td><td>Zar yapısı, enerji deposu, hormon</td></tr>
+        <tr><td>Protein</td><td>Amino asit</td><td>Enzim, taşıma, yapı, savunma</td></tr>
+        <tr><td>Nükleik asit</td><td>Nükleotit</td><td>Genetik bilgi (DNA), protein sentezi (RNA)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>🍬 Karbonhidrat Detayı</h3>
+      <table class="tablo">
+        <tr><th>Tür</th><th>Örnek</th><th>Not</th></tr>
+        <tr><td>Monosakkarit (tek şeker)</td><td>Glikoz, Fruktoz, Galaktoz</td><td>En küçük, hemen enerji</td></tr>
+        <tr><td>Disakkarit (çift şeker)</td><td>Sükroz (=glikoz+fruktoz)</td><td>Çay şekeri</td></tr>
+        <tr><td>Polisakkarit (çok şeker)</td><td>Nişasta, glikojen, selüloz</td><td>Depo veya yapısal</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- VİTAMİNLER -->
+  <div id="vitaminler" class="section">
+    <div class="konu-baslik c2">Vitaminler</div>
+
+    <div class="card">
+      <h3>ℹ️ Temel Bilgi</h3>
+      <ul>
+        <li>Organik moleküllerdir ama enerji vermezler</li>
+        <li>Çoğunlukla <strong>enzim kofaktörü</strong> (yardımcı madde) olarak görev yapar</li>
+        <li>Dışarıdan alınması gerekir (büyük çoğunluğu vücutta üretilemez)</li>
+        <li>İki ana grup: <strong>yağda çözünen</strong> ve <strong>suda çözünen</strong></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🟡 Yağda Çözünen Vitaminler — A, D, E, K</h3>
+      <table class="tablo">
+        <tr><th>Vitamin</th><th>Eksiklik Hastalığı / Görevi</th></tr>
+        <tr><td>A</td><td>Gece körlüğü, deri ve göz sağlığı</td></tr>
+        <tr><td>D</td><td>Raşitizm (kemik yumuşaması), Ca² emilimi</td></tr>
+        <tr><td>E</td><td>Antioksidan (serbest radikal temizleyici)</td></tr>
+        <tr><td>K</td><td>Kan pıhtılaşması</td></tr>
+      </table>
+      <p style="margin-top:0.8rem; color:var(--accent4); font-size:0.85rem">⚠️ Yağda çözünenler vücutta (karaciğer ve yağ dokusunda) <strong>birikerek toksik (zehirli) etki</strong> yapabilir.</p>
+    </div>
+
+    <div class="card">
+      <h3>🔵 Suda Çözünen Vitaminler — B grubu, C</h3>
+      <table class="tablo">
+        <tr><th>Vitamin</th><th>Eksiklik Hastalığı</th></tr>
+        <tr><td>B₁ (Tiamin)</td><td>Beri-beri (sinir sistemi hasarı)</td></tr>
+        <tr><td>B₂ (Riboflavin)</td><td>Ağız köşesi çatlakları</td></tr>
+        <tr><td>B₃ (Niasin)</td><td>Pellegra (deri, sinir, sindirim)</td></tr>
+        <tr><td>B₁₂</td><td>Pernisiyöz anemi (kan hastalığı)</td></tr>
+        <tr><td>C (Askorbik asit)</td><td>Skorbüt (diş eti kanaması)</td></tr>
+        <tr><td>Folik asit (B₉)</td><td>Sinir tüpü defekti (bebeklerde)</td></tr>
+      </table>
+      <p style="margin-top:0.8rem; color:var(--accent1); font-size:0.85rem">✅ Suda çözünenler idrarla atılır → birikmez, günlük alım gerekir.</p>
+    </div>
+  </div>
+
+  <!-- MADDE GEÇİŞİ -->
+  <div id="madde" class="section">
+    <div class="konu-baslik c3">Hücre Zarından Madde Geçişi</div>
+
+    <div class="card">
+      <h3>2 Ana Grup</h3>
+      <p><strong style="color:var(--accent1)">Pasif Taşıma</strong> → Enerji (ATP) gerekmez. Yüksek konsantrasyondan düşüğe doğru.</p>
+      <p style="margin-top:0.5rem"><strong style="color:var(--accent3)">Aktif Taşıma</strong> → Enerji (ATP) gerekir. Düşük konsantrasyondan yükseğe doğru (akıma karşı).</p>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--accent1)">Pasif Taşıma Çeşitleri</h3>
+      <table class="tablo">
+        <tr><th>Tür</th><th>Açıklama</th><th>Örnek</th></tr>
+        <tr><td>Difüzyon (yayılma)</td><td>Yüksek → düşük konsantrasyon, zar gerekmez</td><td>O₂, CO₂ difüzyonu</td></tr>
+        <tr><td>Kolaylaştırılmış difüzyon</td><td>Protein kanalı ile geçiş, hâlâ enerji yok</td><td>Glikoz, aminoasit</td></tr>
+        <tr><td>Ozmos (ozmoz)</td><td>Suyun yarı geçirgen zardan geçişi</td><td>Hücrenin şişmesi / büzülmesi</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--accent3)">Aktif Taşıma</h3>
+      <ul>
+        <li>ATP harcar, taşıyıcı protein kullanır</li>
+        <li>Konsantrasyon gradyanına (farka) karşı gider</li>
+        <li>Örnek: Na⁺/K⁺ pompası — 3 Na⁺ dışarı, 2 K⁺ içeri</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🫧 Büyük Parçacık Taşıma</h3>
+      <table class="tablo">
+        <tr><th>Tür</th><th>Yön</th><th>Açıklama</th></tr>
+        <tr><td>Endositoz (içe alma)</td><td>Dışarı → İçeri</td><td>Zar parçacığı sarar, kesecik oluşturur</td></tr>
+        <tr><td>Fagositoz (katı yutma)</td><td>Dışarı → İçeri</td><td>Katı parçacık yutulur (bağışıklık hücreleri)</td></tr>
+        <tr><td>Pinositoz (sıvı yutma)</td><td>Dışarı → İçeri</td><td>Sıvı damlaları alınır</td></tr>
+        <tr><td>Egzositoz (dışa atma)</td><td>İçeri → Dışarı</td><td>Salgı maddesi hücre dışına verilir</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>🧂 Ozmos Örnekleri</h3>
+      <ul>
+        <li><strong>Hipotonk (su oranı yüksek) ortam</strong> → hücre su alır → şişer (turgor — dolgunluk basıncı)</li>
+        <li><strong>Hipertonik (tuz oranı yüksek) ortam</strong> → hücre su verir → büzülür (plazmoliz — ayrılma)</li>
+        <li><strong>İzotonik (dengeli) ortam</strong> → su hareketi dengeli</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AYIRAÇLAR -->
+  <div id="ayiraclar" class="section">
+    <div class="konu-baslik c4">🧪 Organik Moleküllerin Ayıraçları — Deney</div>
+
+    <div class="card">
+      <h3>⚠️ Deney Sorusu Nasıl Çıkar?</h3>
+      <ul>
+        <li>Hangi maddeye hangi ayıraç kullanılır?</li>
+        <li>Pozitif (olumlu) sonuç hangi renktir?</li>
+        <li>Aynı ayıraç (Lugol, Fehling) farklı maddelerde farklı renk verebilir — karıştırma.</li>
+        <li>Tüm 14 satırı ezberle.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📊 Organik Moleküllerin Ayıraçları — Tam Tablo</h3>
+      <table class="tablo">
+        <tr><th>Organik Molekül</th><th>Ayıraç</th><th>Oluşan Renk</th></tr>
+        <tr><td>Nişasta</td><td>İyot çözeltisi (Lugol)</td><td style="color:#818cf8"><strong>Mavi-mor</strong></td></tr>
+        <tr><td>Glikojen</td><td>İyot çözeltisi (Lugol)</td><td style="color:#fb923c"><strong>Kahverengi-kırmızı</strong></td></tr>
+        <tr><td>Selüloz</td><td>İyotlu çinko klorür</td><td style="color:#4ade80"><strong>Açık mavi veya yeşil</strong></td></tr>
+        <tr><td>Glikoz, Fruktoz</td><td>Benedict (Benedik) çözeltisi</td><td style="color:#ef4444"><strong>Kiremit kırmızısı</strong></td></tr>
+        <tr><td>Glikoz, Fruktoz</td><td>Fehling çözeltisi</td><td style="color:#f97316"><strong>Kiremit kırmızısı veya turuncu</strong></td></tr>
+        <tr><td>Monosakkaritler</td><td>Barfoed (Barfed) reaktifi</td><td style="color:#ef4444"><strong>Kırmızı</strong></td></tr>
+        <tr><td>Amino asitler</td><td>Ninhidrin reaktifi</td><td style="color:#facc15"><strong>Sarı veya mor (amino asite göre)</strong></td></tr>
+        <tr><td>Proteinler</td><td>Nitrik asit</td><td style="color:#facc15"><strong>Sarı</strong></td></tr>
+        <tr><td>Proteinler</td><td>Fehling çözeltisi</td><td style="color:#c084fc"><strong>Menekşe rengi</strong></td></tr>
+        <tr><td>Proteinler</td><td>Biüret (Biüre) reaktifi</td><td style="color:#38bdf8"><strong>Açık mavi veya mor</strong></td></tr>
+        <tr><td>Proteinler</td><td>Commasie (Komasi) mavisi G-250</td><td style="color:#38bdf8"><strong>Mavi</strong></td></tr>
+        <tr><td>Yağlar</td><td>Sudan III ve Sudan IV çözeltisi</td><td style="color:#f97316"><strong>Kırmızı veya turuncu</strong></td></tr>
+        <tr><td>Yağlar</td><td>Sudan kırmızısı</td><td style="color:#ef4444"><strong>Kırmızı</strong></td></tr>
+        <tr><td>Doymamış yağlar</td><td>Osmik asit</td><td style="color:#94a3b8"><strong>Siyah veya koyu kahverengi</strong></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>🃏 Hızlı Ezber Kartları</h3>
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.8rem; margin-top:0.5rem">
+
+        <div style="background:#1e1b2e; border:1px solid #818cf8; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#818cf8; font-weight:700; margin-bottom:0.4rem">NİŞASTA</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Lugol (İyot)</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#818cf8; margin-top:0.3rem">🔵 Mavi-mor</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #b45309; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#fb923c; font-weight:700; margin-bottom:0.4rem">GLİKOJEN</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Lugol (İyot)</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#fb923c; margin-top:0.3rem">🟤 Kahverengi-kırmızı</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #ef4444; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#f87171; font-weight:700; margin-bottom:0.4rem">GLİKOZ / FRUKTOZ</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Benedict çözeltisi</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#ef4444; margin-top:0.3rem">🔴 Kiremit kırmızısı</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #f97316; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#fb923c; font-weight:700; margin-bottom:0.4rem">GLİKOZ / FRUKTOZ</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Fehling çözeltisi</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#f97316; margin-top:0.3rem">🟠 Kiremit / Turuncu</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #c084fc; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#c084fc; font-weight:700; margin-bottom:0.4rem">PROTEİN</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Fehling çözeltisi</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#c084fc; margin-top:0.3rem">🟣 Menekşe</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #38bdf8; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#38bdf8; font-weight:700; margin-bottom:0.4rem">PROTEİN</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Biüret reaktifi</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#38bdf8; margin-top:0.3rem">🔵 Açık mavi / Mor</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #f97316; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#fb923c; font-weight:700; margin-bottom:0.4rem">YAĞ</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Sudan III / IV</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#f97316; margin-top:0.3rem">🟠 Kırmızı / Turuncu</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #ef4444; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#f87171; font-weight:700; margin-bottom:0.4rem">YAĞ</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Sudan kırmızısı</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#ef4444; margin-top:0.3rem">🔴 Kırmızı</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #4ade80; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#4ade80; font-weight:700; margin-bottom:0.4rem">SELÜLOZ</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">İyotlu çinko klorür</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#4ade80; margin-top:0.3rem">🟢 Açık mavi / Yeşil</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #ef4444; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#f87171; font-weight:700; margin-bottom:0.4rem">MONOSAKKARİTLER</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Barfoed (Barfed) reaktifi</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#ef4444; margin-top:0.3rem">🔴 Kırmızı</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #facc15; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#facc15; font-weight:700; margin-bottom:0.4rem">AMİNO ASİTLER</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Ninhidrin reaktifi</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#facc15; margin-top:0.3rem">🟡 Sarı veya mor</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #facc15; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#facc15; font-weight:700; margin-bottom:0.4rem">PROTEİN</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Nitrik asit</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#facc15; margin-top:0.3rem">🟡 Sarı</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #38bdf8; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#38bdf8; font-weight:700; margin-bottom:0.4rem">PROTEİN</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Commasie mavisi G-250</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#38bdf8; margin-top:0.3rem">🔵 Mavi</div>
+        </div>
+
+        <div style="background:#1e1b2e; border:1px solid #94a3b8; border-radius:10px; padding:1rem; text-align:center">
+          <div style="font-size:0.75rem; color:#94a3b8; font-weight:700; margin-bottom:0.4rem">DOYMAMIS YAĞLAR</div>
+          <div style="font-size:0.85rem; color:#e2e8f0">Osmik asit</div>
+          <div style="font-size:1.1rem; font-weight:900; color:#94a3b8; margin-top:0.3rem">⚫ Siyah / Koyu kahverengi</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Kritik Karışıklıklar</h3>
+      <ul>
+        <li><strong>Nişasta vs Glikojen:</strong> İkisi de Lugol kullanır ama renk farklı — nişasta <span style="color:#818cf8">mavi-mor</span>, glikojen <span style="color:#fb923c">kahverengi-kırmızı</span>.</li>
+        <li><strong>Fehling çözeltisi:</strong> Hem <span style="color:#f97316">glikoz/fruktoz</span> (kiremit kırmızısı) hem <span style="color:#c084fc">protein</span> (menekşe) için farklı renk verir — hangi madde olduğuna göre renk değişir.</li>
+        <li><strong>Biüret reaktifi:</strong> Sadece proteinler için — açık mavi veya mor.</li>
+        <li><strong>Sudan boyaları:</strong> Sadece yağlar için kullanılır.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section">
+    <div class="konu-baslik c4">📝 Test — Tüm Konular</div>
+
+    <div class="skor-panel">
+      <div>
+        <div class="skor-sayac" id="skor">0 <span>/ <span id="toplam">0</span> cevaplandı</span></div>
+        <div style="color:var(--muted); font-size:0.82rem; margin-top:0.2rem">Doğru: <span id="dogru-sayisi" style="color:var(--correct)">0</span> | Yanlış: <span id="yanlis-sayisi" style="color:var(--wrong)">0</span></div>
+      </div>
+      <button class="btn-reset" onclick="sifirlaTesti()">🔄 Sıfırla</button>
+    </div>
+
+    <div id="quiz-sorular"></div>
+  </div>
+
+</div>
+
+<script>
+const sorular = [
+  {
+    s: "Prokaryot hücrenin ökaryottan en temel farkı nedir?",
+    s1: ["Mitokondri içermez","Ribozom içermez","Zarla çevrili çekirdeği yoktur","Hücre duvarı yoktur"],
+    c: 2,
+    a: "Prokaryotlarda DNA sitoplazma içinde serbest bulunur; zarla çevrili çekirdek bulunmaz."
+  },
+  {
+    s: "Mitokondri ve kloroplastta ortak olan özellik hangisidir?",
+    s1: ["Her ikisi de tek zarlıdır","Her ikisinde de 80S ribozom bulunur","Her ikisi de çift zarlıdır ve kendi DNA'sına sahiptir","Sadece bitki hücrelerinde bulunurlar"],
+    c: 2,
+    a: "Mitokondri ve kloroplast çift zarlı organellerdir. Her ikisinde de 70S ribozom ve kendi DNA'sı bulunur."
+  },
+  {
+    s: "Günümüzde kabul gören hücre zarı modeli hangisidir?",
+    s1: ["Sandviç modeli","Birim zar modeli","Akışkan Mozaik Model","Davson-Danielli modeli"],
+    c: 2,
+    a: "Singer ve Nicolson (1972) tarafından önerilen Akışkan Mozaik Model günümüzde geçerli olan modeldir."
+  },
+  {
+    s: "Enzim aktivitesi üzerine sıcaklığın etkisi için hangisi doğrudur?",
+    s1: ["Sıcaklık arttıkça aktivite sürekli artar","Optimum sıcaklık aşıldığında enzim denatüre olabilir","Düşük sıcaklıkta enzim kalıcı olarak bozulur","Sıcaklık enzim aktivitesini etkilemez"],
+    c: 1,
+    a: "Optimum sıcaklık üzerindeki sıcaklıklarda enzim proteini denatüre (yapısı bozulur) olur ve aktivite düşer."
+  },
+  {
+    s: "Protein sentezi hangi organelde gerçekleşir?",
+    s1: ["Golgi aygıtı","Mitokondri","Lizozom","Ribozom"],
+    c: 3,
+    a: "Protein sentezi ribozomlarda gerçekleşir. Ribozomlar zarsız organellerdir."
+  },
+  {
+    s: "Suda çözünen vitaminler için hangisi doğrudur?",
+    s1: ["Vücutta birikebilirler","İdrarla atıldıklarından birikmezler","A, D, E, K vitaminleri bu gruptadır","Enerji verirler"],
+    c: 1,
+    a: "B grubu ve C vitamini suda çözünür; idrarla atılır ve birikmez. Yağda çözünen A,D,E,K birikerek toksik olabilir."
+  },
+  {
+    s: "ATP harcayan madde taşıma türü hangisidir?",
+    s1: ["Difüzyon","Ozmoz","Kolaylaştırılmış difüzyon","Aktif taşıma"],
+    c: 3,
+    a: "Aktif taşıma konsantrasyon gradyanına karşı çalışır ve ATP enerji harcar."
+  },
+  {
+    s: "Hücre hipertonik (dışı tuzlu) ortama konulursa ne olur?",
+    s1: ["Hücre su alır ve şişer","Hücre su verir ve büzülür (plazmoliz)","Hiçbir değişim olmaz","Hücre patlar"],
+    c: 1,
+    a: "Hipertonik ortamda dışarısının tuz konsantrasyonu fazla olduğu için osmozla hücreden su çıkar, hücre büzülür."
+  },
+  {
+    s: "D vitamini eksikliği hangi hastalığa yol açar?",
+    s1: ["Beri-beri","Skorbüt","Raşitizm","Pellegra"],
+    c: 2,
+    a: "D vitamini eksikliği çocuklarda raşitizme (kemik yumuşaması) yol açar. Ca² emilimini düzenler."
+  },
+  {
+    s: "Golgi aygıtının temel görevi nedir?",
+    s1: ["ATP üretmek","Fotosentez yapmak","Salgı maddelerini paketlemek ve göndermek","DNA'yı kopyalamak"],
+    c: 2,
+    a: "Golgi aygıtı ER'den gelen proteinleri ve lipitleri modifiye eder, paketler ve hedef noktaya gönderir."
+  },
+  {
+    s: "Kloroplastta fotosentezin ışık reaksiyonları nerede gerçekleşir?",
+    s1: ["Stroma","Dış zar","Tilakoid (granada)","Matris"],
+    c: 2,
+    a: "Işık reaksiyonları klorofil pigmentinin bulunduğu tilakoid zarlarında (grana) gerçekleşir."
+  },
+  {
+    s: "Na⁺/K⁺ pompası hangi taşıma türüne örnektir?",
+    s1: ["Pasif difüzyon","Ozmoz","Aktif taşıma","Endositoz"],
+    c: 2,
+    a: "Na⁺/K⁺ pompası konsantrasyon gradyanına karşı çalışan ve ATP harcayan aktif taşıma örneğidir."
+  },
+  {
+    s: "Nişastanın varlığını test etmek için hangi ayıraç kullanılır?",
+    s1: ["Benedict çözeltisi","Biüret reaktifi","Lugol (İyot çözeltisi)","Sudan III"],
+    c: 2,
+    a: "Nişasta Lugol (iyot çözeltisi) ile mavi-mor renk verir. Bu pozitif (olumlu) test sonucudur."
+  },
+  {
+    s: "Lugol ayıracı ile nişasta mavi-mor renk verirken glikojen hangi rengi verir?",
+    s1: ["Sarı","Kahverengi-kırmızı","Mavi","Turuncu"],
+    c: 1,
+    a: "Glikojen de Lugol (iyot) ayıracı kullanır ancak kahverengi-kırmızı renk oluşturur. Nişastanın verdiği mavi-mor ile karıştırma."
+  },
+  {
+    s: "Glikoz ve fruktoz için Benedict çözeltisi ile yapılan testin pozitif (olumlu) sonucu hangi renktir?",
+    s1: ["Mavi-mor","Sarı","Kiremit kırmızısı","Menekşe rengi"],
+    c: 2,
+    a: "Benedict çözeltisi glikoz ve fruktoz gibi indirgen şekerler ile kiremit kırmızısı renk oluşturur."
+  },
+  {
+    s: "Proteinlerin tespitinde Biüret reaktifi hangi rengi verir?",
+    s1: ["Kiremit kırmızısı","Sarı","Kahverengi","Açık mavi veya mor"],
+    c: 3,
+    a: "Biüret reaktifi proteinlerle açık mavi veya mor renk oluşturur. Sadece protein tespitinde kullanılır."
+  },
+  {
+    s: "Yağların varlığını test etmek için hangi ayıraç kullanılır?",
+    s1: ["Lugol","Ninhidrin","Sudan III ve Sudan IV çözeltisi","Barfoed reaktifi"],
+    c: 2,
+    a: "Sudan III ve Sudan IV çözeltileri yağlarla kırmızı veya turuncu renk oluşturur. Sudan kırmızısı da yağ için kırmızı renk verir."
+  },
+  {
+    s: "Fehling çözeltisi hem glikoz/fruktoz hem de proteinlere uygulandığında hangi durum geçerlidir?",
+    s1: ["Her ikisinde de aynı rengi verir","Glikoz ile kiremit kırmızısı, protein ile menekşe rengi oluşturur","Sadece proteinlerde renk değişimi olur","Yalnızca glikozda renk verir"],
+    c: 1,
+    a: "Fehling çözeltisi glikoz/fruktoz ile kiremit kırmızısı veya turuncu, proteinler ile menekşe rengi oluşturur. Aynı ayıraç, farklı moleküllerle farklı renk verir."
+  },
+  {
+    s: "Selülozun tespitinde hangi ayıraç kullanılır ve hangi rengi verir?",
+    s1: ["Lugol — mavi-mor","İyotlu çinko klorür — açık mavi veya yeşil","Benedict — kiremit kırmızısı","Biüret — açık mavi veya mor"],
+    c: 1,
+    a: "Selüloz için iyotlu çinko klorür kullanılır ve açık mavi veya yeşil renk oluşturur. Lugol ile karıştırma — Lugol nişasta ve glikojen içindir."
+  },
+  {
+    s: "Monosakkaritleri diğer şekerlerden ayırt etmek için kullanılan özel ayıraç hangisidir?",
+    s1: ["Benedict çözeltisi","Fehling çözeltisi","Barfoed (Barfed) reaktifi","Lugol"],
+    c: 2,
+    a: "Barfoed reaktifi monosakkaritlere özgüdür ve kırmızı renk oluşturur. Benedict ve Fehling tüm indirgen şekerlere tepki verir."
+  },
+  {
+    s: "Amino asitlerin tespitinde kullanılan ayıraç ve oluşan renk hangisidir?",
+    s1: ["Nitrik asit — sarı","Ninhidrin reaktifi — sarı veya mor","Biüret — açık mavi","Commasie mavisi — mavi"],
+    c: 1,
+    a: "Ninhidrin reaktifi amino asitlerle sarı veya mor renk verir (amino asit çeşidine göre değişir). Nitrik asit ise protein için sarı renk verir."
+  },
+  {
+    s: "Doymamış yağların tespitinde hangi ayıraç kullanılır?",
+    s1: ["Sudan III","Sudan kırmızısı","Osmik asit","Fehling çözeltisi"],
+    c: 2,
+    a: "Osmik asit doymamış yağlar için kullanılır ve siyah veya koyu kahverengi renk oluşturur. Sudan boyaları doymuş-doymamış ayrımı yapmaksızın genel yağ tespiti içindir."
+  }
+];
+
+let cevaplar = new Array(sorular.length).fill(null);
+
+function sorulariYukle() {
+  const container = document.getElementById('quiz-sorular');
+  container.innerHTML = '';
+  sorular.forEach((soru, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-soru';
+    div.innerHTML = `
+      <p>${i+1}. ${soru.s}</p>
+      <div class="secenekler">
+        ${soru.s1.map((s, j) => `
+          <button class="secenek" id="s${i}_${j}" onclick="cevapla(${i}, ${j})">${String.fromCharCode(65+j)}) ${s}</button>
+        `).join('')}
+      </div>
+      <div class="aciklama" id="ac${i}">💡 ${soru.a}</div>
+    `;
+    container.appendChild(div);
+  });
+  skorGuncelle();
+}
+
+function cevapla(soruIdx, cevapIdx) {
+  if (cevaplar[soruIdx] !== null) return;
+  cevaplar[soruIdx] = cevapIdx;
+  
+  const dogru = sorular[soruIdx].c;
+  
+  for (let j = 0; j < sorular[soruIdx].s1.length; j++) {
+    const btn = document.getElementById(`s${soruIdx}_${j}`);
+    btn.disabled = true;
+    if (j === dogru) btn.classList.add('dogru');
+    else if (j === cevapIdx) btn.classList.add('yanlis');
+  }
+  
+  document.getElementById(`ac${soruIdx}`).classList.add('goster');
+  skorGuncelle();
+}
+
+function skorGuncelle() {
+  const cevaplanan = cevaplar.filter(c => c !== null).length;
+  const dogruSayisi = cevaplar.filter((c, i) => c === sorular[i].c).length;
+  const yanlisSayisi = cevaplanan - dogruSayisi;
+  
+  document.getElementById('skor').innerHTML = `${cevaplanan} <span>/ <span id="toplam">${sorular.length}</span> cevaplandı</span>`;
+  document.getElementById('dogru-sayisi').textContent = dogruSayisi;
+  document.getElementById('yanlis-sayisi').textContent = yanlisSayisi;
+}
+
+function sifirlaTesti() {
+  cevaplar = new Array(sorular.length).fill(null);
+  sorulariYukle();
+}
+
+function goster(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function gosterKonu(id) {
+  const btn = [...document.querySelectorAll('.nav-btn')].find(b => b.getAttribute('onclick')?.includes(`'${id}'`));
+  goster(id, btn);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+sorulariYukle();
+</script>
+</body>
+</html>
