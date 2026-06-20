@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Vatandaşlık Quiz 2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #111827; --surface: #1F2937; --border: #374151;
+    --accent: #6366F1; --accent2: #A78BFA;
+    --correct: #10B981; --wrong: #EF4444;
+    --text: #F9FAFB; --muted: #9CA3AF; --card: #1E293B;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+
+  header { width: 100%; max-width: 740px; display: flex; justify-content: space-between; align-items: center; padding: 14px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo .k { color: var(--accent); }
+  .logo .p { color: var(--accent2); }
+  .stats { display: flex; gap: 20px; font-size: 12px; color: var(--muted); }
+  .stat strong { color: var(--text); font-size: 17px; display: block; text-align: center; }
+
+  .progress-wrap { width: 100%; max-width: 740px; height: 5px; background: var(--border); border-radius: 3px; margin-bottom: 18px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.35s ease; }
+
+  .top-row { width: 100%; max-width: 740px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .cat-pill { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); background: rgba(167,139,250,0.12); border: 1px solid var(--accent2); padding: 3px 10px; border-radius: 20px; }
+  .timer-box { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; }
+  .timer-label { font-size: 11px; color: var(--muted); }
+  .timer-num { font-size: 16px; font-weight: 800; color: var(--accent2); min-width: 22px; }
+  .timer-num.danger { color: var(--wrong); }
+
+  .question-card { width: 100%; max-width: 740px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 26px 30px; margin-bottom: 14px; }
+  .q-number { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.05em; }
+  .q-text { font-size: 18px; line-height: 1.6; color: var(--text); font-weight: 500; }
+
+  .options { width: 100%; max-width: 740px; display: grid; gap: 9px; margin-bottom: 14px; }
+  .option-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 16px; color: var(--text); font-family: inherit; font-size: 14px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; transition: border-color 0.15s, background 0.15s; }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(99,102,241,0.08); }
+  .option-btn .key { width: 28px; height: 28px; border-radius: 6px; background: var(--border); font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--muted); transition: background 0.15s; }
+  .option-btn.correct { border-color: var(--correct); background: rgba(16,185,129,0.1); }
+  .option-btn.correct .key { background: var(--correct); color: #fff; }
+  .option-btn.wrong { border-color: var(--wrong); background: rgba(239,68,68,0.1); }
+  .option-btn.wrong .key { background: var(--wrong); color: #fff; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback { width: 100%; max-width: 740px; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 12px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(16,185,129,0.12); border: 1px solid var(--correct); color: #34D399; }
+  .feedback.wrong { background: rgba(239,68,68,0.12); border: 1px solid var(--wrong); color: #F87171; }
+
+  .next-btn { width: 100%; max-width: 740px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: 10px; padding: 14px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; display: none; transition: opacity 0.15s; }
+  .next-btn:hover { opacity: 0.88; }
+  .next-btn.show { display: block; }
+
+  /* CATEGORY SCREEN */
+  #cat-screen { width: 100%; max-width: 740px; }
+  .cat-header { text-align: center; margin-bottom: 28px; }
+  .cat-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+  .cat-header h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .cat-header p { color: var(--muted); font-size: 14px; }
+  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  .cat-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 18px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .cat-card:hover { border-color: var(--accent); }
+  .cat-card.selected { border-color: var(--accent); background: rgba(99,102,241,0.1); }
+  .cat-card .ci { font-size: 24px; margin-bottom: 8px; }
+  .cat-card .cn { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
+  .cat-card .cc { font-size: 12px; color: var(--muted); }
+  .start-btn { width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: 10px; padding: 15px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+  .start-btn:hover { opacity: 0.88; }
+
+  /* RESULT SCREEN */
+  #result-screen { display: none; width: 100%; max-width: 740px; text-align: center; padding-top: 10px; }
+  .result-emoji { font-size: 52px; margin-bottom: 10px; }
+  .result-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+  .result-score { font-size: 64px; font-weight: 800; line-height: 1; margin: 12px 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .result-label { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .rstat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .rstat .rnum { font-size: 26px; font-weight: 800; margin-bottom: 3px; }
+  .rstat .rlbl { font-size: 11px; color: var(--muted); }
+  .btn-row { display: flex; gap: 10px; justify-content: center; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: 10px; padding: 13px 28px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 28px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-secondary:hover { border-color: var(--accent); }
+
+  #quiz-screen { display: none; width: 100%; }
+
+  @media (max-width: 520px) {
+    .cat-grid { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+    .question-card { padding: 18px; }
+    .q-text { font-size: 16px; }
+    .btn-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="k">K</span><span class="p">PSS</span> Vatandaşlık</div>
+  <div class="stats" id="header-stats" style="display:none">
+    <div class="stat"><strong id="stat-correct">0</strong>Doğru</div>
+    <div class="stat"><strong id="stat-wrong">0</strong>Yanlış</div>
+    <div class="stat"><strong id="stat-total">0</strong>Toplam</div>
+  </div>
+</header>
+
+<!-- KONU SEÇİMİ -->
+<div id="cat-screen">
+  <div class="cat-header">
+    <h1>Konu <span>Seç</span></h1>
+    <p>Çalışmak istediğin konuları işaretle ve başla</p>
+  </div>
+  <div class="cat-grid" id="cat-grid"></div>
+  <button class="start-btn" onclick="startQuiz()">Sınava Başla →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen">
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+  <div class="top-row">
+    <div class="cat-pill" id="cat-pill"></div>
+    <div class="timer-box">
+      <span class="timer-label">⏱</span>
+      <span class="timer-num" id="timer-num">20</span>
+    </div>
+  </div>
+  <div class="question-card">
+    <div class="q-number" id="q-number"></div>
+    <div class="q-text" id="q-text"></div>
+  </div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Sonraki →</button>
+</div>
+
+<!-- SONUÇ -->
+<div id="result-screen">
+  <div class="result-emoji" id="result-emoji"></div>
+  <div class="result-title">Sınav Bitti</div>
+  <div class="result-score" id="result-score"></div>
+  <div class="result-label" id="result-label"></div>
+  <div class="result-grid">
+    <div class="rstat"><div class="rnum" style="color:var(--correct)" id="res-correct">0</div><div class="rlbl">Doğru</div></div>
+    <div class="rstat"><div class="rnum" style="color:var(--wrong)" id="res-wrong">0</div><div class="rlbl">Yanlış</div></div>
+    <div class="rstat"><div class="rnum" style="color:var(--accent2)" id="res-skip">0</div><div class="rlbl">Süre Doldu</div></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-primary" onclick="showCatScreen()">Yeniden Oyna</button>
+    <button class="btn-secondary" onclick="restartSameCat()">Aynı Konuyu Tekrar</button>
+  </div>
+</div>
+
+<script>
+var Q = [];
+
+/* ===== TEMEL HUKUK ===== */
+Q.push({c:"Temel Hukuk", q:"Hukukun yardımcı kaynakları hangileridir?", a:"Doktrin ve İçtihat", o:["Örf ve Adet ile Doktrin","Doktrin ve İçtihat","Kanun ve Yönetmelik","Anayasa ve Kanun"]});
+Q.push({c:"Temel Hukuk", q:"Dayı-Yeğen-Hala-Kardeş hangi hısımlık türündedir?", a:"Yan soy", o:["Alt soy","Üst soy","Yan soy","Yapay soy"]});
+Q.push({c:"Temel Hukuk", q:"Üvey kardeşler arasındaki hısımlık türü nedir?", a:"Yarım kan", o:["Tam kan","Yarım kan","Yapay hısımlık","Kayın hısımlığı"]});
+Q.push({c:"Temel Hukuk", q:"Evlat edinme sonucu doğan hısımlık türü hangisidir?", a:"Yapay hısımlık", o:["Kan hısımlığı","Yarım kan","Yapay hısımlık","Kayın hısımlığı"]});
+Q.push({c:"Temel Hukuk", q:"Eski borcun sona erdirilerek yeni bir borç yaratılmasına ne denir?", a:"Tecdit", o:["İbra","Takas","Tecdit","Birleşme"]});
+Q.push({c:"Temel Hukuk", q:"Kişinin öz amcasıyla arasında kaçıncı derece hısımlık vardır?", a:"3. derece yan soy", o:["2. derece yan soy","3. derece yan soy","4. derece yan soy","3. derece üst soy"]});
+Q.push({c:"Temel Hukuk", q:"Kişinin kuzenleriyle (teyze/amca/hala/dayı çocukları) arası kaçıncı dereceden hısımlıktır?", a:"4. derece yan soy", o:["2. derece yan soy","3. derece yan soy","4. derece yan soy","3. derece alt soy"]});
+Q.push({c:"Temel Hukuk", q:"Bir suçun faili ile zarar arasındaki hukuki bağa ne denir?", a:"Nedensellik (illiyet) bağı", o:["Nedensellik (illiyet) bağı","Hukuki ilişki","Sebep-sonuç bağı","Kusur bağı"]});
+Q.push({c:"Temel Hukuk", q:"'Kaza-i Rüşt' yaşı Türk hukukunda kaçtır?", a:"15", o:["12","15","17","18"]});
+Q.push({c:"Temel Hukuk", q:"Alacaklının sözleşme yaparak alacağından vazgeçmesine ne denir?", a:"İbra", o:["Tecdit","Takas","İbra","Birleşme"]});
+Q.push({c:"Temel Hukuk", q:"Borçlunun alacaklıya karşı özel bir nedene dayanarak borcunu ifa etmekten kaçınma hakkına ne denir?", a:"Def'i", o:["İtiraz","Def'i","Takas","İbra"]});
+Q.push({c:"Temel Hukuk", q:"Gerçek bir kişi hakkında ölüm karinesi hükmünü kim verir?", a:"Vali", o:["Sulh Hukuk Mahkemesi","Asliye Hukuk Mahkemesi","Vali","Kaymakam"]});
+Q.push({c:"Temel Hukuk", q:"Birden fazla kişinin birbirinden önce mi sonra mı öldüğü ispat edilemezse ne uygulanır?", a:"Birlikte ölüm karinesi", o:["Gaiplik","Ölüm karinesi","Birlikte ölüm karinesi","Ölüm belgesi"]});
+Q.push({c:"Temel Hukuk", q:"Bir mal üzerindeki fiili hakimiyeti bulunan kişinin sahip olduğu hukuki duruma ne denir?", a:"Zilyetlik", o:["Mülkiyet","Zilyetlik","Ayni hak","İrtifak hakkı"]});
+Q.push({c:"Temel Hukuk", q:"Kamu yararı amacıyla tapu siciline kaydedilen şerh türüne ne denir?", a:"Şerh", o:["Beyan","Şerh","Tescil","Düzeltme"]});
+Q.push({c:"Temel Hukuk", q:"Devletin yaptığı bayındırlık hizmetleri sonucu değeri artan gayrimenkullerden alınan tutara ne denir?", a:"Şerefiye", o:["Harç","Resim","Şerefiye","Vergi"]});
+Q.push({c:"Temel Hukuk", q:"Kişilerin özel bir hizmetten yararlanması karşılığında ödedikleri tutara ne ad verilir?", a:"Harç", o:["Vergi","Harç","Resim","Şerefiye"]});
+Q.push({c:"Temel Hukuk", q:"Devletin bir kişiye izin veya belge düzenlemesi karşılığında aldığı tutara ne denir?", a:"Resim", o:["Vergi","Harç","Resim","Fon"]});
+Q.push({c:"Temel Hukuk", q:"Ölüm tehlikesiyle kaybolan kişi için miras adına mahkemeye başvuru kaç yıl sonra yapılabilir?", a:"5 yıl", o:["1 yıl","3 yıl","5 yıl","10 yıl"]});
+Q.push({c:"Temel Hukuk", q:"Uzun süre haber alınamayan kişi için gaiplik kararı kaç yıl sonra istenebilir?", a:"5 yıl", o:["1 yıl","3 yıl","5 yıl","15 yıl"]});
+Q.push({c:"Temel Hukuk", q:"Uzun süre haber alınamayan kişinin mirası için mahkemeye başvuru kaç yıl sonra yapılabilir?", a:"15 yıl", o:["5 yıl","10 yıl","15 yıl","20 yıl"]});
+Q.push({c:"Temel Hukuk", q:"Mustafanın alkollüyken senet imzalaması hangi yaptırıma örnektir?", a:"Nisbi butlan", o:["Yokluk","Mutlak butlan","Nisbi butlan","Tek taraflı bağlamazlık"]});
+Q.push({c:"Temel Hukuk", q:"Küçük ve kısıtlıların yaptığı sözleşmenin iptali için hangi yaptırım uygulanır?", a:"Tek taraflı bağlamazlık", o:["Yokluk","Mutlak butlan","Nisbi butlan","Tek taraflı bağlamazlık"]});
+Q.push({c:"Temel Hukuk", q:"Eşya üzerinde doğrudan mutlak egemenlik yetkisi veren haklara ne denir?", a:"Ayni hak", o:["Nisbi hak","Şahsi hak","Ayni hak","Fikri hak"]});
+Q.push({c:"Temel Hukuk", q:"Sınırlı ehliyetli kişilere mahkeme kararıyla atanarak belli konularda iznine başvurulan kişiye ne denir?", a:"Yasal danışman", o:["Vasi","Veli","Yasal danışman","Kayyum"]});
+Q.push({c:"Temel Hukuk", q:"Velisi olmayan küçük çocuklar için mahkemece yasal temsilci atanmasına ne denir?", a:"Vesayet", o:["Velayet","Vesayet","Kayyumluk","Nafaka"]});
+Q.push({c:"Temel Hukuk", q:"Masumiyet karinesi ne anlama gelir?", a:"Suçluluğu hükmen sabit oluncaya kadar kimse suçlu sayılamaz", o:["Herkes suçsuz varsayılır","Suçluluğu hükmen sabit oluncaya kadar kimse suçlu sayılamaz","Sanık beraat eder","Delil olmadan ceza verilmez"]});
+Q.push({c:"Temel Hukuk", q:"Hukuki bir borcun zorla tahsil edilmesi süreci hangi yaptırım türüdür?", a:"Cebri icra", o:["Tazminat","Ceza","Cebri icra","Hükümsüzlük"]});
+Q.push({c:"Temel Hukuk", q:"Toplum düzenini bozan suç fiilinin karşılığı olarak kişiye uygulanan yaptırım türü nedir?", a:"Ceza", o:["Tazminat","Ceza","Cebri icra","İptal"]});
+Q.push({c:"Temel Hukuk", q:"Özel Hukuk dalları arasında hangisi YOK?", a:"Ceza Hukuku", o:["Medeni Hukuk","Borçlar Hukuku","Ceza Hukuku","Ticaret Hukuku"]});
+Q.push({c:"Temel Hukuk", q:"Karma Hukuk dalları arasında hangisi YOK?", a:"Vergi Hukuku", o:["İş Hukuku","Hava Hukuku","Vergi Hukuku","Çevre Hukuku"]});
+Q.push({c:"Temel Hukuk", q:"Evli kişilerin evlat edinebilmesi için en az kaç yıl evli kalmaları gerekir?", a:"5 yıl", o:["1 yıl","2 yıl","3 yıl","5 yıl"]});
+Q.push({c:"Temel Hukuk", q:"Bir kimsenin yapıt üzerindeki düşünsel haklarına ne denir?", a:"Fikri hak", o:["Mülkiyet hakkı","Fikri hak","Şahsi hak","Ayni hak"]});
+
+/* ===== DEVLET BİÇİMLERİ ===== */
+Q.push({c:"Devlet Biçimleri", q:"Egemenliğin küçük bir gruba ait olduğu yönetim biçimi hangisidir?", a:"Oligarşi", o:["Monarşi","Oligarşi","Teokrasi","Diktatörlük"]});
+Q.push({c:"Devlet Biçimleri", q:"Egemenliğin dine dayandığı devlet şekli hangisidir?", a:"Teokrasi", o:["Monarşi","Oligarşi","Teokrasi","Diktatörlük"]});
+Q.push({c:"Devlet Biçimleri", q:"Egemenliğin tek kişiye (kral/padişah) ait olduğu yönetim biçimi hangisidir?", a:"Monarşi", o:["Monarşi","Oligarşi","Teokrasi","Diktatörlük"]});
+Q.push({c:"Devlet Biçimleri", q:"Egemenliğin zorla ele geçiren tek kişinin elinde olduğu yönetim biçimi nedir?", a:"Diktatörlük", o:["Monarşi","Oligarşi","Diktatörlük","Federasyon"]});
+Q.push({c:"Devlet Biçimleri", q:"Eyalet ve kantonların oluşturduğu devlet modeline ne denir?", a:"Federasyon", o:["Üniter devlet","Bölgeli devlet","Federasyon","Konfederasyon"]});
+Q.push({c:"Devlet Biçimleri", q:"Tek ülkede tek millet ve tek egemenliğin olduğu devlet şekli hangisidir?", a:"Üniter devlet", o:["Üniter devlet","Bölgeli devlet","Federasyon","Konfederasyon"]});
+Q.push({c:"Devlet Biçimleri", q:"Çoğunluğun yönetim hakkını azınlık haklarını koruyarak kullanan sistem nedir?", a:"Çoğulcu demokrasi", o:["Çoğunlukçu demokrasi","Çoğulcu demokrasi","Parlamenter sistem","Teokrasi"]});
+Q.push({c:"Devlet Biçimleri", q:"Seçimlerde en çok oyu alanın yönetme hakkına sahip olduğu sistem nedir?", a:"Çoğunlukçu demokrasi", o:["Çoğunlukçu demokrasi","Çoğulcu demokrasi","Federasyon","Oligarşi"]});
+Q.push({c:"Devlet Biçimleri", q:"Bir devletin kendi anayasasını yapma ya da değiştirme iktidarına ne denir?", a:"Kurucu iktidar", o:["Asli iktidar","Kurucu iktidar","Tali iktidar","Yasama iktidarı"]});
+Q.push({c:"Devlet Biçimleri", q:"Mevcut anayasanın çizdiği sınırlar içinde anayasa değişikliği yapan iktidara ne denir?", a:"Tali kurucu iktidar", o:["Asli kurucu iktidar","Tali kurucu iktidar","Yasama iktidarı","Yürütme iktidarı"]});
+Q.push({c:"Devlet Biçimleri", q:"1921 Anayasasında uygulanan hükümet sistemi hangisidir?", a:"Meclis Hükümeti Sistemi", o:["Parlamenter Sistem","Meclis Hükümeti Sistemi","Başkanlık Sistemi","Karma Sistem"]});
+Q.push({c:"Devlet Biçimleri", q:"1924 Anayasasında uygulanan hükümet sistemi hangisidir?", a:"Karma Hükümet Sistemi", o:["Meclis Hükümeti Sistemi","Karma Hükümet Sistemi","Parlamenter Sistem","Başkanlık Sistemi"]});
+Q.push({c:"Devlet Biçimleri", q:"1961 Anayasasında uygulanan hükümet sistemi hangisidir?", a:"Parlamenter Sistem", o:["Meclis Hükümeti Sistemi","Karma Hükümet Sistemi","Parlamenter Sistem","Cumhurbaşkanlığı Hükümeti"]});
+Q.push({c:"Devlet Biçimleri", q:"1982 Anayasasında (2017 sonrası) uygulanan hükümet sistemi hangisidir?", a:"Cumhurbaşkanlığı Hükümeti Sistemi", o:["Meclis Hükümeti Sistemi","Karma Sistem","Parlamenter Sistem","Cumhurbaşkanlığı Hükümeti Sistemi"]});
+Q.push({c:"Devlet Biçimleri", q:"Yasama ve yürütmenin yumuşak biçimde ayrıldığı sistem hangisidir?", a:"Parlamenter sistem", o:["Başkanlık sistemi","Parlamenter sistem","Meclis hükümeti","Yarı başkanlık sistemi"]});
+
+/* ===== ANAYASA HUKUKU ===== */
+Q.push({c:"Anayasa Hukuku", q:"Kısa ve öz hükümlerden oluşan anayasalara ne denir?", a:"Çerçeve anayasa", o:["Kazuistik anayasa","Çerçeve anayasa","Sert anayasa","Yumuşak anayasa"]});
+Q.push({c:"Anayasa Hukuku", q:"Her ayrıntının düzenlendiği geniş anayasalara ne denir?", a:"Kazuistik anayasa", o:["Kazuistik anayasa","Çerçeve anayasa","Sert anayasa","Yumuşak anayasa"]});
+Q.push({c:"Anayasa Hukuku", q:"Gizli oy açık sayım ilkesine dayalı ilk seçim hangi yılda yapılmıştır?", a:"1950", o:["1946","1950","1954","1961"]});
+Q.push({c:"Anayasa Hukuku", q:"Tek dereceli seçim sistemine ilk kez hangi yılda geçilmiştir?", a:"1946", o:["1923","1934","1946","1950"]});
+Q.push({c:"Anayasa Hukuku", q:"Çağdaş anlamda dünyanın ilk yazılı anayasası hangisidir?", a:"1787 ABD Anayasası", o:["1789 Fransız Anayasası","1787 ABD Anayasası","1876 Kanun-i Esasi","Magna Carta"]});
+Q.push({c:"Anayasa Hukuku", q:"Demokratik Devlet, Sosyal Devlet, Hukuk Devleti terimleri ilk kez hangi anayasada yer almıştır?", a:"1961 Anayasası", o:["1924 Anayasası","1961 Anayasası","1982 Anayasası","2010 değişikliği"]});
+Q.push({c:"Anayasa Hukuku", q:"Yüksek Öğretim Kurulu (YÖK) hangi anayasa ile kurulmuştur?", a:"1982 Anayasası", o:["1961 Anayasası","1971 değişikliği","1982 Anayasası","2004 değişikliği"]});
+Q.push({c:"Anayasa Hukuku", q:"Devlet Denetleme Kurulu hangi anayasa ile kurulmuştur?", a:"1982 Anayasası", o:["1961 Anayasası","1971 değişikliği","1982 Anayasası","1987 değişikliği"]});
+Q.push({c:"Anayasa Hukuku", q:"Anayasanın ilk 3 maddesine değiştirilemez kuralı hangi anayasayla getirilmiştir?", a:"1982 Anayasası", o:["1921 Anayasası","1924 Anayasası","1961 Anayasası","1982 Anayasası"]});
+Q.push({c:"Anayasa Hukuku", q:"1982 Anayasasında seçimlerin yargısal denetimini kim yapar?", a:"Yüksek Seçim Kurulu", o:["Danıştay","Yargıtay","Yüksek Seçim Kurulu","Anayasa Mahkemesi"]});
+Q.push({c:"Anayasa Hukuku", q:"1982 Anayasasına göre TBMM'nin yasama yılı başlangıcı hangi tarihtir?", a:"1 Ekim", o:["1 Eylül","1 Ekim","1 Kasım","1 Ocak"]});
+Q.push({c:"Anayasa Hukuku", q:"İç tüzüğün yargısal denetimini hangi mahkeme yapar?", a:"Anayasa Mahkemesi", o:["Danıştay","Yargıtay","Anayasa Mahkemesi","Uyuşmazlık Mahkemesi"]});
+Q.push({c:"Anayasa Hukuku", q:"1982 Anayasasına göre anayasa değişikliği için en az kaç milletvekilinin yazılı teklifi gerekir?", a:"200", o:["100","150","200","301"]});
+Q.push({c:"Anayasa Hukuku", q:"TBMM'nin bilgi edinme yöntemleri arasında hangisi 2017 ile KALDIRILMIŞTIR?", a:"Sözlü soru", o:["Yazılı soru","Genel görüşme","Meclis araştırması","Sözlü soru"]});
+Q.push({c:"Anayasa Hukuku", q:"2017 Anayasa değişikliği ile KALDIRILMAYAN düzenleme hangisidir?", a:"Yazılı soru", o:["Gensoru","Sözlü soru","Güvenoyu","Yazılı soru"]});
+Q.push({c:"Anayasa Hukuku", q:"Yürürlük tarihi belirtilmeyen CBK'lar ne zaman yürürlüğe girer?", a:"Resmi Gazetede yayımlandığı gün", o:["TBMM onayından sonra","Resmi Gazetede yayımlandığı gün","7 gün sonra","30 gün sonra"]});
+Q.push({c:"Anayasa Hukuku", q:"Cumhurbaşkanı yardımcılarının atamasını kim yapar?", a:"Cumhurbaşkanı", o:["TBMM","Cumhurbaşkanı","MGK","Bakanlar Kurulu"]});
+Q.push({c:"Anayasa Hukuku", q:"2025 değişikliği ile Cumhurbaşkanı kararı ile atananlar listesine eklenen kim?", a:"Kaymakam", o:["Vali","Kaymakam","Büyükelçi","Diyanet İşleri Başkanı"]});
+Q.push({c:"Anayasa Hukuku", q:"Avrupa Birliğinin yargı organı hangisidir?", a:"Adalet Divanı", o:["Avrupa İnsan Hakları Mahkemesi","Adalet Divanı","Uluslararası Adalet Divanı","Avrupa Konseyi"]});
+Q.push({c:"Anayasa Hukuku", q:"Birleşmiş Milletlerin yargı organı hangisidir?", a:"Uluslararası Adalet Divanı", o:["Avrupa İnsan Hakları Mahkemesi","Adalet Divanı","Uluslararası Adalet Divanı","BM Güvenlik Konseyi"]});
+Q.push({c:"Anayasa Hukuku", q:"Avrupa Konseyinin temelini oluşturan sözleşme hangisidir?", a:"Avrupa İnsan Hakları Sözleşmesi", o:["Avrupa İnsan Hakları Sözleşmesi","Lizbon Antlaşması","Maastricht Antlaşması","Helsinki Nihai Senedi"]});
+Q.push({c:"Anayasa Hukuku", q:"Olağanüstü hallerde CB tarafından çıkarılan ve yargısal denetimi olmayan kararnameye ne denir?", a:"OHAL CB Kararnamesi", o:["Olağan CB Kararnamesi","OHAL CB Kararnamesi","KHK","Yönetmelik"]});
+Q.push({c:"Anayasa Hukuku", q:"Askeri Yargıtay hangi yıl kaldırılmıştır?", a:"2017", o:["2004","2010","2013","2017"]});
+Q.push({c:"Anayasa Hukuku", q:"Milli Güvenlik Kurulu Genel Sekreterliği 2025 yılında yeniden anayasaya alındı; hangi yıl kaldırılmıştı?", a:"2017", o:["2004","2010","2013","2017"]});
+
+/* ===== TEMEL HAK VE HÜRRİYETLER ===== */
+Q.push({c:"Temel Haklar", q:"Negatif statü hakları olarak da bilinen hak grubu hangisidir?", a:"Kişi hak ve ödevleri", o:["Sosyal ve ekonomik haklar","Kişi hak ve ödevleri","Siyasi haklar ve ödevler","Pozitif haklar"]});
+Q.push({c:"Temel Haklar", q:"Pozitif statü hakları olarak da bilinen hak grubu hangisidir?", a:"Sosyal ve ekonomik haklar", o:["Sosyal ve ekonomik haklar","Kişi hak ve ödevleri","Siyasi haklar ve ödevler","Negatif haklar"]});
+Q.push({c:"Temel Haklar", q:"Aktif statü hakları olarak da bilinen hak grubu hangisidir?", a:"Siyasi haklar ve ödevler", o:["Sosyal ve ekonomik haklar","Kişi hak ve ödevleri","Siyasi haklar ve ödevler","Negatif haklar"]});
+Q.push({c:"Temel Haklar", q:"Yabancıların Türkiye'de yararlanabildiği tek siyasi hak nedir?", a:"Dilekçe hakkı", o:["Seçme hakkı","Seçilme hakkı","Dilekçe hakkı","Siyasi parti kurma hakkı"]});
+Q.push({c:"Temel Haklar", q:"Vergi ödevi ve Dilekçe hakkı hangi hak ve ödevler grubunda düzenlenmiştir?", a:"Siyasi haklar ve ödevler", o:["Kişi hak ve ödevleri","Sosyal ve ekonomik haklar","Siyasi haklar ve ödevler","Temel özgürlükler"]});
+Q.push({c:"Temel Haklar", q:"Sendika kurma hakkı ve grev hakkı hangi hak grubunda düzenlenmiştir?", a:"Sosyal ve ekonomik haklar", o:["Kişi hak ve ödevleri","Sosyal ve ekonomik haklar","Siyasi haklar ve ödevler","Temel özgürlükler"]});
+Q.push({c:"Temel Haklar", q:"Savaş veya OHAL'de dahi dokunulamayan haklar grubuna ne denir?", a:"Çekirdek haklar", o:["Dokunulmaz haklar","Çekirdek haklar","Temel haklar","Mutlak haklar"]});
+Q.push({c:"Temel Haklar", q:"Ölüm cezası Türk hukukundan hangi yıl tamamen kaldırılmıştır?", a:"2004", o:["1997","2001","2004","2010"]});
+Q.push({c:"Temel Haklar", q:"Kamulaştırma bedelinin taksitlendirilebileceği azami süre kaç yıldır?", a:"5 yıl", o:["2 yıl","3 yıl","5 yıl","10 yıl"]});
+Q.push({c:"Temel Haklar", q:"Kamu hizmeti niteliği taşıyan özel teşebbüslerin kamuya geçirilmesine ne denir?", a:"Devletleştirme", o:["Kamulaştırma","Devletleştirme","İstimval","Geçici işgal"]});
+Q.push({c:"Temel Haklar", q:"Olağanüstü durumlarda taşınır malların mülkiyetini idarenin almasına ne denir?", a:"İstimval", o:["Kamulaştırma","Devletleştirme","İstimval","Geçici işgal"]});
+Q.push({c:"Temel Haklar", q:"İşverenin işçileri topluca işten uzaklaştırmasına ne denir?", a:"Lokavt", o:["Grev","Lokavt","İstimval","Boykot"]});
+Q.push({c:"Temel Haklar", q:"Basın hürdür sansür edilemez ilkesi hangi hak grubunda yer alır?", a:"Kişi hak ve ödevleri", o:["Kişi hak ve ödevleri","Sosyal ve ekonomik haklar","Siyasi haklar","Ekonomik özgürlükler"]});
+Q.push({c:"Temel Haklar", q:"Devlet bu sosyal hakları hangi ölçüde yerine getirmekle yükümlüdür?", a:"Mali kaynaklarının yeterliliği ölçüsünde", o:["Her koşulda tam olarak","Mali kaynaklarının yeterliliği ölçüsünde","Meclisten ödenek aldığı ölçüde","İhtiyaca göre"]});
+Q.push({c:"Temel Haklar", q:"Seçimlerde oy kullanamayacaklar arasında hangisi YOKTUR?", a:"Taksirli suçtan ceza infaz kurumunda bulunan hükümlüler", o:["Er ve erbaşlar","Askeri öğrenciler","Tutuklu olanlar","Taksirli suçtan ceza infaz kurumunda bulunan hükümlüler"]});
+Q.push({c:"Temel Haklar", q:"Siyasi partilere üye olamayanlar arasında hangisi YOKTUR?", a:"Yükseköğretim öğrencileri", o:["Hakimler ve savcılar","Askeri personeller","18 yaş altındakiler","Yükseköğretim öğrencileri"]});
+
+/* ===== İDARE HUKUKU (2) ===== */
+Q.push({c:"İdare Hukuku", q:"Kamu hizmetleri için gerekli taşınmazların mülkiyeti alınmadan geçici kullanılmasına ne denir?", a:"Geçici işgal", o:["Kamulaştırma","İstimval","Geçici işgal","Devletleştirme"]});
+Q.push({c:"İdare Hukuku", q:"İdarenin bütünlüğünü sağlayan iki hukuki araç nelerdir?", a:"Hiyerarşi ve idari vesayet", o:["Hiyerarşi ve denetim","Hiyerarşi ve idari vesayet","Kanun ve yönetmelik","Denetim ve yaptırım"]});
+Q.push({c:"İdare Hukuku", q:"Aynı tüzel kişilikteki üst makamların alt makamlara emir verme yetkisine ne denir?", a:"Hiyerarşi", o:["İdari vesayet","Hiyerarşi","Denetim","Gözetim"]});
+Q.push({c:"İdare Hukuku", q:"Ayrı tüzel kişilikler arasındaki kanunla sınırlandırılmış denetim yetkisine ne denir?", a:"İdari vesayet", o:["İdari vesayet","Hiyerarşi","Denetim","Gözetim"]});
+Q.push({c:"İdare Hukuku", q:"Köyün temel ihtiyaçları için köy halkından toplanan paraya ne denir?", a:"Salma", o:["İmece","Salma","Vergi","Harç"]});
+Q.push({c:"İdare Hukuku", q:"Köy işlerinin bütün köylü birleşerek yapılmasına ne denir?", a:"İmece", o:["İmece","Salma","Yardımlaşma","Dayanışma"]});
+Q.push({c:"İdare Hukuku", q:"Suç işlenmesini önlemek amacıyla yürütülen kolluk faaliyetine ne denir?", a:"İdari (önleyici) kolluk", o:["Adli kolluk","İdari (önleyici) kolluk","Yargısal kolluk","Genel kolluk"]});
+Q.push({c:"İdare Hukuku", q:"Suç işlendikten sonra delil toplayıp şüphelileri yargıya teslim eden faaliyete ne denir?", a:"Adli kolluk", o:["Adli kolluk","İdari kolluk","Önleyici kolluk","Genel kolluk"]});
+Q.push({c:"İdare Hukuku", q:"Genel idare kolluk personeli arasında hangisi YOKTUR?", a:"Özel güvenlik", o:["Polis","Jandarma","Bekçi","Özel güvenlik"]});
+Q.push({c:"İdare Hukuku", q:"Bir mahalle kurulabilmesi için nüfusun en az kaç olması gerekir?", a:"500", o:["100","250","500","1000"]});
+Q.push({c:"İdare Hukuku", q:"Merkezi idarenin başkent dışındaki teşkilatına ne ad verilir?", a:"Taşra", o:["Merkez","Taşra","Bölge","Yerel"]});
+Q.push({c:"İdare Hukuku", q:"Hizmet yönünden yerinden yönetim kuruluşları arasında hangisi YER ALMAZ?", a:"Köy", o:["TRT","Üniversiteler","SGK","Köy"]});
+Q.push({c:"İdare Hukuku", q:"Sokağa çıkma yasağına hangi makam karar verir?", a:"İçişleri Bakanlığı", o:["Cumhurbaşkanı","TBMM","İçişleri Bakanlığı","Vali"]});
+Q.push({c:"İdare Hukuku", q:"Türk vatandaşlığına alma işlemlerini hangi makam yapar?", a:"İçişleri Bakanlığı", o:["Cumhurbaşkanı","TBMM","İçişleri Bakanlığı","Danıştay"]});
+Q.push({c:"İdare Hukuku", q:"Yurt sınırı dışındaki tarla ve bahçelere gidip gelmek için verilen belgeye ne denir?", a:"Pasavan", o:["Pasaport","Vize","Pasavan","Oturma izni"]});
+Q.push({c:"İdare Hukuku", q:"Cumhurbaşkanı kararı ile atananlar arasında hangisi YOKTUR?", a:"Kaymakam (2025 öncesi)", o:["Vali","Büyükelçi","Merkez Bankası Başkanı","Kaymakam (2025 öncesi)"]});
+
+/* ===== YASAMA (2) ===== */
+Q.push({c:"Yasama", q:"İki milletvekili seçimi arasındaki süreye ne denir?", a:"Yasama dönemi", o:["Yasama yılı","Yasama dönemi","Birleşim","Oturum"]});
+Q.push({c:"Yasama", q:"1 Ekim - 30 Eylül tarihleri arasını kapsayan TBMM çalışma düzenine ne denir?", a:"Yasama yılı", o:["Yasama yılı","Yasama dönemi","Birleşim","Oturum"]});
+Q.push({c:"Yasama", q:"Genel kurulun belirli bir günde açılan toplantısına ne denir?", a:"Birleşim", o:["Yasama yılı","Yasama dönemi","Birleşim","Oturum"]});
+Q.push({c:"Yasama", q:"Bir birleşimin ara ile bölünen kısımlarına ne denir?", a:"Oturum", o:["Yasama yılı","Yasama dönemi","Birleşim","Oturum"]});
+Q.push({c:"Yasama", q:"TBMM kararıyla vekilliği düşürülen milletvekili kaç gün içinde AYM'e iptal davası açabilir?", a:"7 gün", o:["3 gün","5 gün","7 gün","15 gün"]});
+Q.push({c:"Yasama", q:"AYM bu iptal davasını kaç gün içinde karara bağlamak zorundadır?", a:"15 gün", o:["7 gün","10 gün","15 gün","30 gün"]});
+Q.push({c:"Yasama", q:"TBMM'nin para basılmasına karar verebilmesi için aranan oy çokluğu nedir?", a:"3/5", o:["Salt çoğunluk","2/3","3/5","4/5"]});
+Q.push({c:"Yasama", q:"Milletlerarası antlaşmaları onaylamaya uygun bulan makam hangisidir?", a:"TBMM", o:["Cumhurbaşkanı","TBMM","Danıştay","Dışişleri Bakanlığı"]});
+Q.push({c:"Yasama", q:"Milletlerarası antlaşmaları onaylayan ve Resmi Gazetede yayımlayan makam hangisidir?", a:"Cumhurbaşkanı", o:["Cumhurbaşkanı","TBMM","Dışişleri Bakanı","Danıştay"]});
+Q.push({c:"Yasama", q:"Kağıt para basma yetkisi kime aittir?", a:"Merkez Bankası", o:["Hazine Bakanlığı","TBMM","Merkez Bankası","Cumhurbaşkanı"]});
+Q.push({c:"Yasama", q:"Kanunlar aksi belirtilmedikçe ne zaman yürürlüğe girer?", a:"Resmi Gazetede yayımlandığı gün", o:["TBMM kararından 15 gün sonra","Resmi Gazetede yayımlandığı gün","Cumhurbaşkanı onayından itibaren","45 gün sonra"]});
+Q.push({c:"Yasama", q:"Bir ilin TBMM'de hiç üyesi kalmazsa ara seçim kaçıncı günden sonraki ilk pazar yapılır?", a:"90. günden sonraki ilk pazar", o:["30. günden sonraki ilk pazar","60. günden sonraki ilk pazar","90. günden sonraki ilk pazar","120. günden sonraki ilk pazar"]});
+Q.push({c:"Yasama", q:"Boş kalan bir bakanlığa en fazla kaç gün içinde atama yapılır?", a:"15 gün", o:["7 gün","10 gün","15 gün","30 gün"]});
+Q.push({c:"Yasama", q:"Milletvekilliğinin 'kendiliğinden' düştüğü durumlar arasında hangisi YOK?", a:"İstifa", o:["Cumhurbaşkanı seçilme","Bakan seçilme","Ölüm","İstifa"]});
+Q.push({c:"Yasama", q:"TBMM üye tamsayısının kaçta kaçının yazılı istemiyle TBMM Başkanı meclisi toplantıya çağırmak zorundadır?", a:"1/5", o:["1/10","1/5","1/4","1/3"]});
+Q.push({c:"Yasama", q:"TBMM'de kaç tane katip üye vardır?", a:"7", o:["3","5","7","10"]});
+Q.push({c:"Yasama", q:"TBMM'de kaç tane idari amirler üyesi vardır?", a:"3", o:["3","5","7","10"]});
+
+/* ===== YÜRÜTME (2) ===== */
+Q.push({c:"Yürütme", q:"OHAL ilan edilme nedenleri arasında hangisi YOK?", a:"Siyasi kriz", o:["Salgın hastalık","Ayaklanmalar","Doğal afetler","Siyasi kriz"]});
+Q.push({c:"Yürütme", q:"2017 değişikliği ile TBMM'nin denetim yetkileri arasından kaldırılan hangisidir?", a:"Gensoru", o:["Yazılı soru","Meclis araştırması","Gensoru","Genel görüşme"]});
+Q.push({c:"Yürütme", q:"Milli yas ilan etme yetkisi kime aittir?", a:"Cumhurbaşkanı", o:["TBMM","Cumhurbaşkanı","İçişleri Bakanlığı","MGK"]});
+Q.push({c:"Yürütme", q:"TRT Genel Müdürünün atamasını kim yapar?", a:"Cumhurbaşkanı", o:["TBMM","YÖK","Cumhurbaşkanı","Radyo ve Televizyon Üst Kurulu"]});
+Q.push({c:"Yürütme", q:"Rektör atamasını kim yapar?", a:"Cumhurbaşkanı", o:["YÖK","Üniversite Senatosu","Cumhurbaşkanı","Milli Eğitim Bakanı"]});
+Q.push({c:"Yürütme", q:"Dekan atamalarını kim yapar?", a:"YÖK", o:["Cumhurbaşkanı","YÖK","Üniversite Senatosu","Milli Eğitim Bakanı"]});
+Q.push({c:"Yürütme", q:"YÖK üye sayısı kaçtır?", a:"21", o:["13","17","21","25"]});
+Q.push({c:"Yürütme", q:"Cumhurbaşkanı yardımcıları ve bakanlara sorulan yazılı soruya kaç gün içinde cevap verilmelidir?", a:"15 gün", o:["7 gün","10 gün","15 gün","30 gün"]});
+Q.push({c:"Yürütme", q:"Cumhurbaşkanlığı makamı boşalırsa seçimlere 1 yıldan az zaman varsa seçim ne zaman yapılır?", a:"60. günü izleyen ilk pazar", o:["30. günü izleyen ilk pazar","45. günü izleyen ilk pazar","60. günü izleyen ilk pazar","90. günü izleyen ilk pazar"]});
+Q.push({c:"Yürütme", q:"Cumhurbaşkanlığı makamı boşalırsa seçimlere 1 yıldan fazla zaman varsa seçim ne zaman yapılır?", a:"45 gün içindeki son pazar", o:["30 gün içindeki son pazar","45 gün içindeki son pazar","60 gün içindeki son pazar","90 gün içindeki son pazar"]});
+Q.push({c:"Yürütme", q:"Cumhurbaşkanlığı seçiminin 2. turuna kalan bir aday çekilirse ne yapılır?", a:"Referanduma gidilir", o:["Kalan aday seçilir","Referanduma gidilir","Seçim iptal edilir","Yeni aday belirlenir"]});
+Q.push({c:"Yürütme", q:"Türk Silahlı Kuvvetlerinin başkomutanlığını Türk Milleti adına kim temsil eder?", a:"Cumhurbaşkanı", o:["Genelkurmay Başkanı","Cumhurbaşkanı","Milli Savunma Bakanı","TBMM"]});
+Q.push({c:"Yürütme", q:"Olağan dönem CBK'larla hangi haklar düzenlenEMEZ?", a:"Kişi hak ve ödevleri ile siyasi haklar", o:["Sosyal ve ekonomik haklar","Kişi hak ve ödevleri ile siyasi haklar","Eğitim hakları","Çalışma hakları"]});
+Q.push({c:"Yürütme", q:"Yargıtay Cumhuriyet Başsavcısı ve vekilini kim seçer?", a:"Cumhurbaşkanı", o:["Yargıtay Genel Kurulu","Cumhurbaşkanı","HSK","Adalet Bakanı"]});
+Q.push({c:"Yürütme", q:"Diyanet İşleri Başkanının görev süresi kaç yıldır?", a:"4", o:["2","3","4","5"]});
+
+/* ===== YARGI (2) ===== */
+Q.push({c:"Yargı", q:"Kamu Başdenetçisini (Ombudsman) seçme görevi kime aittir?", a:"TBMM", o:["Cumhurbaşkanı","TBMM","Anayasa Mahkemesi","HSK"]});
+Q.push({c:"Yargı", q:"Kamu Başdenetçisi kaç yıl için seçilir?", a:"4 yıl", o:["2 yıl","3 yıl","4 yıl","5 yıl"]});
+Q.push({c:"Yargı", q:"HSK'nın 4 üyesini kim seçer?", a:"Cumhurbaşkanı", o:["TBMM","Cumhurbaşkanı","Yargıtay","Danıştay"]});
+Q.push({c:"Yargı", q:"HSK'nın 7 üyesini kim seçer?", a:"TBMM", o:["Cumhurbaşkanı","TBMM","Yargıtay","Danıştay"]});
+Q.push({c:"Yargı", q:"YSK üyelerinin görev süresi kaç yıldır?", a:"6", o:["4","5","6","8"]});
+Q.push({c:"Yargı", q:"YSK'nın 6 üyesini kim seçer?", a:"Yargıtay", o:["Danıştay","Yargıtay","TBMM","Cumhurbaşkanı"]});
+Q.push({c:"Yargı", q:"YSK'nın 5 üyesini kim seçer?", a:"Danıştay", o:["Danıştay","Yargıtay","TBMM","Cumhurbaşkanı"]});
+Q.push({c:"Yargı", q:"Soyut norm denetiminde (iptal davası) dava açma süresi kaç gündür?", a:"60 gün", o:["15 gün","30 gün","60 gün","90 gün"]});
+Q.push({c:"Yargı", q:"Somut norm denetimi başvurusunu alan AYM kararını kaç ay içinde açıklamalıdır?", a:"5 ay", o:["2 ay","3 ay","5 ay","6 ay"]});
+Q.push({c:"Yargı", q:"AYM iptal kararları geriye yürür mü?", a:"Hayır, geriye yürümez", o:["Evet her zaman","Sadece anayasa değişikliklerinde","Hayır, geriye yürümez","Kanuna göre değişir"]});
+Q.push({c:"Yargı", q:"Hakimler ve savcıların zorunlu emeklilik yaşı kaçtır?", a:"65", o:["60","62","65","70"]});
+Q.push({c:"Yargı", q:"HSK kararlarına karşı hangi kararda yargı yolu açıktır?", a:"Meslekten çıkarma kararlarında", o:["Atama kararlarında","Nakil kararlarında","Meslekten çıkarma kararlarında","Disiplin kararlarında"]});
+Q.push({c:"Yargı", q:"Adliye mahkemeleri ile idare mahkemeleri arasındaki uyuşmazlıklarda hangi mahkeme kararı üstün sayılır?", a:"Uyuşmazlık Mahkemesi", o:["Anayasa Mahkemesi","Yargıtay","Danıştay","Uyuşmazlık Mahkemesi"]});
+Q.push({c:"Yargı", q:"AYM ile Uyuşmazlık Mahkemesi kararları çelişirse hangi mahkemenin kararı esas alınır?", a:"Anayasa Mahkemesi", o:["Anayasa Mahkemesi","Uyuşmazlık Mahkemesi","Son karar veren mahkeme","Danıştay"]});
+Q.push({c:"Yargı", q:"AYM'nin reddettiği kanun hükmü hakkında kaç yıl geçmeden yeniden başvurulamaz?", a:"10 yıl", o:["2 yıl","5 yıl","10 yıl","15 yıl"]});
+Q.push({c:"Yargı", q:"Günümüzde askeri mahkemeler hangi koşulda kurulabilir?", a:"Sadece savaş halinde", o:["OHAL ilan edildiğinde","Her zaman kurulabilir","Sadece savaş halinde","Cumhurbaşkanı kararıyla"]});
+
+/* ===== MEMURLAR (2) ===== */
+Q.push({c:"Memurlar", q:"İstisnai devlet memurları arasında hangisi YOKTUR?", a:"Kaymakam", o:["Vali","TOKİ Başkanı","Büyükelçi","Kaymakam"]});
+Q.push({c:"Memurlar", q:"Memurun aylıktan 1/30 ile 1/8 arasında kesinti yapılmasına ne denir?", a:"Aylıktan kesme", o:["Uyarma","Kınama","Aylıktan kesme","Kademe durdurma"]});
+Q.push({c:"Memurlar", q:"Memurlara verilen disiplin cezaları arasında 'uzaklaştırma' var mı?", a:"Hayır, uzaklaştırma bir disiplin cezası değildir", o:["Evet var","Hayır, uzaklaştırma bir disiplin cezası değildir","Sadece OHAL döneminde var","Sadece üst kademe memurlarda var"]});
+Q.push({c:"Memurlar", q:"Memurun süt izin hakkı ilk 6 ay için günde kaç saattir?", a:"3 saat", o:["1 saat","1.5 saat","2 saat","3 saat"]});
+Q.push({c:"Memurlar", q:"Memurun süt izin hakkı ikinci 6 ay için günde kaç saattir?", a:"1.5 saat", o:["1 saat","1.5 saat","2 saat","3 saat"]});
+Q.push({c:"Memurlar", q:"Memurluğa atanan kişi atandıktan sonra en geç kaç gün içinde göreve başlamalıdır?", a:"15 gün", o:["3 gün","7 gün","15 gün","30 gün"]});
+Q.push({c:"Memurlar", q:"İtiraz mercileri, itiraz dilekçesi kendilerine ulaştıktan kaç gün içinde karara bağlamak zorundadır?", a:"30 gün", o:["7 gün","15 gün","30 gün","60 gün"]});
+Q.push({c:"Memurlar", q:"Disiplin amirlerinin verdiği uyarma/kınama cezalarına karşı itiraz mercii neresidir?", a:"Disiplin Kurulu", o:["Disiplin Kurulu","Yüksek Disiplin Kurulu","İdare Mahkemesi","Danıştay"]});
+Q.push({c:"Memurlar", q:"Kademe ilerlemesini durdurma cezasına karşı itiraz mercii neresidir?", a:"Yüksek Disiplin Kurulu", o:["Disiplin Kurulu","Yüksek Disiplin Kurulu","İdare Mahkemesi","Danıştay"]});
+Q.push({c:"Memurlar", q:"Devlet memurlarının haftalık çalışma süresi kaç saattir?", a:"40 saat", o:["35 saat","38 saat","40 saat","45 saat"]});
+Q.push({c:"Memurlar", q:"Devlet memuru olabilmek için asgari öğrenim şartı nedir?", a:"Ortaokul mezunu", o:["İlkokul mezunu","Ortaokul mezunu","Lise mezunu","Önlisans mezunu"]});
+Q.push({c:"Memurlar", q:"Aylıktan kesme ve kademe durdurma cezaları kaç yıl sonra özlük dosyasından silinir?", a:"10 yıl", o:["5 yıl","7 yıl","10 yıl","15 yıl"]});
+
+var CATEGORIES = [];
+Q.forEach(function(x){if(CATEGORIES.indexOf(x.c)===-1)CATEGORIES.push(x.c);});
+
+var selCats={};
+CATEGORIES.forEach(function(c){selCats[c]=true;});
+var questions=[],curIdx=0,corr=0,wrng=0,skip=0,answered=false,tmr=null,tLeft=20,lastSel=null;
+
+function shuf(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+
+function showCatScreen(){
+  document.getElementById('cat-screen').style.display='block';
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('header-stats').style.display='none';
+  renderCats();
+}
+
+function renderCats(){
+  var icons={'Temel Hukuk':'⚖️','Devlet Biçimleri':'🌐','Anayasa Hukuku':'📜','Temel Haklar':'🛡️','İdare Hukuku':'🏢','Yasama':'🏛️','Yürütme':'🫅','Yargı':'🔨','Memurlar':'👨‍💼'};
+  var g=document.getElementById('cat-grid'),h='';
+  CATEGORIES.forEach(function(c){
+    var cnt=0;Q.forEach(function(x){if(x.c===c)cnt++;});
+    h+='<div class="cat-card'+(selCats[c]?' selected':'')+'" onclick="togCat(\''+c+'\',this)">';
+    h+='<div class="ci">'+(icons[c]||'📚')+'</div>';
+    h+='<div class="cn">'+c+'</div>';
+    h+='<div class="cc">'+cnt+' soru</div></div>';
+  });
+  g.innerHTML=h;
+}
+
+function togCat(c,el){
+  var cnt=0;CATEGORIES.forEach(function(x){if(selCats[x])cnt++;});
+  if(selCats[c]){if(cnt===1)return;selCats[c]=false;el.classList.remove('selected');}
+  else{selCats[c]=true;el.classList.add('selected');}
+}
+
+function startQuiz(){
+  lastSel={};CATEGORIES.forEach(function(c){lastSel[c]=selCats[c];});
+  var pool=[];Q.forEach(function(x){if(selCats[x.c])pool.push(x);});
+  questions=shuf(pool).slice(0,Math.min(20,pool.length));
+  curIdx=0;corr=0;wrng=0;skip=0;
+  document.getElementById('cat-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('header-stats').style.display='flex';
+  updStats();showQ();
+}
+
+function restartSameCat(){
+  if(lastSel)CATEGORIES.forEach(function(c){selCats[c]=lastSel[c];});
+  startQuiz();
+}
+
+function showQ(){
+  if(curIdx>=questions.length){showResult();return;}
+  answered=false;clearInterval(tmr);tLeft=20;
+  var q=questions[curIdx];
+  document.getElementById('cat-pill').textContent=q.c;
+  document.getElementById('q-number').textContent='SORU '+(curIdx+1)+' / '+questions.length;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('progress-bar').style.width=((curIdx/questions.length)*100)+'%';
+  var opts=shuf(q.o),keys=['A','B','C','D'],h='';
+  opts.forEach(function(o,i){
+    var safe=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    h+='<button class="option-btn" onclick="pick(this,\''+safe+'\')">';
+    h+='<span class="key">'+keys[i]+'</span>'+o+'</button>';
+  });
+  document.getElementById('options').innerHTML=h;
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('feedback').textContent='';
+  document.getElementById('next-btn').className='next-btn';
+  updTimer();
+  tmr=setInterval(tick,1000);
+}
+
+function tick(){
+  tLeft--;updTimer();
+  if(tLeft<=0){
+    clearInterval(tmr);
+    if(!answered){answered=true;skip++;updStats();hlCorrect();showFB(false,true);
+      document.getElementById('next-btn').className='next-btn show';
+      var bs=document.getElementById('options').getElementsByTagName('button');
+      for(var i=0;i<bs.length;i++)bs[i].disabled=true;
+    }
+  }
+}
+
+function updTimer(){
+  var el=document.getElementById('timer-num');
+  el.textContent=tLeft;
+  el.className='timer-num'+(tLeft<=5?' danger':'');
+}
+
+function pick(btn,chosen){
+  if(answered)return;answered=true;clearInterval(tmr);
+  var q=questions[curIdx],ok=(chosen===q.a);
+  if(ok){corr++;btn.classList.add('correct');btn.querySelector('.key').style.cssText='background:var(--correct);color:#fff';}
+  else{wrng++;btn.classList.add('wrong');btn.querySelector('.key').style.cssText='background:var(--wrong);color:#fff';hlCorrect();}
+  updStats();showFB(ok,false);
+  document.getElementById('next-btn').className='next-btn show';
+  var bs=document.getElementById('options').getElementsByTagName('button');
+  for(var i=0;i<bs.length;i++)bs[i].disabled=true;
+}
+
+function hlCorrect(){
+  var q=questions[curIdx];
+  var bs=document.getElementById('options').getElementsByTagName('button');
+  for(var i=0;i<bs.length;i++){
+    if(bs[i].textContent.indexOf(q.a)!==-1)bs[i].classList.add('correct');
+  }
+}
+
+function showFB(ok,timeout){
+  var fb=document.getElementById('feedback'),q=questions[curIdx];
+  if(timeout){fb.textContent='⏰ Süre doldu! Doğru: '+q.a;fb.className='feedback wrong show';}
+  else if(ok){fb.textContent='✅ Doğru!';fb.className='feedback correct show';}
+  else{fb.textContent='❌ Yanlış! Doğru cevap: '+q.a;fb.className='feedback wrong show';}
+}
+
+function updStats(){
+  document.getElementById('stat-correct').textContent=corr;
+  document.getElementById('stat-wrong').textContent=wrng+skip;
+  document.getElementById('stat-total').textContent=curIdx;
+}
+
+function nextQuestion(){curIdx++;updStats();showQ();}
+
+function showResult(){
+  clearInterval(tmr);
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  var pct=Math.round((corr/questions.length)*100);
+  document.getElementById('result-score').textContent='%'+pct;
+  var emoji=pct>=80?'🏆':pct>=60?'👍':'📖';
+  var label=pct>=80?'Mükemmel! KPSS\'ye hazırsın.':pct>=60?'İyi iş! Biraz daha pratik yap.':'Tekrar çalışman gerekiyor.';
+  document.getElementById('result-emoji').textContent=emoji;
+  document.getElementById('result-label').textContent=label;
+  document.getElementById('res-correct').textContent=corr;
+  document.getElementById('res-wrong').textContent=wrng;
+  document.getElementById('res-skip').textContent=skip;
+  document.getElementById('progress-bar').style.width='100%';
+}
+
+showCatScreen();
+</script>
+</body>
+</html>
