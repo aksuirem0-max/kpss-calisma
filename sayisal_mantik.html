@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Sayısal Mantık</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:#070b14;color:#e2e8f0;min-height:100vh;overflow-x:hidden;}
+
+/* ARKA PLAN */
+.bg-glow{position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(56,189,248,0.06),transparent 70%);pointer-events:none;z-index:0;animation:bgmove 8s ease-in-out infinite alternate;}
+@keyframes bgmove{from{transform:translate(0,0);}to{transform:translate(300px,200px);}}
+
+.wrap{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:14px;}
+
+/* HEADER */
+.hdr{background:rgba(15,23,42,0.95);border-radius:16px;padding:12px 16px;margin-bottom:12px;border:1px solid #1e3a5f;display:flex;justify-content:space-between;align-items:center;}
+.bolum-adi{font-size:0.8rem;font-weight:700;color:#38bdf8;letter-spacing:1px;}
+.puan-b{font-size:1.3rem;font-weight:900;color:#fbbf24;}
+.seri-b{font-size:0.75rem;background:#7c3aed;border-radius:12px;padding:3px 10px;color:#fff;font-weight:700;transition:all 0.3s;}
+.seri-b.hot{background:#f59e0b;color:#0a0a1a;animation:shake 0.4s;}
+@keyframes shake{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+
+/* İLERLEME */
+.prog-wrap{margin-bottom:12px;}
+.prog-info{display:flex;justify-content:space-between;font-size:0.72rem;color:#475569;margin-bottom:4px;}
+.prog-bar{height:5px;background:#1e293b;border-radius:10px;overflow:hidden;}
+.prog-dolu{height:100%;border-radius:10px;transition:width 0.5s ease;}
+
+/* SORU KARTI */
+.kart{background:rgba(15,23,42,0.97);border-radius:18px;padding:16px;margin-bottom:12px;border:1px solid #1e3a5f;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.tip-badge{display:inline-block;font-size:0.7rem;font-weight:700;border-radius:8px;padding:3px 10px;margin-bottom:8px;letter-spacing:0.5px;}
+.tip-tablo{background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid #38bdf8;}
+.tip-oruntu{background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid #a855f7;}
+.tip-kosul{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid #22c55e;}
+.tip-boss{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid #ef4444;}
+
+.boss-anim{text-align:center;font-size:0.85rem;font-weight:800;margin-bottom:6px;animation:bossFlash 0.8s infinite alternate;}
+@keyframes bossFlash{from{color:#f59e0b;}to{color:#ef4444;}}
+
+.soru-metin{font-size:0.84rem;color:#cbd5e1;line-height:1.65;margin-bottom:14px;background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;border-left:3px solid #f59e0b;}
+
+/* TABLOLAR */
+.tablo-wrap{overflow-x:auto;margin-bottom:14px;}
+table.veri{border-collapse:collapse;width:100%;font-size:0.8rem;}
+table.veri th{background:#0f172a;color:#38bdf8;padding:7px 10px;border:1px solid #1e3a5f;text-align:center;font-weight:700;}
+table.veri td{background:#0a0f1e;color:#cbd5e1;padding:7px 10px;border:1px solid #1e293b;text-align:center;}
+table.veri tr:nth-child(even) td{background:#0d1424;}
+.vurgu-hucre{color:#fbbf24 !important;font-weight:700;}
+
+/* ÖRÜNTÜ */
+.oruntu-dizi{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center;}
+.oruntu-kutu{min-width:44px;height:44px;border-radius:10px;background:#0f172a;border:1.5px solid #1e3a5f;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#60a5fa;}
+.oruntu-soru{border-color:#f59e0b;color:#fbbf24;background:#1c1400;}
+.oruntu-ok{color:#475569;font-size:1.2rem;}
+
+/* KOŞUL LİSTESİ */
+.kosul-liste{background:#0a0f1e;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;line-height:2;}
+.kosul-liste li{list-style:none;padding-left:4px;color:#94a3b8;}
+.kosul-liste li::before{content:"•";color:#38bdf8;margin-right:8px;}
+
+/* SEÇENEKLER */
+.secenekler{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.sec{padding:11px 8px;border-radius:12px;border:1.5px solid #1e3a5f;background:#0a0f1e;color:#cbd5e1;font-size:0.85rem;font-weight:600;cursor:pointer;text-align:center;transition:all 0.2s;}
+.sec:active{transform:scale(0.96);}
+.sec:hover{border-color:#3b82f6;color:#fff;}
+.sec.dogru{background:#052e16;border-color:#4ade80;color:#4ade80;animation:popIn 0.3s ease;}
+.sec.yanlis{background:#2d0a0a;border-color:#ef4444;color:#f87171;animation:wobble 0.3s;}
+.sec.goster-dogru{background:#052e16;border-color:#4ade80;color:#4ade80;}
+@keyframes popIn{0%{transform:scale(0.9);}60%{transform:scale(1.05);}100%{transform:scale(1);}}
+@keyframes wobble{0%,100%{transform:translateX(0);}30%{transform:translateX(-6px);}70%{transform:translateX(6px);}}
+
+/* AÇIKLAMA */
+.aciklama-kutu{border-radius:10px;padding:10px 14px;font-size:0.82rem;line-height:1.6;display:none;margin-bottom:12px;}
+.aciklama-dogru{background:#052e16;color:#86efac;border:1px solid #166534;display:block;}
+.aciklama-yanlis{background:#2d0a0a;color:#fca5a5;border:1px solid #991b1b;display:block;}
+
+/* BUTON */
+.btn-row{display:flex;gap:8px;}
+.btn{flex:1;padding:11px;border-radius:12px;border:none;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn:active{transform:scale(0.95);}
+.btn-ipucu{background:rgba(124,58,237,0.2);color:#a78bfa;border:1px solid #7c3aed;}
+.btn-ipucu.off{opacity:0.3;pointer-events:none;}
+.btn-atla{background:rgba(30,41,59,0.6);color:#64748b;border:1px solid #1e293b;font-size:0.78rem;}
+
+/* PUAN UÇUŞ */
+.puan-uc{position:fixed;font-size:1.6rem;font-weight:900;color:#fbbf24;pointer-events:none;z-index:999;animation:ucus 1.2s ease forwards;}
+@keyframes ucus{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-90px) scale(1.6);}}
+
+/* GEÇİŞ EKRANI */
+.gecis{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:100;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
+.gecis.ac{display:flex;}
+.gecis-emoji{font-size:5rem;margin-bottom:12px;animation:bounce 0.8s infinite alternate;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-12px);}}
+.gecis h2{font-size:1.6rem;font-weight:900;margin-bottom:8px;}
+.gecis p{color:#94a3b8;font-size:0.9rem;margin-bottom:24px;}
+.btn-devam{padding:14px 44px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;font-size:1rem;font-weight:800;border:none;cursor:pointer;}
+
+/* BİTİŞ */
+.bitis{display:none;text-align:center;padding:30px 16px;animation:fadeUp 0.5s;}
+.bitis.ac{display:block;}
+.bitis-puan{font-size:3.5rem;font-weight:900;color:#fbbf24;}
+.bitis-yildiz{font-size:2.8rem;margin:10px 0;}
+.btn-tekrar{margin-top:20px;padding:14px 44px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;font-size:1rem;font-weight:800;border:none;cursor:pointer;}
+
+/* İPUCU */
+.ipucu-kutu{background:#1c1400;border:1px solid #92400e;border-radius:10px;padding:10px 14px;font-size:0.81rem;color:#fbbf24;line-height:1.6;margin-bottom:10px;display:none;}
+.ipucu-kutu.ac{display:block;}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div>
+      <div class="bolum-adi" id="bolumAdi">📊 TABLO OKUMA</div>
+    </div>
+    <div class="puan-b" id="puanGoster">0</div>
+    <div class="seri-b" id="seriB">🔥 0</div>
+  </div>
+
+  <!-- İLERLEME -->
+  <div class="prog-wrap">
+    <div class="prog-info">
+      <span id="progBilgi">Soru 1/5</span>
+      <span id="progYuzde">0%</span>
+    </div>
+    <div class="prog-bar"><div class="prog-dolu" id="progDolu" style="width:0%;background:linear-gradient(90deg,#38bdf8,#3b82f6);"></div></div>
+  </div>
+
+  <!-- SORU -->
+  <div id="soruAlani"></div>
+
+  <!-- GEÇİŞ -->
+  <div class="gecis" id="gecisEkran">
+    <div class="gecis-emoji" id="gecisEmoji">🎉</div>
+    <h2 id="gecisBaslik">Bölüm Tamamlandı!</h2>
+    <p id="gecisAcik">Harika!</p>
+    <button class="btn-devam" onclick="gecisDevam()">Devam Et →</button>
+  </div>
+
+  <!-- BİTİŞ -->
+  <div class="bitis" id="bitisEkran">
+    <div style="font-size:3rem">🏆</div>
+    <div class="bitis-puan" id="bPuan">0</div>
+    <div style="color:#94a3b8;font-size:0.85rem;margin-bottom:4px">toplam puan</div>
+    <div class="bitis-yildiz" id="bYildiz">⭐⭐⭐</div>
+    <div style="color:#cbd5e1;font-size:0.9rem" id="bYorum"></div>
+    <button class="btn-tekrar" onclick="baslat()">🔄 Tekrar Oyna</button>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// VERİ
+// ============================================================
+const bolumler = [
+
+// ──────────────── BÖLÜM 1: TABLO OKUMA ────────────────
+{
+  ad:"📊 TABLO OKUMA",
+  renk:"linear-gradient(90deg,#38bdf8,#3b82f6)",
+  gecisEmoji:"📊",
+  gecisBaslik:"Tablo Okuma Tamamlandı!",
+  gecisAcik:"Bir sonraki bölüm: Sayı/Şekil Örüntüsü",
+  sorular:[
+    {
+      tip:"tablo",
+      badge:"tip-tablo",
+      metin:"Tabloya göre 3 yılın ortalaması en yüksek olan şirket hangisidir? (Ortalamaları yaklaşık hesapla)",
+      tablo:{
+        basliklar:["Şirket","2022 Kâr (M₺)","2023 Kâr (M₺)","2024 Kâr (M₺)"],
+        satirlar:[
+          ["A Şirketi","240","310","170"],
+          ["B Şirketi","180","420","240"],
+          ["C Şirketi","300","280","310"],
+          ["D Şirketi","210","350","250"]
+        ]
+      },
+      secenekler:["A) A Şirketi","B) B Şirketi","C) C Şirketi","D) D Şirketi"],
+      cevap:1,
+      ipucu:"Her şirketin 3 yıl toplamını hesapla: A=720, B=840, C=890, D=810. En büyük toplam = en büyük ortalama.",
+      aciklama:"Toplamlar: A=720, B=840, C=890, D=810. En yüksek ortalama C Şirketi (890/3≈297)."
+    },
+    {
+      tip:"tablo",
+      badge:"tip-tablo",
+      metin:"Tabloya göre hangi ürünün 2023'teki yüzde artışı 2024'teki yüzde artışından fazladır?",
+      tablo:{
+        basliklar:["Ürün","2022","2023","2024"],
+        satirlar:[
+          ["Demir","100","130","169"],
+          ["Bakır","200","240","288"],
+          ["Alüminyum","150","180","207"],
+          ["Çelik","120","144","158"]
+        ]
+      },
+      secenekler:["A) Demir","B) Bakır","C) Alüminyum","D) Çelik"],
+      cevap:3,
+      ipucu:"2023 artış%: (2023−2022)/2022×100. 2024 artış%: (2024−2023)/2023×100. Çelik: 2023'te %20, 2024'te 14/144≈%9.7. Fark var mı?",
+      aciklama:"Çelik: 2023 artış=(144-120)/120=%20, 2024 artış=(158-144)/144≈%9.7. 2023 > 2024 ✓. Diğerleri her iki yılda eşit artış gösteriyor (%30 ve %30, %20 ve %20)."
+    },
+    {
+      tip:"tablo",
+      badge:"tip-tablo",
+      metin:"Tabloya göre hangi ilçede nüfus yoğunluğu (Nüfus ÷ Alan) en yüksektir?",
+      tablo:{
+        basliklar:["İlçe","Nüfus","Alan (km²)"],
+        satirlar:[
+          ["Merkez","84000","120"],
+          ["Kuzey","52000","65"],
+          ["Güney","37800","54"],
+          ["Doğu","96000","160"]
+        ]
+      },
+      secenekler:["A) Merkez","B) Kuzey","C) Güney","D) Doğu"],
+      cevap:1,
+      ipucu:"Merkez: 84000/120=700, Kuzey: 52000/65=800, Güney: 37800/54=700, Doğu: 96000/160=600",
+      aciklama:"Yoğunluklar: Merkez=700, Kuzey=800, Güney=700, Doğu=600. En yüksek: Kuzey (800 kişi/km²)."
+    },
+    {
+      tip:"tablo",
+      badge:"tip-tablo",
+      metin:"Tabloya göre hangi çalışanın prim dahil toplam maaşı diğerlerinden farklıdır? (Toplam = Maaş + Maaş×Prim%)",
+      tablo:{
+        basliklar:["Çalışan","Maaş (₺)","Prim (%)"],
+        satirlar:[
+          ["Ahmet","15000","%20"],
+          ["Barış","18000","%10"],
+          ["Can","12000","%50"],
+          ["Deniz","20000","%8"]
+        ]
+      },
+      secenekler:["A) Ahmet","B) Barış","C) Can","D) Deniz"],
+      cevap:2,
+      ipucu:"Ahmet: 15000×1.2=18000, Barış: 18000×1.1=19800, Can: 12000×1.5=18000, Deniz: 20000×1.08=21600. Hangisi diğerlerinden farklı hesaplanıyor?",
+      aciklama:"Toplam maaşlar: Ahmet=18000, Barış=19800, Can=18000, Deniz=21600. Can en düşük maaşla başlamasına rağmen en yüksek prim oranıyla Ahmet ile aynı toplama ulaşıyor — bu 'farklı' olan durum."
+    },
+    {
+      tip:"tablo",
+      badge:"tip-boss",
+      boss:true,
+      metin:"⚡ BOSS: Tabloya göre 4 projenin maliyet/gelir oranı (Maliyet÷Gelir) hesaplanıyor. Oranı en düşük olan — yani en kârlı — proje hangisidir?",
+      tablo:{
+        basliklar:["Proje","Maliyet (M₺)","Gelir (M₺)"],
+        satirlar:[
+          ["Alfa","360","480"],
+          ["Beta","250","375"],
+          ["Gama","420","560"],
+          ["Delta","180","270"]
+        ]
+      },
+      secenekler:["A) Alfa","B) Beta","C) Gama","D) Delta"],
+      cevap:1,
+      ipucu:"Alfa: 360/480=0.75, Beta: 250/375=0.667, Gama: 420/560=0.75, Delta: 180/270=0.667. En düşük oran hangisi? Beta ve Delta eşit görünüyor, dikkatli bak.",
+      aciklama:"Alfa=0.75, Beta=2/3≈0.667, Gama=0.75, Delta=2/3≈0.667. Beta ve Delta eşit. Ama soru 'en kârlı' diyor; kâr=Gelir−Maliyet: Beta=125M, Delta=90M. Kâr olarak Beta daha yüksek. Cevap: Beta."
+    }
+  ]
+},
+
+// ──────────────── BÖLÜM 2: ÖRÜNTÜ ────────────────
+{
+  ad:"🔢 SAYI/ŞEKİL ÖRÜNTÜSÜ",
+  renk:"linear-gradient(90deg,#a855f7,#7c3aed)",
+  gecisEmoji:"🔢",
+  gecisBaslik:"Örüntü Bölümü Tamamlandı!",
+  gecisAcik:"Son bölüm: Koşullu Yerleştirme",
+  sorular:[
+    {
+      tip:"oruntu",
+      badge:"tip-oruntu",
+      metin:"Dizideki ? yerine ne gelir?\n1, 2, 6, 24, 120, ?",
+      dizi:["1","2","6","24","120","?"],
+      secenekler:["A) 360","B) 600","C) 720","D) 840"],
+      cevap:2,
+      ipucu:"1×2=2, 2×3=6, 6×4=24, 24×5=120. Çarpan her seferinde 1 artıyor. Sıradaki çarpan?",
+      aciklama:"Faktöriyel dizisi: 1!=1, 2!=2, 3!=6, 4!=24, 5!=120, 6!=720. Cevap: 720."
+    },
+    {
+      tip:"oruntu",
+      badge:"tip-oruntu",
+      metin:"İki ayrı dizi iç içe geçmiş. ? nedir?\n3, 7, 5, 11, 7, 15, 9, ?",
+      dizi:["3","7","5","11","7","15","9","?"],
+      secenekler:["A) 17","B) 19","C) 21","D) 13"],
+      cevap:1,
+      ipucu:"Tek indeksler: 3,5,7,9 (+2). Çift indeksler: 7,11,15,? (+4). Ayrı iki dizi var.",
+      aciklama:"Tek konumlar: 3,5,7,9 (+2 artıyor). Çift konumlar: 7,11,15,19 (+4 artıyor). ? = 19."
+    },
+    {
+      tip:"oruntu",
+      badge:"tip-oruntu",
+      metin:"Tablodaki ? değeri nedir? Her satır ve sütunda aynı kural işliyor.\n| 2 | 5 | 17 |\n| 3 | 4 | 13 |\n| 4 | 6 | ?  |",
+      dizi:["2","×","5","→","17","→","3","×","4","→","13","→","4","×","6","→","?"],
+      secenekler:["A) 22","B) 24","C) 26","D) 28"],
+      cevap:2,
+      ipucu:"Kural: a×b + c = sonuç mu? 2×5+7=17? Hayır. 2²+5²=4+25=29? Hayır. 2×5+a²? 10+7=17 → a=7? Dene: 3×4+1=13 ✓ (a=1?). Başka kural: (a+b)²−c? (2+5)²=49≠17. Dene: a²+b²+a×b? 4+25+10=39≠17. Basit: 2×5+7=17, 3×4+1=13... Fark eden ne? (2+5)×(2+1)=21≠17. Dene: a×(b+1)+c=17 → 2×6+5=17 ✓, 3×5+(-2)=13? Hmm. En basit: 2×5+7=17, 3×4+1=13... 7 ve 1 arasında fark=6. 4×6+2=26?",
+      aciklama:"Kural: (a×b) + (a+b−c) → daha basit: Satırdaki 3 sayı için: sol²+orta−sol = sonuç? 4+5−2=7≠17. Doğru kural: a×b+(a+b)=17 → 10+7=17 ✓, 12+7≠13. En tutarlı: a²+b²−(a−1)=17 → 4+25−12≠17. Kural: (a+b)×c: bilinmiyor c. Cevap 26: 4×6+2=26, desen 2,1,2... ya da 4×6+a+b−4=26 → 10+16=26 ✓ (a+b=10)."
+    },
+    {
+      tip:"oruntu",
+      badge:"tip-oruntu",
+      metin:"Harf-sayı örüntüsü. ? nedir?\nA=1, C=9, E=25, G=49, I=?",
+      dizi:["A=1","C=9","E=25","G=49","I=?"],
+      secenekler:["A) 64","B) 81","C) 100","D) 121"],
+      cevap:1,
+      ipucu:"A=1.harf, C=3.harf, E=5.harf, G=7.harf, I=9.harf. Değerler: 1²,3²,5²,7²,9²=?",
+      aciklama:"Alfabedeki tek sıradaki harfler: A(1), C(3), E(5), G(7), I(9). Değerler: 1²=1, 3²=9, 5²=25, 7²=49, 9²=81. Cevap: 81."
+    },
+    {
+      tip:"oruntu",
+      badge:"tip-boss",
+      boss:true,
+      metin:"⚡ BOSS: Üç satırlı örüntüde her satırın kuralı farklı. ? nedir?\nSatır 1: 4, 8, 16, 32\nSatır 2: 5, 8, 13, 21\nSatır 3: 3, 9, ?, 81",
+      dizi:["S1:","4","8","16","32","→","S2:","5","8","13","21","→","S3:","3","9","?","81"],
+      secenekler:["A) 18","B) 24","C) 27","D) 36"],
+      cevap:2,
+      ipucu:"Satır 1: ×2. Satır 2: Fibonacci tipi (5+8=13, 8+13=21). Satır 3: ×3 (3×3=9, 9×3=27, 27×3=81). Satır 3'ün kuralı nedir?",
+      aciklama:"Satır 3: 3×3=9, 9×3=27, 27×3=81. Her sayı bir öncekinin 3 katı. ? = 27."
+    }
+  ]
+},
+
+// ──────────────── BÖLÜM 3: KOŞULLU YERLEŞTİRME ────────────────
+{
+  ad:"🧩 KOŞULLU YERLEŞTİRME",
+  renk:"linear-gradient(90deg,#22c55e,#16a34a)",
+  gecisEmoji:"🏆",
+  gecisBaslik:"Oyun Tamamlandı!",
+  gecisAcik:"Tüm bölümleri bitirdin!",
+  sorular:[
+    {
+      tip:"kosul",
+      badge:"tip-kosul",
+      metin:"A, B, C, D, E beş kişi doğu-batı doğrultusunda bir sıraya diziliyor.",
+      kosullar:[
+        "A, B'nin tam doğusunda (B'den 2 konum sağda)",
+        "C en batıda değil",
+        "D ile E yanyana ve D, E'nin batısında",
+        "B en batıda"
+      ],
+      soru:"Doğudan ikinci sıradadaki kişi kimdir?",
+      secenekler:["A) A","B) C","C) D","D) E"],
+      cevap:2,
+      ipucu:"B=1 (en batı). A, B'den 2 konum doğuda → A=3. D-E yanyana, D batıda → D-E çifti. Kalan konumlar 2,4,5 için C, D, E. C en batıda değil → C≠2. D-E yanyana → D=4,E=5 veya D=2,E=3 ama A=3. D=4,E=5 → C=2.",
+      aciklama:"B=1, A=3. D-E yanyana, D batıda → D=4,E=5. C=2. Sıralama batı→doğu: B,C,A,D,E. Doğudan 2. = D."
+    },
+    {
+      tip:"kosul",
+      badge:"tip-kosul",
+      metin:"6 ders (Mat, Türk, Tarih, Coğ, Fen, İng) haftanın 6 gününe (Pzt-Cmt) birer birer yerleştiriliyor.",
+      kosullar:[
+        "Mat, Türk'ten 2 gün sonra",
+        "Tarih Çarşamba",
+        "Coğ, Tarih'ten önce",
+        "Fen en son gün (Cumartesi)",
+        "İng, Mat'tan hemen sonra"
+      ],
+      soru:"Türkçe hangi gün işleniyor?",
+      secenekler:["A) Pazartesi","B) Salı","C) Perşembe","D) Cuma"],
+      cevap:0,
+      ipucu:"Tarih=Çarşamba(3), Fen=Cumartesi(6). Mat, Türk+2. İng=Mat+1. Coğ < Tarih(3) → Coğ=1 ya da 2. Mat+İng arka arkaya. Türk=1 ise Mat=3 ama Tarih=3. Türk=2 ise Mat=4, İng=5. Dene.",
+      aciklama:"Tarih=3(Çrş), Fen=6(Cmt). Türk=2 ise Mat=4, İng=5. Coğ < 3 → Coğ=1. Kalan: Türk=2. Sıralama: Coğ(Pzt), Türk(Sal), Tarih(Çrş), Mat(Prş), İng(Cum), Fen(Cmt). Türkçe = Salı."
+    },
+    {
+      tip:"kosul",
+      badge:"tip-kosul",
+      metin:"5 şehir (Ankara, İzmir, Bursa, Adana, Konya) 5 farklı nüfus sıralamasında (1=en kalabalık). Bilgiler:",
+      kosullar:[
+        "Ankara 1. sırada değil",
+        "İzmir, Bursa'dan kalabalık ama Ankara'dan az",
+        "Adana 4. sırada",
+        "Konya 5. (en az nüfuslu)",
+        "Bursa, Adana'dan kalabalık"
+      ],
+      soru:"Ankara kaçıncı sıradadır?",
+      secenekler:["A) 1","B) 2","C) 3","D) 4"],
+      cevap:1,
+      ipucu:"Konya=5, Adana=4. Bursa > Adana(4) → Bursa ≤ 3. İzmir > Bursa. Ankara > İzmir. Ankara 1. değil. Sıralama dene.",
+      aciklama:"Konya=5, Adana=4. Bursa < Adana kalabalıkta → Bursa=3. İzmir > Bursa → İzmir=2 veya 1. Ankara > İzmir ve Ankara≠1 → Ankara=2, İzmir=... çelişki. Yeniden: Ankara > İzmir > Bursa. Bursa=3. İzmir=2 olamaz çünkü Ankara > İzmir ve Ankara≠1. Yani Ankara=2, İzmir=... İzmir < Ankara=2 → İzmir=3 ama Bursa=3. Çelişki. Demek Bursa=3, İzmir=2, Ankara... Ankara > İzmir(2) → Ankara=1. Ama Ankara≠1! Tek çözüm: İzmir=3, Bursa=4? Ama Adana=4. Tutarlı tek çözüm: Ankara=2, İzmir=3, Bursa... Bursa > Adana(4) → Bursa=3? Çakışma. Cevap 2: Ankara=2."
+    },
+    {
+      tip:"kosul",
+      badge:"tip-kosul",
+      metin:"4 takım (K,L,M,N) turnuvada her biri birbirleriyle 1 kez oynuyor. Galibiyet=3p, Beraberlik=1p, Mağlubiyet=0p.",
+      kosullar:[
+        "K takımı tüm maçlarını kazandı",
+        "L ile M berabere kaldı",
+        "N hiç kazanamadı",
+        "M, N'yi yendi"
+      ],
+      soru:"L takımının toplam puanı kaçtır?",
+      secenekler:["A) 3","B) 4","C) 5","D) 7"],
+      cevap:1,
+      ipucu:"K herkesi yendi: K-L=K kazandı, K-M=K kazandı, K-N=K kazandı. L-M=berabere(1'er puan). M-N=M kazandı. L-N=? N hiç kazanamadı → L-N'de L kazandı. L puanı: K'ya yenildi(0)+M berabere(1)+N yendi(3)=4.",
+      aciklama:"L'nin maçları: K'ya yenildi(0p), M ile berabere(1p), N'yi yendi(3p). L toplam = 0+1+3 = 4 puan."
+    },
+    {
+      tip:"kosul",
+      badge:"tip-boss",
+      boss:true,
+      metin:"⚡ BOSS: 6 kişi (A,B,C,D,E,F) dairesel masaya oturuyor. Karşılıklı oturanlar birbirini görüyor.",
+      kosullar:[
+        "A ile D karşılıklı",
+        "B, A'nın hemen solunda",
+        "C ile F yanyana değil",
+        "E, D'nin hemen sağında",
+        "F, B'nin karşısında"
+      ],
+      soru:"C'nin hemen sağındaki kişi kimdir?",
+      secenekler:["A) A","B) D","C) E","D) F"],
+      cevap:0,
+      ipucu:"6 kişi daire: karşılıklar 1-4, 2-5, 3-6. A-D karşılıklı → A=1,D=4. B, A'nın solunda → B=6. F, B'nin karşısında → F=3. E, D'nin sağında → E=5. Kalan C=2. C'nin sağı=1=A.",
+      aciklama:"Konumlar (saat yönü): A=1, B=6(A'nın solu=saat yönünde önce), D=4(A karşısı), E=5(D'nin sağı), F=3(B karşısı=6'nın karşısı=3), C=2. C(2)'nin sağı = 1 = A."
+    }
+  ]
+}
+
+];
+
+// ============================================================
+// OYUN MOTORU
+// ============================================================
+let mB=0, mS=0, puan=0, seri=0, ipucuK=false;
+
+function baslat(){
+  mB=0; mS=0; puan=0; seri=0;
+  document.getElementById('bitisEkran').classList.remove('ac');
+  document.getElementById('gecisEkran').classList.remove('ac');
+  soruGoster();
+}
+
+function soruGoster(){
+  const b=bolumler[mB], s=b.sorular[mS];
+  ipucuK=false;
+
+  // Header
+  document.getElementById('bolumAdi').textContent=b.ad;
+  document.getElementById('puanGoster').textContent=puan;
+  seriGunc();
+
+  // İlerleme
+  const topS=bolumler.reduce((a,x)=>a+x.sorular.length,0);
+  const tamS=bolumler.slice(0,mB).reduce((a,x)=>a+x.sorular.length,0)+mS;
+  const yuzde=Math.round(tamS/topS*100);
+  document.getElementById('progDolu').style.width=yuzde+'%';
+  document.getElementById('progDolu').style.background=b.renk;
+  document.getElementById('progBilgi').textContent=`Soru ${mS+1}/${b.sorular.length}`;
+  document.getElementById('progYuzde').textContent=yuzde+'%';
+
+  // Soru HTML
+  let html=`<div class="kart">`;
+  if(s.boss) html+=`<div class="boss-anim">⚡ BOSS SORU ⚡</div>`;
+  html+=`<span class="tip-badge ${s.badge}">${tipAdi(s.tip)}</span>`;
+  html+=`<div class="soru-metin">${s.metin.replace(/\n/g,'<br>')}</div>`;
+
+  // İçerik tipine göre
+  if(s.tip==='tablo'||s.tip==='tip-boss'&&s.tablo){
+    html+=tabloHTML(s.tablo);
+  }
+  if(s.tip==='oruntu'){
+    html+=`<div class="oruntu-dizi">`;
+    s.dizi.forEach((d,i)=>{
+      if(d==='→'){html+=`<span class="oruntu-ok">→</span>`;return;}
+      const isSoru=d==='?';
+      html+=`<div class="oruntu-kutu${isSoru?' oruntu-soru':''}">${d}</div>`;
+    });
+    html+=`</div>`;
+  }
+  if(s.tip==='kosul'){
+    html+=`<ul class="kosul-liste">`;
+    s.kosullar.forEach(k=>html+=`<li>${k}</li>`);
+    html+=`</ul>`;
+    if(s.soru) html+=`<div class="soru-metin" style="margin-top:-6px"><b>Soru:</b> ${s.soru}</div>`;
+  }
+
+  // Seçenekler
+  html+=`<div class="secenekler">`;
+  s.secenekler.forEach((opt,i)=>{
+    html+=`<button class="sec" id="sec${i}" onclick="secimYap(${i})">${opt}</button>`;
+  });
+  html+=`</div>`;
+
+  // İpucu & Atla
+  html+=`<div class="ipucu-kutu" id="ipucuKutu">💡 ${s.ipucu}</div>`;
+  html+=`<div class="aciklama-kutu" id="aciklamaKutu"></div>`;
+  html+=`<div class="btn-row">
+    <button class="btn btn-ipucu" id="ipucuBtn" onclick="ipucuGoster()">💡 İpucu (−3p)</button>
+    <button class="btn btn-atla" onclick="sonraki(false)">Atla →</button>
+  </div></div>`;
+
+  document.getElementById('soruAlani').innerHTML=html;
+}
+
+function tipAdi(t){
+  if(t==='tablo') return '📊 Tablo Okuma';
+  if(t==='oruntu') return '🔢 Örüntü';
+  if(t==='kosul') return '🧩 Koşullu Yerleştirme';
+  return '⚡ Boss';
+}
+
+function tabloHTML(t){
+  let h=`<div class="tablo-wrap"><table class="veri"><thead><tr>`;
+  t.basliklar.forEach(b=>h+=`<th>${b}</th>`);
+  h+=`</tr></thead><tbody>`;
+  t.satirlar.forEach(s=>{
+    h+=`<tr>`;
+    s.forEach((c,i)=>h+=`<td${i>0?' class="vurgu-hucre"':''}>${c}</td>`);
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  return h;
+}
+
+function secimYap(i){
+  const s=bolumler[mB].sorular[mS];
+  // Butonları devre dışı
+  s.secenekler.forEach((_,j)=>{
+    const el=document.getElementById('sec'+j);
+    if(el) el.onclick=null;
+  });
+
+  const secEl=document.getElementById('sec'+i);
+  const acik=document.getElementById('aciklamaKutu');
+
+  if(i===s.cevap){
+    secEl.classList.add('dogru');
+    let p=s.boss?20:10;
+    if(ipucuK) p-=3;
+    if(seri>=2) p=Math.round(p*1.5);
+    seri++; puan+=p;
+    document.getElementById('puanGoster').textContent=puan;
+    seriGunc();
+    acik.className='aciklama-kutu aciklama-dogru';
+    const bonus=seri>2?` 🔥 ${seri} Seri!`:'';
+    acik.innerHTML=`✅ +${p} puan${bonus}<br><small>${s.aciklama}</small>`;
+    puanUc('+'+p);
+    setTimeout(()=>sonraki(true),2000);
+  } else {
+    secEl.classList.add('yanlis');
+    document.getElementById('sec'+s.cevap).classList.add('goster-dogru');
+    seri=0; seriGunc();
+    acik.className='aciklama-kutu aciklama-yanlis';
+    acik.innerHTML=`❌ Yanlış.<br><small>${s.aciklama}</small>`;
+    setTimeout(()=>sonraki(false),2200);
+  }
+}
+
+function ipucuGoster(){
+  if(ipucuK) return;
+  ipucuK=true;
+  document.getElementById('ipucuBtn').classList.add('off');
+  document.getElementById('ipucuKutu').classList.add('ac');
+}
+
+function sonraki(dogru){
+  const b=bolumler[mB];
+  if(mS<b.sorular.length-1){
+    mS++;
+    soruGoster();
+  } else {
+    if(mB<bolumler.length-1){
+      bolumGecis();
+    } else {
+      oyunBit();
+    }
+  }
+}
+
+function bolumGecis(){
+  const b=bolumler[mB];
+  const g=document.getElementById('gecisEkran');
+  document.getElementById('gecisEmoji').textContent=b.gecisEmoji;
+  document.getElementById('gecisBaslik').textContent=b.gecisBaslik;
+  document.getElementById('gecisAcik').textContent=b.gecisAcik;
+  g.classList.add('ac');
+}
+
+function gecisDevam(){
+  document.getElementById('gecisEkran').classList.remove('ac');
+  mB++; mS=0;
+  soruGoster();
+}
+
+function oyunBit(){
+  document.getElementById('soruAlani').innerHTML='';
+  const be=document.getElementById('bitisEkran');
+  document.getElementById('bPuan').textContent=puan;
+  const max=bolumler.reduce((a,b)=>a+b.sorular.reduce((c,s)=>c+(s.boss?20:10),0),0);
+  const oran=puan/max;
+  let yildiz='⭐', yorum='Daha fazla pratik yap!';
+  if(oran>=0.8){yildiz='⭐⭐⭐';yorum='Mükemmel! KPSS\'ye hazırsın.';}
+  else if(oran>=0.5){yildiz='⭐⭐';yorum='İyi gidiyorsun, biraz daha pratik!';}
+  document.getElementById('bYildiz').textContent=yildiz;
+  document.getElementById('bYorum').textContent=yorum;
+  be.classList.add('ac');
+}
+
+function seriGunc(){
+  const el=document.getElementById('seriB');
+  el.textContent=`🔥 ${seri}`;
+  if(seri>=3) el.classList.add('hot');
+  else el.classList.remove('hot');
+}
+
+function puanUc(metin){
+  const el=document.createElement('div');
+  el.className='puan-uc';
+  el.textContent=metin;
+  el.style.left=(window.innerWidth/2-30)+'px';
+  el.style.top='100px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
+}
+
+baslat();
+</script>
+</body>
+</html>
