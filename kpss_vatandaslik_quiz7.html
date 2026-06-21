@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Vatandaşlık Quiz 7 - Final</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#08050F;--surface:#100D1A;--border:#1A1528;
+  --accent:#E879F9;--accent2:#C084FC;--accent3:#A855F7;
+  --correct:#10B981;--wrong:#EF4444;
+  --text:#F1F5F9;--muted:#64748B;--card:#0C0A14;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;}
+header{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;padding:14px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.logo{font-size:18px;font-weight:800;}
+.logo .v{color:var(--accent2);}
+.logo .badge{font-size:10px;font-weight:700;border:1px solid var(--accent);color:var(--accent);padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle;}
+.logo .fin{font-size:10px;color:var(--accent);margin-left:4px;}
+.stats{display:flex;gap:18px;font-size:12px;color:var(--muted);}
+.stat strong{color:var(--text);font-size:16px;display:block;text-align:center;}
+.progress-wrap{width:100%;max-width:760px;height:4px;background:var(--border);border-radius:2px;margin-bottom:18px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent));border-radius:2px;transition:width .35s ease;}
+.top-row{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.cat-pill{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:rgba(232,121,249,.1);border:1px solid var(--accent);padding:3px 10px;border-radius:20px;}
+.timer-box{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);padding:4px 12px;border-radius:20px;}
+.timer-num{font-size:16px;font-weight:800;color:var(--accent2);min-width:22px;}
+.timer-num.danger{color:var(--wrong);}
+.question-card{width:100%;max-width:760px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:12px;}
+.q-number{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;margin-bottom:10px;}
+.q-text{font-size:17px;line-height:1.6;color:var(--text);font-weight:500;}
+.options{width:100%;max-width:760px;display:grid;gap:8px;margin-bottom:12px;}
+.option-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 15px;color:var(--text);font-family:inherit;font-size:14px;cursor:pointer;text-align:left;display:flex;align-items:flex-start;gap:10px;transition:border-color .15s,background .15s;line-height:1.4;}
+.option-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(232,121,249,.05);}
+.option-btn .key{width:26px;height:26px;border-radius:5px;background:var(--border);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);margin-top:1px;}
+.option-btn.correct{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.option-btn.correct .key{background:var(--correct);color:#fff;}
+.option-btn.wrong{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.option-btn.wrong .key{background:var(--wrong);color:#fff;}
+.option-btn:disabled{cursor:default;}
+.feedback{width:100%;max-width:760px;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:8px;display:none;line-height:1.5;}
+.feedback.show{display:block;}
+.feedback.correct{background:rgba(16,185,129,.12);border:1px solid var(--correct);color:#34D399;}
+.feedback.wrong{background:rgba(239,68,68,.12);border:1px solid var(--wrong);color:#F87171;}
+.hint-row{width:100%;max-width:760px;margin-bottom:12px;display:none;}
+.hint-row.show{display:block;}
+.hint-toggle{background:none;border:1px dashed var(--accent3);color:var(--accent3);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;cursor:pointer;transition:background .15s;}
+.hint-toggle:hover{background:rgba(168,85,247,.1);}
+.hint-box{margin-top:8px;background:rgba(168,85,247,.07);border:1px solid var(--accent3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--accent2);line-height:1.5;display:none;}
+.hint-box.open{display:block;}
+.next-btn{width:100%;max-width:760px;background:linear-gradient(135deg,var(--accent3),var(--accent));color:#fff;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:opacity .15s;}
+.next-btn:hover{opacity:.88;}
+.next-btn.show{display:block;}
+#result-screen{display:none;width:100%;max-width:760px;text-align:center;padding-top:10px;}
+.result-emoji{font-size:50px;margin-bottom:10px;}
+.result-title{font-size:24px;font-weight:800;margin-bottom:6px;}
+.result-score{font-size:62px;font-weight:800;line-height:1;margin:12px 0;background:linear-gradient(90deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.result-label{color:var(--muted);font-size:14px;margin-bottom:22px;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
+.rstat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.rstat .rnum{font-size:24px;font-weight:800;margin-bottom:3px;}
+.rstat .rlbl{font-size:11px;color:var(--muted);}
+.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:linear-gradient(135deg,var(--accent3),var(--accent));color:#fff;border:none;border-radius:10px;padding:13px 26px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-s{background:var(--surface);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:13px 26px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-s:hover{border-color:var(--accent);}
+#cat-screen{width:100%;max-width:760px;}
+.cat-header{text-align:center;margin-bottom:26px;}
+.cat-header h1{font-size:26px;font-weight:800;margin-bottom:6px;}
+.cat-header h1 span{background:linear-gradient(90deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.cat-header p{color:var(--muted);font-size:13px;}
+.final-badge{display:inline-block;background:linear-gradient(90deg,var(--accent3),var(--accent));color:#fff;font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;margin-bottom:14px;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.cat-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s;}
+.cat-card:hover{border-color:var(--accent);}
+.cat-card.selected{border-color:var(--accent);background:rgba(232,121,249,.06);}
+.cat-card .ci{font-size:22px;margin-bottom:6px;}
+.cat-card .cn{font-weight:700;font-size:13px;margin-bottom:2px;}
+.cat-card .cc{font-size:11px;color:var(--muted);}
+.start-btn{width:100%;background:linear-gradient(135deg,var(--accent3),var(--accent));color:#fff;border:none;border-radius:10px;padding:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+#quiz-screen{display:none;width:100%;}
+@media(max-width:520px){.cat-grid{grid-template-columns:1fr;}.result-grid{grid-template-columns:1fr 1fr;}.q-text{font-size:15px;}.btn-row{flex-direction:column;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">KPSS <span class="v">Vatandaşlık</span><span class="badge">7</span><span class="fin">FİNAL</span></div>
+  <div class="stats" id="hstats" style="display:none">
+    <div class="stat"><strong id="sc">0</strong>Doğru</div>
+    <div class="stat"><strong id="sw">0</strong>Yanlış</div>
+    <div class="stat"><strong id="st">0</strong>Toplam</div>
+  </div>
+</header>
+
+<div id="cat-screen">
+  <div class="cat-header">
+    <div class="final-badge">🎯 FİNAL — PDF'in Tamamı Bitti</div>
+    <h1>Son <span>Quiz</span></h1>
+    <p>Kalan tüm konular — 7 quizde PDF tamamen kaplandı</p>
+  </div>
+  <div class="cat-grid" id="cat-grid"></div>
+  <button class="start-btn" onclick="startQuiz()">Başla →</button>
+</div>
+
+<div id="quiz-screen">
+  <div class="progress-wrap"><div class="progress-bar" id="pbar"></div></div>
+  <div class="top-row">
+    <div class="cat-pill" id="cpill"></div>
+    <div class="timer-box"><span style="font-size:13px;color:var(--muted)">⏱</span><span class="timer-num" id="tnum">20</span></div>
+  </div>
+  <div class="question-card">
+    <div class="q-number" id="qnum"></div>
+    <div class="q-text" id="qtext"></div>
+  </div>
+  <div class="options" id="opts"></div>
+  <div class="hint-row" id="hint-row">
+    <button class="hint-toggle" onclick="toggleHint()">💡 İpucunu göster</button>
+    <div class="hint-box" id="hint-box"></div>
+  </div>
+  <div class="feedback" id="fb"></div>
+  <button class="next-btn" id="nbtn" onclick="nextQ()">Sonraki →</button>
+</div>
+
+<div id="result-screen">
+  <div class="result-emoji" id="remoji"></div>
+  <div class="result-title">Tüm PDF Tamamlandı!</div>
+  <div class="result-score" id="rscore"></div>
+  <div class="result-label" id="rlabel"></div>
+  <div class="result-grid">
+    <div class="rstat"><div class="rnum" style="color:var(--correct)" id="rc">0</div><div class="rlbl">Doğru</div></div>
+    <div class="rstat"><div class="rnum" style="color:var(--wrong)" id="rw">0</div><div class="rlbl">Yanlış</div></div>
+    <div class="rstat"><div class="rnum" style="color:var(--accent2)" id="rs">0</div><div class="rlbl">Süre Doldu</div></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-p" onclick="showCat()">Yeniden Oyna</button>
+    <button class="btn-s" onclick="replaySame()">Aynı Konuyu Tekrar</button>
+  </div>
+</div>
+
+<script>
+var Q=[];
+
+/* ===== SAKIN KARIŞTIRMA (PDF'DEKİ LİSTENİN TAMAMI) ===== */
+Q.push({c:"Karıştırılanlar",q:"OHAL ilan etme ve OHAL'i onaylama yetkileri sırasıyla kimindir?",a:"İlan: Cumhurbaşkanı — Onaylama: TBMM",o:["İlan: TBMM — Onaylama: CB","İlan: Cumhurbaşkanı — Onaylama: TBMM","İkisi de TBMM","İkisi de Cumhurbaşkanı"],h:"CB ilan eder, TBMM aynı gün onaylar. TBMM uzatabilir, kısaltabilir veya kaldırabilir."});
+Q.push({c:"Karıştırılanlar",q:"Dernekler ve vakıflar kaçar kişiyle kurulur?",a:"Dernekler 7 — Vakıflar 1",o:["Dernekler 1 — Vakıflar 7","Dernekler 5 — Vakıflar 3","Dernekler 7 — Vakıflar 1","İkisi de 7"],h:"Dernek: en az 7 gerçek kişi. Vakıf: 1 kişi bile kurabilir (mal tahsisi yeterli)."});
+Q.push({c:"Karıştırılanlar",q:"Olağan ve olağanüstü evlenme yaşları sırasıyla nedir?",a:"Olağan: 17 — Olağanüstü: 16",o:["Olağan: 18 — Olağanüstü: 17","Olağan: 17 — Olağanüstü: 16","Olağan: 16 — Olağanüstü: 15","İkisi de 18"],h:"Olağan evlenme 17. Olağanüstü (hakim kararıyla) 16. 18 değil."});
+Q.push({c:"Karıştırılanlar",q:"Belediye başkanını daimi ve geçici olarak görevden alabilecek makamlar nelerdir?",a:"Daimi: Danıştay — Geçici: İçişleri Bakanı",o:["Daimi: İçişleri Bakanı — Geçici: Danıştay","Daimi: Danıştay — Geçici: İçişleri Bakanı","İkisi de Danıştay","İkisi de İçişleri Bakanı"],h:"Daimi = yargı kararı gerekir (Danıştay). Geçici = idari tedbir (İçişleri Bakanı)."});
+Q.push({c:"Karıştırılanlar",q:"Türk vatandaşlığına alma ve vatandaşlıktan çıkarma işlemlerini sırasıyla hangi makam yapar?",a:"Alma: İçişleri Bakanlığı — Çıkarma: Cumhurbaşkanı",o:["İkisi de Cumhurbaşkanı","Alma: Cumhurbaşkanı — Çıkarma: İçişleri Bakanlığı","Alma: İçişleri Bakanlığı — Çıkarma: Cumhurbaşkanı","İkisi de İçişleri Bakanlığı"],h:"Alma: İçişleri Bakanlığı. Çıkarma: Cumhurbaşkanı. Ters gibi görünüyor ama öyle."});
+Q.push({c:"Karıştırılanlar",q:"Kıdemi 1-10 yıl ve 10 yıldan fazla olan memurlara tanınan yıllık izin süreleri sırasıyla nedir?",a:"1-10 yıl: 20 gün — 10 yıldan fazla: 30 gün",o:["1-10 yıl: 14 gün — 10 yıldan fazla: 21 gün","1-10 yıl: 20 gün — 10 yıldan fazla: 30 gün","1-10 yıl: 15 gün — 10 yıldan fazla: 25 gün","Her ikisinde de 20 gün"],h:"10 yıl altı: 20 gün. 10 yıldan fazla: 30 gün. 10 tam yıl olması durumu ikinci gruba girer."});
+Q.push({c:"Karıştırılanlar",q:"Siyasi partilere kapatma davası açan ve kapatma kararı veren makamlar sırasıyla nelerdir?",a:"Dava açan: Yargıtay C. Başsavcısı — Karar veren: Anayasa Mahkemesi",o:["İkisi de Anayasa Mahkemesi","Dava açan: Danıştay — Karar veren: AYM","Dava açan: Yargıtay C. Başsavcısı — Karar veren: Anayasa Mahkemesi","İkisi de Yargıtay"],h:"Kapatma davası Yargıtay Cumhuriyet Başsavcısı tarafından AYM'ye açılır."});
+Q.push({c:"Karıştırılanlar",q:"Miras bırakan ve miras bırakılan kişilere verilen adlar nelerdir?",a:"Miras bırakan: Muris — Miras bırakılan: Varis",o:["Miras bırakan: Varis — Miras bırakılan: Muris","Miras bırakan: Muris — Miras bırakılan: Varis","İkisi de Muris","Miras bırakan: Tereke — Miras bırakılan: Muris"],h:"MUris = ölen, vefat eden. VAris = miras alan. Tereke ise miras malıdır."});
+Q.push({c:"Karıştırılanlar",q:"Dekan ve rektör atamalarını sırasıyla kim yapar?",a:"Dekan: YÖK — Rektör: Cumhurbaşkanı",o:["Dekan: CB — Rektör: YÖK","Dekan: Üniversite Senatosu — Rektör: CB","Dekan: YÖK — Rektör: Cumhurbaşkanı","İkisi de CB"],h:"Rektörü CB atar. Dekanı YÖK atar. Sık karıştırılır."});
+Q.push({c:"Karıştırılanlar",q:"Normal belediyeler ve büyükşehir belediyeleri nasıl kurulur?",a:"Normal: CB Kararı — Büyükşehir: Kanun",o:["Normal: Kanun — Büyükşehir: CB Kararı","Normal: CB Kararı — Büyükşehir: Kanun","İkisi de Kanun","İkisi de CB Kararı"],h:"Normal belediye CB kararıyla kurulur. Büyükşehir ancak kanunla kurulabilir."});
+Q.push({c:"Karıştırılanlar",q:"Siyasi partiler ve siyasi parti grupları kaçar kişiyle kurulur?",a:"Siyasi parti: 30 kişi — Parti grubu: 20 milletvekili",o:["Siyasi parti: 20 — Parti grubu: 30","Siyasi parti: 30 kişi — Parti grubu: 20 milletvekili","İkisi de 30","İkisi de 20"],h:"Parti kurmak için 30 kişi. Mecliste grup kurmak için 20 milletvekili."});
+Q.push({c:"Karıştırılanlar",q:"Milletlerarası antlaşmaları onaylamaya uygun bulan ve onaylayan makamlar sırasıyla nelerdir?",a:"Uygun bulan: TBMM — Onaylayan ve yayımlayan: Cumhurbaşkanı",o:["Uygun bulan: CB — Onaylayan: TBMM","Uygun bulan: TBMM — Onaylayan ve yayımlayan: Cumhurbaşkanı","İkisi de TBMM","İkisi de CB"],h:"TBMM uygun bulur (kanunla), CB onaylar ve Resmi Gazetede yayımlar."});
+Q.push({c:"Karıştırılanlar",q:"Ölüm ve doğum bildirimi için nüfus müdürlüğüne başvuru süreleri sırasıyla nedir?",a:"Ölüm: 10 gün — Doğum: 30 gün",o:["Ölüm: 3 gün — Doğum: 7 gün","Ölüm: 7 gün — Doğum: 15 gün","Ölüm: 10 gün — Doğum: 30 gün","Ölüm: 30 gün — Doğum: 10 gün"],h:"Ölüm önce bildirilir (10 gün). Doğum sonra (30 gün). Ters gibi ama mantıklı."});
+Q.push({c:"Karıştırılanlar",q:"CB mazbatasını ve milletvekili mazbatasını sırasıyla kimden alır?",a:"CB: YSK'dan — Milletvekili: İl Seçim Kurulundan",o:["CB: İl Seçim Kurulundan — Milletvekili: YSK'dan","CB: YSK'dan — Milletvekili: İl Seçim Kurulundan","İkisi de YSK'dan","İkisi de İl Seçim Kurulundan"],h:"CB ulusal seçimle gelir, mazbatasını YSK'dan alır. Milletvekili il düzeyinde, İl Seçim Kurulundan alır."});
+
+/* ===== AYM BİREYSEL BAŞVURU ===== */
+Q.push({c:"AYM Bireysel Başvuru",q:"Bireysel başvurunun konusu ne olabilir?",a:"Anayasada güvence altındaki ve AİHS kapsamındaki temel hakların kamu gücünce ihlal edildiği iddiası",o:["Her türlü hak ihlali","Anayasada güvence altındaki ve AİHS kapsamındaki temel hakların kamu gücünce ihlal edildiği iddiası","Yalnızca mülkiyet hakkı ihlalleri","Yalnızca yargısal hak ihlalleri"],h:"Hem Anayasa güvencesi hem AİHS kapsamı gerekir. Yalnızca biri yetmez."});
+Q.push({c:"AYM Bireysel Başvuru",q:"Bireysel başvuru öncesinde mutlaka ne yapılmış olmalıdır?",a:"Olağan kanun yollarının (tüm idari ve yargısal yolların) tüketilmiş olması",o:["En az bir mahkemeye başvurulmuş olması","Olağan kanun yollarının (tüm idari ve yargısal yolların) tüketilmiş olması","AİHM'e başvurulmuş olması","Cumhurbaşkanlığına dilekçe gönderilmiş olması"],h:"Bireysel başvuru ikincil yoldur. Önce tüm olağan yollar denenmelidir."});
+Q.push({c:"AYM Bireysel Başvuru",q:"Bireysel başvuru, son yargı kararından itibaren kaç gün içinde yapılmalıdır?",a:"30 gün",o:["7 gün","15 gün","30 gün","60 gün"],h:"Nihai kararın tebliğinden itibaren 30 gün. Soyut norm denetiminde ise 60 gün."});
+Q.push({c:"AYM Bireysel Başvuru",q:"AYM bireysel başvuruda 'kabul edilemezlik' kararı verdikten sonra ne yapılabilir?",a:"Kural olarak kesindir, itiraz yolu kapalıdır",o:["AİHM'e başvurulabilir","Kural olarak kesindir, itiraz yolu kapalıdır","Yargıtay'a itiraz edilebilir","6 ay içinde yeniden başvurulabilir"],h:"AYM kararları kesindir. Bireysel başvuru kabul edilmezse AİHM yolu açık kalır."});
+Q.push({c:"AYM Bireysel Başvuru",q:"Soyut norm denetimi (iptal davası) açma süresi ve bireysel başvuru süresi sırasıyla nedir?",a:"İptal davası: 60 gün — Bireysel başvuru: 30 gün",o:["İptal davası: 30 gün — Bireysel başvuru: 60 gün","İptal davası: 60 gün — Bireysel başvuru: 30 gün","İkisi de 60 gün","İkisi de 30 gün"],h:"Sık karıştırılır: iptal davası 60 gün, bireysel başvuru 30 gün."});
+
+/* ===== KANUNLARIN YARGISALDENETIMI ===== */
+Q.push({c:"Kanunların Denetimi",q:"Anayasa değişikliklerinin iptali için AYM'de hangi tür denetim yapılabilir?",a:"Yalnızca şekil (usul) denetimi — esas denetimi yapılamaz",o:["Yalnızca esas denetimi","Hem şekil hem esas denetimi","Yalnızca şekil (usul) denetimi — esas denetimi yapılamaz","Hiçbir denetim yapılamaz"],h:"AYM anayasa değişikliklerinin içeriğini denetleyemez, sadece yapılış usulüne bakabilir."});
+Q.push({c:"Kanunların Denetimi",q:"Somut norm denetiminde AYM 5 ay içinde karar vermezse yerel mahkeme ne yapar?",a:"Davayı yürürlükteki kanun hükümlerine göre sonuçlandırır",o:["Davayı bekletmeye devam eder","Davayı düşürür","Davayı yürürlükteki kanun hükümlerine göre sonuçlandırır","AİHM'e başvurur"],h:"5 ay beklenir. Karar çıkmazsa yerel mahkeme mevcut kanunla karar verir."});
+Q.push({c:"Kanunların Denetimi",q:"AYM iptal kararlarının yürürlüğe girmesinde erteleme mümkün müdür?",a:"Evet, AYM bir yıla kadar yürürlüğü erteleyebilir",o:["Hayır, karar anında yürürlüğe girer","Evet, AYM bir yıla kadar yürürlüğü erteleyebilir","Evet, TBMM 6 ay erteleyebilir","Hayır, CB'nın onayıyla yürürlüğe girer"],h:"AYM iptal kararının hukuki boşluk doğurmaması için yürürlüğü 1 yıla kadar erteleyebilir."});
+Q.push({c:"Kanunların Denetimi",q:"Soyut norm denetiminde dava açabilecekler arasında kaç milletvekili gerekir?",a:"Üye tam sayısının 1/5'i (120 milletvekili)",o:["1/4 (150 milletvekili)","1/5 (120 milletvekili)","1/3 (200 milletvekili)","3/5 (360 milletvekili)"],h:"Anayasa değişikliği teklifi için 1/3 (200). İptal davası için 1/5 (120). Farklı eşikler."});
+Q.push({c:"Kanunların Denetimi",q:"AYM'nin esastan reddettiği kanun hükmü için kaç yıl geçmeden yeniden dava açılamaz?",a:"10 yıl",o:["2 yıl","5 yıl","10 yıl","Süresiz açılamaz"],h:"AYM esastan reddederse 10 yıl geçmeden aynı konu için tekrar başvurulamaz."});
+
+/* ===== OHAL DETAYLARI ===== */
+Q.push({c:"OHAL Detayları",q:"OHAL ilan edildiğinde bu karar aynı gün kimin onayına sunulur?",a:"TBMM",o:["Anayasa Mahkemesi","Danıştay","TBMM","MGK"],h:"CB OHAL ilan eder, aynı gün TBMM'ye sunar. TBMM onaylamazsa OHAL sona erer."});
+Q.push({c:"OHAL Detayları",q:"OHAL döneminde çıkarılan CBK'ların yargısal denetimi var mıdır?",a:"Hayır, OHAL CBK'ları AYM denetimine tabi değildir",o:["Evet, AYM denetler","Hayır, OHAL CBK'ları AYM denetimine tabi değildir","Evet, Danıştay denetler","Hayır ama TBMM iptal edebilir"],h:"Olağan CBK'lar AYM denetimine tabidir. OHAL CBK'ları tabi değildir."});
+Q.push({c:"OHAL Detayları",q:"OHAL sona erdikten sonra OHAL CBK'ları ne olur?",a:"3 ay içinde TBMM'ce kanuna dönüştürülmezse kendiliğinden yürürlükten kalkar",o:["Otomatik olarak kanuna dönüşür","3 ay içinde TBMM'ce kanuna dönüştürülmezse kendiliğinden yürürlükten kalkar","CB kararıyla yürürlükte tutulabilir","6 ay süreyle yürürlükte kalır"],h:"OHAL biter, CBK'lar 3 ay içinde TBMM tarafından kanunlaştırılmalıdır."});
+Q.push({c:"OHAL Detayları",q:"OHAL ilan nedenlerinden hangisi 2017 öncesinde vardı ama şimdi yoktur?",a:"Sıkıyönetim",o:["Salgın hastalık","Ekonomik bunalım","Sıkıyönetim","Doğal afetler"],h:"Sıkıyönetim kurumu tamamen kaldırıldı. Artık OHAL nedenleri arasında yer almıyor."});
+Q.push({c:"OHAL Detayları",q:"OHAL'de temel haklar tamamen askıya alınabilir mi?",a:"Hayır, çekirdek haklar hiçbir koşulda askıya alınamaz",o:["Evet, OHAL'de tüm haklar askıya alınabilir","Hayır, çekirdek haklar hiçbir koşulda askıya alınamaz","Evet, ama AYM denetimi devam eder","Sadece kişi dokunulmazlığı korunur"],h:"Yaşam hakkı, kişi bütünlüğü, din-vicdan özgürlüğü vb. çekirdek haklar OHAL'de de korunur."});
+
+/* ===== KAMU MALLARI VE KOLLUK ===== */
+Q.push({c:"Kamu Malları ve Kolluk",q:"Kamu mallarının temel özellikleri nelerdir?",a:"Satılamazlar, haczedilemezler, zamanaşımına tabi değillerdir",o:["Satılabilirler ama haczedilemezler","Satılamazlar, haczedilemezler, zamanaşımına tabi değillerdir","Yalnızca devlete aittir","CB kararıyla satılabilirler"],h:"Kamu malları özel hukuka tabi olmayan mallardır. Devletin özel malları ise satılabilir."});
+Q.push({c:"Kamu Malları ve Kolluk",q:"Genel idare kolluk personeli ve amirleri arasındaki fark nedir?",a:"Amirler: CB, İçişleri Bakanı, Vali, Kaymakam — Personel: Polis, Jandarma, Bekçi, Sahil Güvenlik",o:["Amir: Vali ve Kaymakam — Personel: Polis ve Jandarma","Amirler: CB, İçişleri Bakanı, Vali, Kaymakam — Personel: Polis, Jandarma, Bekçi, Sahil Güvenlik","Amir: Emniyet Genel Müdürü — Personel: Polis","İkisi aynı kategoridedir"],h:"Amir emir verir. Personel uygular. Jandarma 2017'den itibaren İçişleri Bakanlığına bağlıdır."});
+Q.push({c:"Kamu Malları ve Kolluk",q:"İdari (önleyici) kolluk ve adli kolluk arasındaki temel fark nedir?",a:"İdari kolluk suçu önlemek için — adli kolluk suç işlendikten sonra delil toplar",o:["İkisi aynı işi yapar","İdari kolluk suçu önlemek için — adli kolluk suç işlendikten sonra delil toplar","Adli kolluk önleyicidir — idari kolluk sonraki aşamadır","İdari kolluk yasama organına bağlıdır"],h:"İdari (önleyici) kolluk: suç öncesi. Adli kolluk: suç sonrası, savcılığın emrinde çalışır."});
+Q.push({c:"Kamu Malları ve Kolluk",q:"Kamu düzeninin unsurları nelerdir?",a:"Güvenlik, dirlik-esenlik, genel sağlık, genel ahlak",o:["Eşitlik, adalet, güvenlik","Güvenlik, dirlik-esenlik, genel sağlık, genel ahlak","Kamu yararı, güvenlik, sağlık","Huzur, adalet, güvenlik, refah"],h:"Bu dört unsur kolluk faaliyetinin amacını oluşturur. Genel ahlak sıkça atlanır."});
+
+/* ===== İDARİ İŞLEM TÜRLERİ ===== */
+Q.push({c:"İdari İşlem Türleri",q:"Bireysel idari işlem ile düzenleyici idari işlem arasındaki fark nedir?",a:"Bireysel: belirli kişilere yönelik. Düzenleyici: genel ve soyut, herkese uygulanır",o:["İkisi aynıdır","Bireysel: belirli kişilere yönelik. Düzenleyici: genel ve soyut, herkese uygulanır","Bireysel: kanun niteliğindedir. Düzenleyici: mahkeme kararıdır","Bireysel sadece CB çıkarabilir"],h:"Yönetmelik düzenleyici. Atama kararı bireysel. İkisi farklı hukuki rejime tabidir."});
+Q.push({c:"İdari İşlem Türleri",q:"İdarenin tek taraflı irade açıklamasıyla kamu hukuku alanında doğrudan sonuç doğuran işleme ne denir?",a:"İdari işlem",o:["Özel hukuk işlemi","İdari işlem","Yargı kararı","Kanun"],h:"İdari işlem: idarenin kamu gücü kullanarak tek taraflı aldığı karar. Özel sözleşmeden farklıdır."});
+Q.push({c:"İdari İşlem Türleri",q:"İptal davası ile tam yargı davası arasındaki temel fark nedir?",a:"İptal: idari işlemin hukuka aykırılığını ortadan kaldırmak için. Tam yargı: zararın tazmin edilmesi için",o:["İkisi aynıdır","İptal: idari işlemin hukuka aykırılığını ortadan kaldırmak için. Tam yargı: zararın tazmin edilmesi için","İptal: ceza davası. Tam yargı: hukuk davası","İptal sadece AYM'de açılır"],h:"İdari yargıda iki temel dava türü: iptal (işlem iptali) ve tam yargı (tazminat)."});
+Q.push({c:"İdari İşlem Türleri",q:"Ülke genelinde uygulanacak yönetmeliklerin yargısal denetimi nerede yapılır?",a:"Danıştay",o:["Yargıtay","Anayasa Mahkemesi","Danıştay","İdare Mahkemesi"],h:"Yerel yönetmelikleri idare mahkemeleri denetler. Ülke genelindekiler Danıştay'da."});
+
+/* ===== SAYIŞTAY ===== */
+Q.push({c:"Sayıştay",q:"Sayıştay'ın temel görevleri nelerdir?",a:"Merkezi yönetim bütçesi kapsamındaki idarelerin gelir-giderlerini TBMM adına denetlemek ve hesapları kesin hükme bağlamak",o:["Siyasi partilerin mali denetimi","Merkezi yönetim bütçesi kapsamındaki idarelerin gelir-giderlerini TBMM adına denetlemek ve hesapları kesin hükme bağlamak","Vergi uyuşmazlıklarına bakmak","Cumhurbaşkanlığı harcamalarını denetlemek"],h:"Sayıştay yüksek mahkeme değildir ama anayasal denetim organıdır. TBMM adına denetim yapar."});
+Q.push({c:"Sayıştay",q:"Sayıştay başkan ve üyelerini kim seçer?",a:"TBMM",o:["Cumhurbaşkanı","HSK","TBMM","Danıştay"],h:"Sayıştay TBMM'ye karşı sorumludur ve üyeleri TBMM tarafından seçilir."});
+Q.push({c:"Sayıştay",q:"Sayıştay yüksek mahkeme sayılır mı?",a:"Hayır, anayasal bir denetim organıdır ama yüksek mahkeme değildir",o:["Evet, yüksek mahkemedir","Hayır, anayasal bir denetim organıdır ama yüksek mahkeme değildir","Evet, idari yargı mahkemesidir","Hayır, idari bir kurumdur"],h:"Yüksek mahkemeler: AYM, Yargıtay, Danıştay, Uyuşmazlık Mahkemesi. Sayıştay bu listede değil."});
+
+/* ===== ANAYASANIN TEMEL NİTELİKLERİ ===== */
+Q.push({c:"Anayasanın Temel Nitelikleri",q:"1982 Anayasası Madde 2'de sayılan devletin temel nitelikleri nelerdir?",a:"Demokratik, laik, sosyal hukuk devleti",o:["Cumhuriyetçi, laik, üniter devlet","Demokratik, laik, sosyal hukuk devleti","Sosyalist, laik, demokratik devlet","Laik, üniter, güçlü devlet"],h:"Madde 2: TC demokratik, laik ve sosyal bir hukuk devletidir."});
+Q.push({c:"Anayasanın Temel Nitelikleri",q:"1982 Anayasasının değiştirilemez ve teklif edilemez ilk 3 maddesi sırasıyla neyi düzenler?",a:"Md.1: Devletin şekli (Cumhuriyet) — Md.2: Nitelikleri — Md.3: Bütünlük, dil, bayrak, marş, başkent",o:["Md.1: Temel haklar — Md.2: Seçim sistemi — Md.3: Yargı","Md.1: Devletin şekli (Cumhuriyet) — Md.2: Nitelikleri — Md.3: Bütünlük, dil, bayrak, marş, başkent","Md.1: Egemenlik — Md.2: Laiklik — Md.3: Başkent","Md.1: CB yetkileri — Md.2: Yasama — Md.3: Yargı"],h:"Bu 3 madde değiştirilemez ve teklif dahi edilemez. Anayasa Md.4 bunu güvence altına alır."});
+Q.push({c:"Anayasanın Temel Nitelikleri",q:"1982 Anayasasında egemenlik kime aittir ve nasıl kullanılır?",a:"Kayıtsız şartsız millete aittir — TBMM ve CB tarafından kullanılır",o:["Devlete aittir — Bakanlar Kurulunca kullanılır","Kayıtsız şartsız millete aittir — TBMM ve CB tarafından kullanılır","Millete aittir — yalnızca TBMM tarafından kullanılır","Devlete aittir — tüm organlar tarafından kullanılır"],h:"2017 sonrası: yasama yetkisi TBMM'de, yürütme yetkisi CB'nda."});
+Q.push({c:"Anayasanın Temel Nitelikleri",q:"Hukuk devleti ilkesinin içerdiği temel unsurlar nelerdir?",a:"İdarenin kanuniliği, yargı denetimi, temel hakların güvencesi, hukuki güvenlik",o:["Yalnızca yargı bağımsızlığı","İdarenin kanuniliği, yargı denetimi, temel hakların güvencesi, hukuki güvenlik","Yalnızca eşitlik ilkesi","Demokrasi ve laiklik"],h:"Hukuk devleti = sadece kanunlara uyum değil; temel hakların korunması ve yargısal denetim de gerekir."});
+Q.push({c:"Anayasanın Temel Nitelikleri",q:"Sosyal devlet ilkesinin Türk anayasasına girişi ve içeriği nedir?",a:"1961'de girdi — devletin vatandaşların ekonomik ve sosyal refahını sağlama yükümlülüğü",o:["1924'te girdi — yalnızca eğitim hakkını kapsar","1961'de girdi — devletin vatandaşların ekonomik ve sosyal refahını sağlama yükümlülüğü","1982'de girdi — yalnızca sağlık hizmetlerini kapsar","1924'te girdi — mali yükümlülük yoktur"],h:"Sosyal devlet 1961'de geldi. Devlet bu hakları mali kaynaklarıyla orantılı olarak güvence altına alır."});
+
+/* ===== DİYANET İŞLERİ VE ANAYASAL KURUMLAR ===== */
+Q.push({c:"Anayasal Kurumlar",q:"Diyanet İşleri Başkanlığının anayasal statüsü nedir?",a:"Genel idare içinde yer alır, laiklik ilkesi doğrultusunda kanunla düzenlenir",o:["Özerk bir kurumdur","Genel idare içinde yer alır, laiklik ilkesi doğrultusunda kanunla düzenlenir","Dini bir yönetim organıdır","Cumhurbaşkanlığından bağımsızdır"],h:"1961 Anayasasıyla kuruldu. Laiklik ilkesi çerçevesinde tüm İslam inançlarına hizmet eder."});
+Q.push({c:"Anayasal Kurumlar",q:"Devlet Denetleme Kurulunun (DDK) hangi organları denetleyemeyeceği anayasada belirtilmiştir?",a:"Yargı organları (mahkemeler)",o:["Silahlı Kuvvetler","Üniversiteler","Yargı organları (mahkemeler)","Belediyeler"],h:"2017 değişikliğiyle TSK dahil tüm idari yapılar DDK denetimine alındı. Yalnızca yargı dışında."});
+Q.push({c:"Anayasal Kurumlar",q:"Ombudsman (Kamu Başdenetçisi) kurumunun özellikleri nelerdir?",a:"TBMM tarafından 4 yıllığına seçilir — idarenin eylemlerini denetler",o:["CB tarafından 5 yıllığına atanır","TBMM tarafından 4 yıllığına seçilir — idarenin eylemlerini denetler","Bağımsız bir yargı organıdır","AYM bünyesinde çalışır"],h:"2010 değişikliğiyle getirildi. Bağımsız bir denetim organıdır, yargı kararı vermez."});
+Q.push({c:"Anayasal Kurumlar",q:"Ekonomik ve Sosyal Konsey'in işlevi nedir?",a:"Ekonomik ve sosyal politikaların oluşturulmasında istişari görüş bildirmek",o:["Bütçeyi onaylamak","Ekonomik ve sosyal politikaların oluşturulmasında istişari görüş bildirmek","Vergi kararları almak","TBMM'ye alternatif bir organ olmak"],h:"Ekonomik ve Sosyal Konsey: merkezi idareye yardımcı danışma organıdır. Bağlayıcı kararı yoktur."});
+
+/* ===== KRONOLOJİ ===== */
+Q.push({c:"Kronoloji",q:"Türk anayasa tarihindeki kronolojik sıraya göre kadınlara tanınan haklar:",a:"1930 belediye → 1933 muhtar → 1934 milletvekili",o:["1923 belediye → 1930 muhtar → 1934 milletvekili","1930 belediye → 1933 muhtar → 1934 milletvekili","1928 belediye → 1932 muhtar → 1936 milletvekili","1924 tüm haklar birden tanındı"],h:"Şifre: B-M-V — Belediye(1930), Muhtarlık(1933), Vekillik(1934)."});
+Q.push({c:"Kronoloji",q:"Türk hukuk reformlarının kronolojik sırası nedir?",a:"1923 Cumhuriyet → 1924 Anayasa → 1926 Medeni Kanun → 1928 laiklik",o:["1920 Medeni Kanun → 1923 Cumhuriyet → 1926 Anayasa","1923 Cumhuriyet → 1924 Anayasa → 1926 Medeni Kanun → 1928 laiklik","1921 Anayasa → 1924 Cumhuriyet → 1928 Medeni Kanun","1924 Cumhuriyet → 1926 Anayasa → 1930 Medeni Kanun"],h:"Medeni Kanun 1926'da İsviçre'den alındı. Laiklik 1928'de anayasaya girdi, 1937'de pekişti."});
+Q.push({c:"Kronoloji",q:"Türkiye'nin NATO'ya girişi ve çok partili hayata geçiş sırasıyla hangi yıllarda olmuştur?",a:"Çok partili hayat: 1946 — NATO üyeliği: 1952",o:["Çok partili hayat: 1950 — NATO: 1955","Çok partili hayat: 1946 — NATO üyeliği: 1952","Çok partili hayat: 1923 — NATO: 1949","Çok partili hayat: 1946 — NATO: 1949"],h:"1946: çok partili dönem. 1950: DP iktidarı. 1952: NATO. 1961: yeni Anayasa."});
+Q.push({c:"Kronoloji",q:"Türk anayasa tarihinde darbe sonrası yapılan anayasaların tarihleri nelerdir?",a:"1960 darbesi → 1961 Anayasası, 1980 darbesi → 1982 Anayasası",o:["1950 darbesi → 1952 Anayasası","1960 darbesi → 1961 Anayasası, 1980 darbesi → 1982 Anayasası","1971 darbesi → 1973 Anayasası","1960 darbesi → 1963 Anayasası"],h:"Türkiye'de 3 askeri müdahale oldu. Yalnızca 1960 ve 1980 sonrası yeni anayasa yapıldı."});
+Q.push({c:"Kronoloji",q:"Anayasa Mahkemesine bireysel başvuru ve Ombudsman kurumunun anayasaya girdiği yıl nedir?",a:"Her ikisi de 2010",o:["AYM bireysel başvuru: 2001 — Ombudsman: 2010","AYM bireysel başvuru: 2010 — Ombudsman: 2012","Her ikisi de 2010","AYM bireysel başvuru: 2004 — Ombudsman: 2010"],h:"2010 referandumu önemli değişiklikler getirdi: bireysel başvuru + Ombudsman + HSK yeniden yapılanması."});
+
+/* ===== CBK SINIRLAMALARI ===== */
+Q.push({c:"CBK Sınırlamaları",q:"Olağan dönem Cumhurbaşkanlığı Kararnamesiyle hangi konular düzenlenebilir?",a:"Yalnızca sosyal ve ekonomik haklar — kişi hakları ve siyasi haklar düzenlenemez",o:["Her türlü hak düzenlenebilir","Yalnızca sosyal ve ekonomik haklar — kişi hakları ve siyasi haklar düzenlenemez","Yalnızca kamu düzeni konuları","Hiçbir hak düzenlenemez"],h:"Anayasa Md.104: olağan CBK kişi hakları ve siyasi haklara giremez."});
+Q.push({c:"CBK Sınırlamaları",q:"Kanunla zaten düzenlenmiş bir konuda CBK çıkarılırsa ne olur?",a:"CBK hükmü hükümsüz kalır",o:["Kanun hükümsüz kalır","CBK hükmü hükümsüz kalır","Sonraki tarihli olan uygulanır","AYM karar verir"],h:"Hiyerarşi: Kanun > CBK. Kanun varken CBK o konuyu düzenleyemez."});
+Q.push({c:"CBK Sınırlamaları",q:"Anayasada münhasıran kanunla düzenlenmesi gereken konulara CBK ile girilebilir mi?",a:"Hayır, kesinlikle girilemez",o:["Evet, OHAL döneminde girilebilir","Hayır, kesinlikle girilemez","Evet, TBMM onayıyla girilebilir","Evet, vergi konuları dışında girilebilir"],h:"Anayasanın açıkça 'kanunla düzenlenir' dediği konular CBK'nın devre dışı olduğu alanlardır."});
+
+var CATS=[];Q.forEach(function(x){if(CATS.indexOf(x.c)===-1)CATS.push(x.c);});
+var sel={};CATS.forEach(function(c){sel[c]=true;});
+var qs=[],ci=0,co=0,wr=0,sk=0,ans=false,tmr=null,tl=20,ls=null,hintOpen=false;
+
+function shuf(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+
+function showCat(){
+  document.getElementById('cat-screen').style.display='block';
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('hstats').style.display='none';
+  renderCats();
+}
+
+function renderCats(){
+  var icons={'Karıştırılanlar':'🔄','AYM Bireysel Başvuru':'📩','Kanunların Denetimi':'🔍','OHAL Detayları':'🚨','Kamu Malları ve Kolluk':'🏛️','İdari İşlem Türleri':'📋','Sayıştay':'💹','Anayasanın Temel Nitelikleri':'📜','Anayasal Kurumlar':'🏢','Kronoloji':'📅','CBK Sınırlamaları':'⛔'};
+  var g=document.getElementById('cat-grid'),h='';
+  CATS.forEach(function(c){
+    var cnt=0;Q.forEach(function(x){if(x.c===c)cnt++;});
+    h+='<div class="cat-card'+(sel[c]?' selected':'')+'" onclick="tog(\''+c+'\',this)">';
+    h+='<div class="ci">'+(icons[c]||'📚')+'</div><div class="cn">'+c+'</div><div class="cc">'+cnt+' soru</div></div>';
+  });
+  g.innerHTML=h;
+}
+
+function tog(c,el){
+  var n=0;CATS.forEach(function(x){if(sel[x])n++;});
+  if(sel[c]){if(n===1)return;sel[c]=false;el.classList.remove('selected');}
+  else{sel[c]=true;el.classList.add('selected');}
+}
+
+function startQuiz(){
+  ls={};CATS.forEach(function(c){ls[c]=sel[c];});
+  var pool=[];Q.forEach(function(x){if(sel[x.c])pool.push(x);});
+  qs=shuf(pool).slice(0,Math.min(20,pool.length));
+  ci=0;co=0;wr=0;sk=0;
+  document.getElementById('cat-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('hstats').style.display='flex';
+  updS();showQ();
+}
+
+function replaySame(){if(ls)CATS.forEach(function(c){sel[c]=ls[c];});startQuiz();}
+
+function showQ(){
+  if(ci>=qs.length){showRes();return;}
+  ans=false;hintOpen=false;clearInterval(tmr);tl=20;
+  var q=qs[ci];
+  document.getElementById('cpill').textContent=q.c;
+  document.getElementById('qnum').textContent='SORU '+(ci+1)+' / '+qs.length;
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('pbar').style.width=((ci/qs.length)*100)+'%';
+  var hr=document.getElementById('hint-row');
+  var hb=document.getElementById('hint-box');
+  hr.className='hint-row';
+  hb.className='hint-box';
+  hb.textContent=q.h||'';
+  var ht=document.querySelector('.hint-toggle');
+  if(ht)ht.textContent='💡 İpucunu göster';
+  var opts=shuf(q.o),keys=['A','B','C','D'],h='';
+  opts.forEach(function(o,i){
+    var s=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    h+='<button class="option-btn" onclick="pick(this,\''+s+'\')">';
+    h+='<span class="key">'+keys[i]+'</span>'+o+'</button>';
+  });
+  document.getElementById('opts').innerHTML=h;
+  document.getElementById('fb').className='feedback';
+  document.getElementById('nbtn').className='next-btn';
+  updT();tmr=setInterval(tick,1000);
+}
+
+function toggleHint(){
+  hintOpen=!hintOpen;
+  var hb=document.getElementById('hint-box');
+  var btn=document.querySelector('.hint-toggle');
+  if(hintOpen){hb.className='hint-box open';btn.textContent='💡 İpucunu gizle';}
+  else{hb.className='hint-box';btn.textContent='💡 İpucunu göster';}
+}
+
+function tick(){
+  tl--;updT();
+  if(tl<=0){
+    clearInterval(tmr);
+    if(!ans){
+      ans=true;sk++;updS();hlC();showFB(false,true);
+      document.getElementById('nbtn').className='next-btn show';
+      document.getElementById('hint-row').className='hint-row show';
+      var bs=document.getElementById('opts').getElementsByTagName('button');
+      for(var i=0;i<bs.length;i++)bs[i].disabled=true;
+    }
+  }
+}
+
+function updT(){var el=document.getElementById('tnum');el.textContent=tl;el.className='timer-num'+(tl<=5?' danger':'');}
+
+function pick(btn,ch){
+  if(ans)return;ans=true;clearInterval(tmr);
+  var q=qs[ci],ok=(ch===q.a);
+  if(ok){co++;btn.classList.add('correct');btn.querySelector('.key').style.cssText='background:var(--correct);color:#fff';}
+  else{wr++;btn.classList.add('wrong');btn.querySelector('.key').style.cssText='background:var(--wrong);color:#fff';hlC();}
+  updS();showFB(ok,false);
+  document.getElementById('nbtn').className='next-btn show';
+  document.getElementById('hint-row').className='hint-row show';
+  var bs=document.getElementById('opts').getElementsByTagName('button');
+  for(var i=0;i<bs.length;i++)bs[i].disabled=true;
+}
+
+function hlC(){
+  var q=qs[ci];
+  var bs=document.getElementById('opts').getElementsByTagName('button');
+  for(var i=0;i<bs.length;i++){if(bs[i].textContent.indexOf(q.a)!==-1)bs[i].classList.add('correct');}
+}
+
+function showFB(ok,to){
+  var fb=document.getElementById('fb'),q=qs[ci];
+  if(to){fb.textContent='⏰ Süre doldu! Doğru: '+q.a;fb.className='feedback wrong show';}
+  else if(ok){fb.textContent='✅ Doğru!';fb.className='feedback correct show';}
+  else{fb.textContent='❌ Yanlış! Doğru cevap: '+q.a;fb.className='feedback wrong show';}
+}
+
+function updS(){document.getElementById('sc').textContent=co;document.getElementById('sw').textContent=wr+sk;document.getElementById('st').textContent=ci;}
+function nextQ(){ci++;updS();showQ();}
+
+function showRes(){
+  clearInterval(tmr);
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  var pct=Math.round((co/qs.length)*100);
+  document.getElementById('rscore').textContent='%'+pct;
+  var e=pct>=80?'🏆':pct>=60?'💪':'📖';
+  var l=pct>=80?'Tüm PDF bitti, KPSS\'ye hazırsın!':pct>=60?'Çok iyi — son tekrarı yap.':'Zayıf noktalara geri dön.';
+  document.getElementById('remoji').textContent=e;
+  document.getElementById('rlabel').textContent=l;
+  document.getElementById('rc').textContent=co;
+  document.getElementById('rw').textContent=wr;
+  document.getElementById('rs').textContent=sk;
+  document.getElementById('pbar').style.width='100%';
+}
+
+showCat();
+</script>
+</body>
+</html>
