@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPSS Vatandaşlık Quiz 6</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07080F;--surface:#0D1117;--border:#161B22;
+  --accent:#22C55E;--accent2:#4ADE80;--accent3:#86EFAC;
+  --correct:#10B981;--wrong:#EF4444;
+  --text:#F1F5F9;--muted:#64748B;--card:#0A0D14;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;}
+header{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;padding:14px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.logo{font-size:18px;font-weight:800;}
+.logo .v{color:var(--accent2);}
+.logo .badge{font-size:10px;font-weight:700;border:1px solid var(--accent);color:var(--accent);padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle;}
+.stats{display:flex;gap:18px;font-size:12px;color:var(--muted);}
+.stat strong{color:var(--text);font-size:16px;display:block;text-align:center;}
+.progress-wrap{width:100%;max-width:760px;height:4px;background:var(--border);border-radius:2px;margin-bottom:18px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .35s ease;}
+.top-row{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.cat-pill{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent2);background:rgba(74,222,128,.1);border:1px solid var(--accent2);padding:3px 10px;border-radius:20px;}
+.timer-box{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);padding:4px 12px;border-radius:20px;}
+.timer-num{font-size:16px;font-weight:800;color:var(--accent2);min-width:22px;}
+.timer-num.danger{color:var(--wrong);}
+.question-card{width:100%;max-width:760px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:12px;}
+.q-number{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;margin-bottom:10px;}
+.q-text{font-size:17px;line-height:1.6;color:var(--text);font-weight:500;}
+.options{width:100%;max-width:760px;display:grid;gap:8px;margin-bottom:12px;}
+.option-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 15px;color:var(--text);font-family:inherit;font-size:14px;cursor:pointer;text-align:left;display:flex;align-items:flex-start;gap:10px;transition:border-color .15s,background .15s;line-height:1.4;}
+.option-btn:hover:not(:disabled){border-color:var(--accent2);background:rgba(74,222,128,.05);}
+.option-btn .key{width:26px;height:26px;border-radius:5px;background:var(--border);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);margin-top:1px;}
+.option-btn.correct{border-color:var(--correct);background:rgba(16,185,129,.1);}
+.option-btn.correct .key{background:var(--correct);color:#fff;}
+.option-btn.wrong{border-color:var(--wrong);background:rgba(239,68,68,.1);}
+.option-btn.wrong .key{background:var(--wrong);color:#fff;}
+.option-btn:disabled{cursor:default;}
+.feedback{width:100%;max-width:760px;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:8px;display:none;line-height:1.5;}
+.feedback.show{display:block;}
+.feedback.correct{background:rgba(16,185,129,.12);border:1px solid var(--correct);color:#34D399;}
+.feedback.wrong{background:rgba(239,68,68,.12);border:1px solid var(--wrong);color:#F87171;}
+.hint-row{width:100%;max-width:760px;margin-bottom:12px;display:none;}
+.hint-row.show{display:block;}
+.hint-toggle{background:none;border:1px dashed var(--accent);color:var(--accent);font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;cursor:pointer;transition:background .15s;}
+.hint-toggle:hover{background:rgba(34,197,94,.1);}
+.hint-box{margin-top:8px;background:rgba(34,197,94,.06);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--accent3);line-height:1.5;display:none;}
+.hint-box.open{display:block;}
+.next-btn{width:100%;max-width:760px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:13px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:opacity .15s;}
+.next-btn:hover{opacity:.88;}
+.next-btn.show{display:block;}
+#result-screen{display:none;width:100%;max-width:760px;text-align:center;padding-top:10px;}
+.result-emoji{font-size:50px;margin-bottom:10px;}
+.result-title{font-size:24px;font-weight:800;margin-bottom:6px;}
+.result-score{font-size:62px;font-weight:800;line-height:1;margin:12px 0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.result-label{color:var(--muted);font-size:14px;margin-bottom:22px;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
+.rstat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.rstat .rnum{font-size:24px;font-weight:800;margin-bottom:3px;}
+.rstat .rlbl{font-size:11px;color:var(--muted);}
+.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:13px 26px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-s{background:var(--surface);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:13px 26px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-s:hover{border-color:var(--accent2);}
+#cat-screen{width:100%;max-width:760px;}
+.cat-header{text-align:center;margin-bottom:26px;}
+.cat-header h1{font-size:26px;font-weight:800;margin-bottom:6px;}
+.cat-header h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.cat-header p{color:var(--muted);font-size:13px;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.cat-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s;}
+.cat-card:hover{border-color:var(--accent2);}
+.cat-card.selected{border-color:var(--accent2);background:rgba(74,222,128,.06);}
+.cat-card .ci{font-size:22px;margin-bottom:6px;}
+.cat-card .cn{font-weight:700;font-size:13px;margin-bottom:2px;}
+.cat-card .cc{font-size:11px;color:var(--muted);}
+.start-btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+#quiz-screen{display:none;width:100%;}
+@media(max-width:520px){.cat-grid{grid-template-columns:1fr;}.result-grid{grid-template-columns:1fr 1fr;}.q-text{font-size:15px;}.btn-row{flex-direction:column;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">KPSS <span class="v">Vatandaşlık</span><span class="badge">6</span></div>
+  <div class="stats" id="hstats" style="display:none">
+    <div class="stat"><strong id="sc">0</strong>Doğru</div>
+    <div class="stat"><strong id="sw">0</strong>Yanlış</div>
+    <div class="stat"><strong id="st">0</strong>Toplam</div>
+  </div>
+</header>
+
+<div id="cat-screen">
+  <div class="cat-header">
+    <h1>Konu <span>Seç</span></h1>
+    <p>Son quiz — PDF'deki kalan tüm konular 💡</p>
+  </div>
+  <div class="cat-grid" id="cat-grid"></div>
+  <button class="start-btn" onclick="startQuiz()">Başla →</button>
+</div>
+
+<div id="quiz-screen">
+  <div class="progress-wrap"><div class="progress-bar" id="pbar"></div></div>
+  <div class="top-row">
+    <div class="cat-pill" id="cpill"></div>
+    <div class="timer-box"><span style="font-size:13px;color:var(--muted)">⏱</span><span class="timer-num" id="tnum">20</span></div>
+  </div>
+  <div class="question-card">
+    <div class="q-number" id="qnum"></div>
+    <div class="q-text" id="qtext"></div>
+  </div>
+  <div class="options" id="opts"></div>
+  <div class="hint-row" id="hint-row">
+    <button class="hint-toggle" onclick="toggleHint()">💡 İpucunu göster</button>
+    <div class="hint-box" id="hint-box"></div>
+  </div>
+  <div class="feedback" id="fb"></div>
+  <button class="next-btn" id="nbtn" onclick="nextQ()">Sonraki →</button>
+</div>
+
+<div id="result-screen">
+  <div class="result-emoji" id="remoji"></div>
+  <div class="result-title">Sınav Bitti</div>
+  <div class="result-score" id="rscore"></div>
+  <div class="result-label" id="rlabel"></div>
+  <div class="result-grid">
+    <div class="rstat"><div class="rnum" style="color:var(--correct)" id="rc">0</div><div class="rlbl">Doğru</div></div>
+    <div class="rstat"><div class="rnum" style="color:var(--wrong)" id="rw">0</div><div class="rlbl">Yanlış</div></div>
+    <div class="rstat"><div class="rnum" style="color:var(--accent2)" id="rs">0</div><div class="rlbl">Süre Doldu</div></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-p" onclick="showCat()">Yeniden Oyna</button>
+    <button class="btn-s" onclick="replaySame()">Aynı Konuyu Tekrar</button>
+  </div>
+</div>
+
+<script>
+var Q=[];
+
+/* ===== 2017 DEĞİŞİKLİKLERİ ===== */
+Q.push({c:"2017 Değişiklikleri",q:"2017 Anayasa değişikliğiyle KALDIRILMAYAN düzenleme hangisidir?",a:"Yazılı soru",o:["Gensoru","Sözlü soru","Kanun tasarısı","Yazılı soru"],h:"Kaldırılanlar: Gensoru, Sözlü soru, Tüzük, Sıkıyönetim, Bakanlar Kurulu, Güvenoyu, KHK, Müşterek Kararname, Kanun Tasarısı, Başbakanlık, AYİM."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle kaldırılan ve yürütmeyle ilgili olan belgeler hangileridir?",a:"Müşterek Kararname ve KHK",o:["Kanun ve Yönetmelik","Müşterek Kararname ve KHK","Tüzük ve Yönetmelik","Genelge ve Tebliğ"],h:"Müşterek Kararname: Bakanlar Kurulu + CB imzasıyla çıkardı. KHK: Bakanlar Kurulunun yetkisi. İkisi de kaldırıldı."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle Anayasaya EKLENEN ifade nedir?",a:"Yargı yetkisi bağımsız ve tarafsız mahkemelerce kullanılır — 'tarafsız' kelimesi yeni eklendi",o:["Yargı bağımsızdır ifadesi eklendi","Yargı yetkisi bağımsız ve tarafsız mahkemelerce kullanılır — 'tarafsız' kelimesi yeni eklendi","Kuvvetler ayrılığı ilkesi eklendi","Hukuk devleti ilkesi güçlendirildi"],h:"Sadece 'bağımsız' varken 'tarafsız' da eklendi — sınav sorusu olarak çok çıkar."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle Cumhurbaşkanına tanınan yeni hak nedir?",a:"Siyasi parti üyesi olabilme",o:["İki dönem yerine üç dönem görev yapabilme","Siyasi parti üyesi olabilme","TBMM'yi istediği zaman feshetme","Kanun yapma yetkisi"],h:"Önceden CB tarafsız olmak zorundaydı ve partisiyle ilişiğini keserdi."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle MGK'dan çıkarılan ve İçişleri Bakanlığına bağlanan komutanlık hangisidir?",a:"Jandarma Genel Komutanlığı",o:["Kara Kuvvetleri Komutanlığı","Sahil Güvenlik Komutanlığı","Jandarma Genel Komutanlığı","Hava Kuvvetleri Komutanlığı"],h:"Jandarma artık MGK üyesi değil ve İçişleri Bakanlığına bağlı."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle kaldırılan güvenoyu ve gensoru yerine hangi denetim mekanizmaları kaldı?",a:"Yazılı soru, genel görüşme, meclis araştırması, meclis soruşturması",o:["Sadece yazılı soru","Yazılı soru ve genel görüşme","Yazılı soru, genel görüşme, meclis araştırması, meclis soruşturması","Hiçbir denetim mekanizması kalmadı"],h:"4 denetim yolu kaldı. Gensoru ve sözlü soru kaldırıldı."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle Yüce Divan kapsamına EKLENEN kişiler kimlerdir?",a:"Cumhurbaşkanı yardımcıları",o:["Milletvekilleri","Cumhurbaşkanı yardımcıları","Genelkurmay Başkanı","Danıştay üyeleri"],h:"2017'de CB yardımcısı makamı oluşturuldu ve bunlar da Yüce Divan kapsamına alındı."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle yüksek mahkemeler arasından çıkarılan mahkeme hangisidir?",a:"Askeri Yargıtay",o:["Danıştay","Yargıtay","Askeri Yargıtay","Uyuşmazlık Mahkemesi"],h:"Hem Askeri Yargıtay hem AYİM (Askeri Yüksek İdare Mahkemesi) kaldırıldı."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle milletvekili seçilme yaşı kaçtan kaça indirildi?",a:"25'ten 18'e",o:["30'dan 25'e","25'ten 18'e","21'den 18'e","30'dan 18'e"],h:"Seçme yaşı zaten 18'di. Seçilme yaşı 25'ten 18'e indi."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle Bakanlıkların kurulması ve kaldırılması artık hangi işlemle yapılmaktadır?",a:"Cumhurbaşkanlığı Kararnamesi",o:["Kanun","TBMM kararı","Cumhurbaşkanlığı Kararnamesi","Müşterek kararname"],h:"Önceden kanunla yapılırdı. Artık CBK yeterli."});
+Q.push({c:"2017 Değişiklikleri",q:"2017 değişikliğiyle TBMM görev süresi ve milletvekili sayısı nasıl değişti?",a:"Süre 4'ten 5 yıla çıktı — sayı 550'den 600'e çıktı",o:["Süre 4'ten 5 yıla çıktı — sayı 550'den 600'e çıktı","Süre aynı kaldı — sayı 400'den 600'e çıktı","Süre 5'ten 7 yıla çıktı — sayı aynı kaldı","Her ikisi de değişmedi"],h:"2017 öncesi: 4 yıl ve 550 milletvekili. Sonrası: 5 yıl ve 600."});
+
+/* ===== TBMM ÖNEMLİ SAYILAR ===== */
+Q.push({c:"TBMM Sayıları",q:"TBMM'de şu eşikleri doğru eşleştirin: Karar yeter sayısı / Toplantı yeter sayısı / Salt çoğunluk",a:"151 / 200 / 301",o:["120 / 200 / 301","151 / 200 / 301","151 / 250 / 301","151 / 200 / 360"],h:"151 basit çoğunluk (karar yeter). 200 toplantı yeter. 301 salt çoğunluk (tüm üyelerin yarısından fazlası)."});
+Q.push({c:"TBMM Sayıları",q:"Anayasa değişikliği için teklif, kabul ve zorunlu referandum eşikleri sırasıyla kaçtır?",a:"200 teklif / 360 kabul / 400 zorunlu referandum",o:["100 / 301 / 400","200 teklif / 360 kabul / 400 zorunlu referandum","150 / 360 / 400","200 / 301 / 400"],h:"200 (1/3): teklif. 360 (3/5): kabul + CB referanduma gönderebilir. 400 (2/3): kabul + CB doğrudan onaylar veya referandum."});
+Q.push({c:"TBMM Sayıları",q:"TBMM'de savaş ilanı, genel af ve bütçenin kabulü için aranan oy sırasıyla nedir?",a:"301 / 360 / salt çoğunluk",o:["200 / 301 / 360","301 / 360 / salt çoğunluk","360 / 400 / salt çoğunluk","301 / 400 / 301"],h:"Savaş ilanı = 301. Genel/özel af = 3/5 (360). Bütçe = toplantıya katılanların salt çoğunluğu."});
+Q.push({c:"TBMM Sayıları",q:"CB hakkında soruşturma açma, Yüce Divana sevk ve yargılanmaya karar verme eşikleri sırasıyla nedir?",a:"301 / 400 / 360",o:["200 / 360 / 400","301 / 360 / 400","301 / 400 / 360","360 / 400 / 301"],h:"Soruşturma açma=301. Yüce Divana sevk=400 (2/3). Yargılanma kararı=360 (3/5)."});
+Q.push({c:"TBMM Sayıları",q:"TBMM Başkanlık seçiminde turlar ve aranan oylar sırasıyla nedir?",a:"1.tur=400, 2.tur=400, 3.tur=301, 4.tur=en çok oy alan",o:["1.tur=301, 2.tur=301, 3.tur=200, 4.tur=en çok oy","1.tur=400, 2.tur=400, 3.tur=301, 4.tur=en çok oy alan","1.tur=360, 2.tur=301, 3.tur=200, 4.tur=en çok oy","1.tur=400, 2.tur=301, 3.tur=200, 4.tur=en çok oy"],h:"İlk iki turda 2/3 (400) aranır. 3.turda salt çoğunluk (301). 4.turda en fazla oyu alan seçilir."});
+Q.push({c:"TBMM Sayıları",q:"TBMM'de referandum kararı için aranan oy sayısı kaçtır?",a:"360",o:["200","301","360","400"],h:"Para basma ve referandum kararı: 3/5 (360). Savaş ilanı: salt çoğunluk (301)."});
+Q.push({c:"TBMM Sayıları",q:"TBMM Başkanlık Divanı kaç üyeden oluşur ve içinde kaç başkanvekili, kaç katip, kaç idare amiri vardır?",a:"15 üye — 4 başkanvekili, 7 katip, 3 idare amiri + 1 başkan",o:["10 üye — 2 başkanvekili, 5 katip, 2 idare amiri","15 üye — 4 başkanvekili, 7 katip, 3 idare amiri + 1 başkan","12 üye — 3 başkanvekili, 6 katip, 2 idare amiri","20 üye — 5 başkanvekili, 10 katip, 4 idare amiri"],h:"1 Başkan + 4 Başkanvekili + 7 Katip Üye + 3 İdare Amiri = 15 üye."});
+Q.push({c:"TBMM Sayıları",q:"TBMM Meclis Bütçe Komisyonu kaç üyeden oluşur?",a:"30",o:["15","20","25","30"],h:"Bütçe Komisyonu TBMM'nin en kalabalık komisyonudur — 30 üye."});
+
+/* ===== YÜCE DİVAN ===== */
+Q.push({c:"Yüce Divan",q:"Anayasa Mahkemesi'nin Yüce Divan sıfatıyla yargıladıkları arasında aşağıdakilerden hangisi YER ALMAZ?",a:"Milletvekilleri",o:["Cumhurbaşkanı","Genelkurmay Başkanı","Sayıştay Başkanı","Milletvekilleri"],h:"Milletvekilleri Yüce Divan'da yargılanamaz. Dokunulmazlıkları kaldırılırsa adli mahkemelerde yargılanır."});
+Q.push({c:"Yüce Divan",q:"Yüce Divan kapsamındaki askeri kişiler kimlerdir?",a:"Genelkurmay Başkanı, Kara, Deniz ve Hava Kuvvetleri Komutanları",o:["Genelkurmay Başkanı ve tüm generaller","Genelkurmay Başkanı, Kara, Deniz ve Hava Kuvvetleri Komutanları","Genelkurmay Başkanı, 3 kuvvet komutanı ve Jandarma","Tüm komutanlar ve Jandarma"],h:"Jandarma Genel Komutanı 2017'de çıkarıldı. Sahil Güvenlik de kapsam dışında."});
+Q.push({c:"Yüce Divan",q:"Yüce Divan yargılamalarında süre sınırı var mıdır?",a:"Evet, yargılama 3 ay (90 gün) içinde tamamlanmalıdır",o:["Hayır, süre sınırı yoktur","Evet, yargılama 3 ay (90 gün) içinde tamamlanmalıdır","Evet, 6 ay içinde tamamlanmalıdır","Evet, 1 yıl içinde tamamlanmalıdır"],h:"Yüce Divan yargılaması 3 ay içinde sonuçlanmalıdır."});
+Q.push({c:"Yüce Divan",q:"Anayasa Mahkemesi'nin Yüce Divan sıfatıyla yargılayamadıkları arasında hangisi YER ALIR?",a:"Emniyet Genel Müdürü",o:["Danıştay Başkanı","Yargıtay Başkanı","Emniyet Genel Müdürü","Uyuşmazlık Mahkemesi Başkanı"],h:"Yargılanamayacaklar: Milletvekilleri, MİT Başkanı, Emniyet Genel Müdürü, Sahil Güvenlik ve Jandarma Komutanı."});
+Q.push({c:"Yüce Divan",q:"Yüce Divan'da seçilmeye engel suçtan mahkum edilen CB'nın görevi ne olur?",a:"Görevi kendiliğinden sona erer",o:["TBMM onu görevden alır","Görevi kendiliğinden sona erer","CB Yardımcısı göreve başlar ve seçim yapılır","6 ay içinde yeni seçim yapılır"],h:"Yüce Divan kararıyla mahkumiyet halinde görev kendiliğinden sona erer."});
+
+/* ===== CB SEÇİM SENARYOLARI ===== */
+Q.push({c:"CB Seçim Senaryoları",q:"CB makamı boşalırsa ve seçimlere 1 yıldan az süre varsa ne zaman seçim yapılır?",a:"60. günü izleyen ilk pazar",o:["30. günü izleyen ilk pazar","45. günü izleyen ilk pazar","60. günü izleyen ilk pazar","90. günü izleyen ilk pazar"],h:"1 yıldan fazla varsa: 45 gün içindeki son pazar. Az varsa: 60. günü izleyen ilk pazar."});
+Q.push({c:"CB Seçim Senaryoları",q:"CB makamı boşalırsa ve seçimlere 1 yıldan fazla süre varsa ne zaman seçim yapılır?",a:"45 gün içindeki son pazar",o:["30 gün içindeki son pazar","45 gün içindeki son pazar","60 gün içindeki son pazar","90 gün içindeki son pazar"],h:"1 yıldan az: 60. günü izleyen ilk pazar. 1 yıldan fazla: 45 gün içindeki son pazar."});
+Q.push({c:"CB Seçim Senaryoları",q:"CB seçiminde 2. turda kalan iki adaydan biri çekilirse ne olur?",a:"Referanduma gidilir ve adayın salt çoğunluk alması gerekir",o:["Kalan aday seçilir","Referanduma gidilir ve adayın salt çoğunluk alması gerekir","Seçim iptal edilir yeniden yapılır","3. aday eklenir"],h:"Tek adayla seçim referandum şeklinde yapılır. Salt çoğunluk şartı aranır."});
+Q.push({c:"CB Seçim Senaryoları",q:"CB tarafından seçimlerin yenilenmesi kararı alınırsa seçim ne zaman yapılır?",a:"60. günü izleyen ilk pazar",o:["30. günü izleyen ilk pazar","45. günü izleyen ilk pazar","60. günü izleyen ilk pazar","90. günü izleyen ilk pazar"],h:"CB seçimleri yenileme kararında da aynı kural: 60. günü izleyen ilk pazar."});
+Q.push({c:"CB Seçim Senaryoları",q:"CB seçiminde 1. turda salt çoğunluk sağlanamazsa 2. tur ne zaman yapılır?",a:"1. turu takip eden ikinci pazar günü",o:["7 gün sonraki pazar","1. turu takip eden ikinci pazar günü","30 gün sonra","45 gün sonra"],h:"1. tur: salt çoğunluk. 2. tur: iki hafta sonraki pazar. En fazla oy alan seçilir."});
+
+/* ===== SİYASİ PARTİ DETAYLARI ===== */
+Q.push({c:"Siyasi Partiler",q:"Siyasi partilere üye olamayanların tam listesi nedir?",a:"Hakimler, savcılar, askeri personel, devlet memurları, 18 yaş altı, YÖ öncesi öğrenci, mahkumlar",o:["Yalnızca hakimler ve askerler","Hakimler, savcılar, askeri personel, devlet memurları, 18 yaş altı, YÖ öncesi öğrenci, mahkumlar","Yalnızca hakimler, savcılar ve askerler","Tüm kamu çalışanları"],h:"Yükseköğretim öğrencileri genel merkez ve gençlik kollarına ÜYE OLABİLİR — bu istisna sıkça sorulur."});
+Q.push({c:"Siyasi Partiler",q:"Birden fazla partinin ortak CB adayı gösterebilmesi için seçimlerde almaları gereken asgari oy oranı nedir?",a:"%5",o:["%3","%5","%7","%10"],h:"Tek parti için CB adayı barajı: %5. Ortak aday için de: %5. Aynı oran."});
+Q.push({c:"Siyasi Partiler",q:"Siyasi partilerin hazine yardımı alabilmesi için gereken asgari oy oranı kaçtır?",a:"%3",o:["%1","%3","%5","%7"],h:"Hazine yardımı: %3. CB adayı gösterme: %5. Meclis grubu kurma: %7. Üç ayrı baraj."});
+Q.push({c:"Siyasi Partiler",q:"Anayasa Mahkemesi bir siyasi partiyi kapatabilmek için hangi çoğunluğa ihtiyaç duyar?",a:"Üye tam sayısının 2/3'ü (10 üye)",o:["Salt çoğunluk (8 üye)","Üye tam sayısının 2/3'ü (10 üye)","Oybirliği","3/5 çoğunluk"],h:"AYM 15 üyeli. 2/3 = 10 üye gerekir. Çoğunluk sağlanamazsa parti kapatılmaz, hazine yardımı kesilebilir."});
+Q.push({c:"Siyasi Partiler",q:"Siyasi partilerin mali denetimi yapılırken AYM hangi kurumdan yardım alır?",a:"Sayıştay",o:["Maliye Bakanlığı","Sayıştay","Danıştay","TBMM Bütçe Komisyonu"],h:"AYM hem kapatma davalarına hem mali denetime bakar. Mali denetimde Sayıştay yardım eder."});
+Q.push({c:"Siyasi Partiler",q:"Herhangi bir nedenle partisinin kapatılmasına sebebiyet veren milletvekiline kaç yıl siyaset yasağı uygulanır?",a:"5 yıl",o:["2 yıl","3 yıl","5 yıl","10 yıl"],h:"Kapatma kararında partinin odağı olan kişi de 5 yıl siyasi yasakla karşılaşabilir."});
+
+/* ===== HSK ve YARGI ATAMALAR ===== */
+Q.push({c:"HSK ve Yargı Atamaları",q:"HSK'nın toplam üye sayısı, CB'nın seçtiği, TBMM'nin seçtiği ve doğal üye sayıları sırasıyla nedir?",a:"13 — 4 — 7 — 2",o:["15 — 5 — 8 — 2","13 — 4 — 7 — 2","11 — 3 — 6 — 2","13 — 3 — 8 — 2"],h:"13 üye: 2 doğal (Adalet Bakanı + Yardımcısı) + 4 CB'nın seçtiği + 7 TBMM'nin seçtiği."});
+Q.push({c:"HSK ve Yargı Atamaları",q:"HSK hangi mahkemenin TÜM üyelerini seçer?",a:"Yargıtay",o:["Danıştay","Yargıtay","Anayasa Mahkemesi","Uyuşmazlık Mahkemesi"],h:"Yargıtay: tüm üyeler HSK tarafından seçilir. Danıştay: 3/4'ü HSK, 1/4'ü CB."});
+Q.push({c:"HSK ve Yargı Atamaları",q:"HSK üyelerinin görev süresi ve yeniden seçilip seçilemeyecekleri nasıldır?",a:"4 yıl — yeniden seçilebilirler",o:["6 yıl — seçilemezler","4 yıl — yeniden seçilebilirler","12 yıl — seçilemezler","5 yıl — seçilebilirler"],h:"AYM üyeleri: 12 yıl, yeniden seçilemez. HSK üyeleri: 4 yıl, yeniden seçilebilir."});
+Q.push({c:"HSK ve Yargı Atamaları",q:"Yargıtay Başkanını kim seçer?",a:"Yargıtay Genel Kurulu",o:["HSK","Cumhurbaşkanı","TBMM","Adalet Bakanı"],h:"Yargıtay Başkanı = Yargıtay Genel Kurulu seçer. Yargıtay C.Başsavcısı = Yargıtay GK önerir, CB seçer."});
+Q.push({c:"HSK ve Yargı Atamaları",q:"Danıştay Başkanı kaç yıllığına seçilir?",a:"4 yıl",o:["2 yıl","4 yıl","6 yıl","12 yıl"],h:"Danıştay üyeleri: 12 yıl. Danıştay Başkanı: 4 yıl. Aynı süre değil."});
+Q.push({c:"HSK ve Yargı Atamaları",q:"AYM üyelerinin zorunlu emeklilik yaşı ile hakimler/savcıların zorunlu emeklilik yaşı sırasıyla nedir?",a:"İkisi de 65",o:["AYM 70 — Hakim/Savcı 65","AYM 65 — Hakim/Savcı 60","İkisi de 65","AYM 65 — Hakim/Savcı 70"],h:"Hem AYM üyeleri hem hakimler/savcılar 65 yaşında zorunlu emekliliğe ayrılır."});
+
+/* ===== CB ATAMA LİSTESİ ===== */
+Q.push({c:"CB Atama Listesi",q:"Cumhurbaşkanı kararı ile atananların tam listesinde hangisi YER ALMAZ?",a:"Mahkeme hakimleri",o:["Merkez Bankası Başkanı","Diyanet İşleri Başkanı","Büyükelçiler","Mahkeme hakimleri"],h:"Mahkeme hakimleri HSK tarafından atanır, CB tarafından değil."});
+Q.push({c:"CB Atama Listesi",q:"Diyanet İşleri Başkanının görev süresi ve atanma biçimi nedir?",a:"4 yıl — Cumhurbaşkanı tarafından atanır",o:["5 yıl — TBMM tarafından seçilir","4 yıl — Cumhurbaşkanı tarafından atanır","6 yıl — Bakanlar Kurulu tarafından atanır","4 yıl — İçişleri Bakanı tarafından atanır"],h:"Diyanet İşleri Başkanlığı Cumhurbaşkanlığına bağlıdır."});
+Q.push({c:"CB Atama Listesi",q:"ÖSYM Başkanının görev süresi kaç yıldır?",a:"4 yıl",o:["2 yıl","3 yıl","4 yıl","5 yıl"],h:"ÖSYM Başkanı da Cumhurbaşkanı tarafından 4 yıllığına atanır."});
+Q.push({c:"CB Atama Listesi",q:"TRT Genel Müdürünün atamasını kim yapar?",a:"Cumhurbaşkanı",o:["RTÜK","TRT Yönetim Kurulu","Cumhurbaşkanı","Kültür ve Turizm Bakanı"],h:"TRT Genel Müdürü CB tarafından atanır. TRT Cumhurbaşkanlığına bağlıdır."});
+Q.push({c:"CB Atama Listesi",q:"Kamu Başdenetçisini (Ombudsman) kim seçer ve görev süresi kaç yıldır?",a:"TBMM — 4 yıl",o:["Cumhurbaşkanı — 5 yıl","TBMM — 4 yıl","AYM — 6 yıl","Danıştay — 4 yıl"],h:"Ombudsman kurumu 2010 değişikliğiyle getirildi. TBMM tarafından seçilir."});
+
+/* ===== TEMEL HAK SINIRLAMALARI ===== */
+Q.push({c:"Temel Hak Sınırlamaları",q:"Düşünce ve kanaat hürriyeti neden mutlak bir hak olarak kabul edilir?",a:"Kimse düşüncelerini açıklamaya zorlanamaz ve düşüncelerinden dolayı kınanamaz — sınırlandırılamaz",o:["Anayasada yer almasından dolayı","Kimse düşüncelerini açıklamaya zorlanamaz ve düşüncelerinden dolayı kınanamaz — sınırlandırılamaz","Uluslararası sözleşmelerden dolayı","Savaş döneminde bile korunduğundan"],h:"Düşünce ve kanaat hürriyeti sınırlandırılamaz. Ancak düşünceyi açıklama ve yayma hürriyeti sınırlandırılabilir."});
+Q.push({c:"Temel Hak Sınırlamaları",q:"Haberleşme hürriyetinin kısıtlanabilmesi için gereken koşul nedir?",a:"Hakim kararı — gecikmesinde sakınca varsa kanunla yetkili kılınmış merciin yazılı emri",o:["Savcı emri yeterli","Hakim kararı — gecikmesinde sakınca varsa kanunla yetkili kılınmış merciin yazılı emri","İçişleri Bakanlığı kararı","OHAL ilan edilmesi"],h:"Haberleşme gizliliği anayasal güvence altındadır. İstisna: yargısal veya yetkili merci yazılı emri."});
+Q.push({c:"Temel Hak Sınırlamaları",q:"Vatandaşın yurt dışına çıkma hürriyeti hangi koşulda sınırlanabilir?",a:"Suç soruşturması veya kovuşturması nedeniyle hakim kararına bağlı olarak",o:["İçişleri Bakanı kararıyla","Savcı talebiyle","Suç soruşturması veya kovuşturması nedeniyle hakim kararına bağlı olarak","OHAL döneminde CB kararıyla"],h:"Yurt dışına çıkma hürriyeti temel haklar arasındadır; sınırlandırma hakim kararına bağlıdır."});
+Q.push({c:"Temel Hak Sınırlamaları",q:"Konut dokunulmazlığının istisnası nedir?",a:"Hakim kararı olmadıkça konut aranamaz; gecikmede sakınca varsa kanunla yetkili kılınmış merciin emriyle aranabilir",o:["Hiçbir şekilde sınırlandırılamaz","Savcı emriyle aranabilir","Hakim kararı olmadıkça konut aranamaz; gecikmede sakınca varsa kanunla yetkili kılınmış merciin emriyle aranabilir","OHAL'de serbestçe aranabilir"],h:"Gece baskını: kural olarak yasak. İstisna: hakim/yetkili merci kararı."});
+Q.push({c:"Temel Hak Sınırlamaları",q:"Zorla çalıştırma yasağının istisnaları nelerdir?",a:"Hükümlülük/tutukluluk çalışmaları, OHAL'de vatandaştan istenecek hizmetler, zorunlu teknik emek",o:["Hiçbir istisnası yoktur","Savaş halinde her türlü çalışma","Hükümlülük/tutukluluk çalışmaları, OHAL'de vatandaştan istenecek hizmetler, zorunlu teknik emek","Yalnızca hükümlülük hali"],h:"Cezaevindeki çalışma zorla çalıştırma yasağının istisnasıdır."});
+Q.push({c:"Temel Hak Sınırlamaları",q:"Mülkiyet hakkı hangi sebeple ve nasıl sınırlandırılabilir?",a:"Ancak kamu yararı amacıyla ve kanunla sınırlandırılabilir",o:["CB kararnamesiyle her zaman","Ancak kamu yararı amacıyla ve kanunla sınırlandırılabilir","İdari kararla","Sadece savaş halinde"],h:"Mülkiyet hakkı anayasal güvence altındadır. Sınırlandırma için hem kamu yararı hem kanun şartı gerekir."});
+
+/* ===== KURUMLAR VE ORGANLARIN ÜYE SAYILARI ===== */
+Q.push({c:"Kurum Üye Sayıları",q:"Aşağıdaki kurumların üye sayılarını eşleştirin: AYM / HSK / YSK / DDK",a:"15 / 13 / 11 / 9",o:["13 / 15 / 11 / 9","15 / 13 / 11 / 9","15 / 13 / 9 / 11","11 / 13 / 15 / 9"],h:"AYM=15, HSK=13, YSK=11 (7 asıl+4 yedek), DDK=9."});
+Q.push({c:"Kurum Üye Sayıları",q:"Uyuşmazlık Mahkemesi, TBMM Başkanlık Divanı ve YÖK üye sayıları sırasıyla nedir?",a:"13 / 15 / 21",o:["11 / 15 / 21","13 / 15 / 21","13 / 20 / 25","11 / 20 / 21"],h:"Uyuşmazlık=13, Başkanlık Divanı=15, YÖK=21."});
+Q.push({c:"Kurum Üye Sayıları",q:"YSK'nın asıl ve yedek üye sayıları kaçtır ve üye görev süresi kaç yıldır?",a:"7 asıl + 4 yedek = 11 — 6 yıl",o:["7 asıl + 4 yedek = 11 — 4 yıl","7 asıl + 4 yedek = 11 — 6 yıl","5 asıl + 6 yedek = 11 — 6 yıl","9 asıl + 2 yedek = 11 — 5 yıl"],h:"YSK toplam 11 üye. 6 üye Yargıtay, 5 üye Danıştay'dan seçilir."});
+Q.push({c:"Kurum Üye Sayıları",q:"AYM'nin kaç bölümde çalıştığı ve her bölümde kaç üye bulunduğu nedir?",a:"2 bölüm — her bölümde 7 üye",o:["3 bölüm — her bölümde 5 üye","2 bölüm — her bölümde 7 üye","2 bölüm — her bölümde 6 üye","1 bölüm — 15 üye"],h:"AYM: 1 Genel Kurul (15 üye) + 2 Bölüm (7'şer üye) + 3 Komisyon (3'er üye)."});
+Q.push({c:"Kurum Üye Sayıları",q:"Milli Güvenlik Kurulu kaç ayda bir toplanır ve gündemi kim belirler?",a:"2 ayda bir — Cumhurbaşkanı",o:["1 ayda bir — Genelkurmay Başkanı","2 ayda bir — Cumhurbaşkanı","3 ayda bir — CB Yardımcısı","Her 6 ayda bir — Savunma Bakanı"],h:"MGK tavsiye niteliğinde kararlar alır. Gündem CB tarafından belirlenir."});
+
+/* ===== DİSİPLİN VE MEMUR ===== */
+Q.push({c:"Disiplin ve Memur",q:"Memurlara verilecek disiplin cezalarını kim verir ve hangisi Yüksek Disiplin Kuruluna aittir?",a:"Uyarma/kınama/aylıktan kesme: Disiplin Amirleri — Kademe durdurma ve ihraç: Yüksek Disiplin Kurulu",o:["Hepsi Disiplin Amirlerince verilir","Uyarma/kınama/aylıktan kesme: Disiplin Amirleri — Kademe durdurma ve ihraç: Yüksek Disiplin Kurulu","Hepsi Yüksek Disiplin Kurulunca verilir","İhraç: Adalet Bakanlığı, diğerleri: Disiplin Amirleri"],h:"İhraç kararı Yüksek Disiplin Kuruluna aittir. Diğerleri Disiplin Amirleri."});
+Q.push({c:"Disiplin ve Memur",q:"Disiplin cezalarına itiraz süresi ve itiraz mercii nedir?",a:"7 gün içinde — Disiplin Kuruluna itiraz edilir (ihraçta: Yüksek Disiplin Kurulu)",o:["15 gün içinde — İdare Mahkemesine","7 gün içinde — Disiplin Kuruluna itiraz edilir (ihraçta: Yüksek Disiplin Kurulu)","30 gün içinde — Danıştaya","10 gün içinde — Cumhurbaşkanlığına"],h:"İtiraz süresi 7 gün. Disiplin cezalarına karşı yargı yolu da açıktır (idare mahkemesi)."});
+Q.push({c:"Disiplin ve Memur",q:"Memurun herhangi bir nedenle göreve başlamaması halinde hangi işlem yapılır?",a:"Atama işlemi iptal edilir ve o yıl başka bir göreve atanamaz",o:["Aylıktan kesme cezası verilir","Atama işlemi iptal edilir ve o yıl başka bir göreve atanamaz","İhraç kararı verilir","Uyarma cezası verilir"],h:"Göreve başlamamak ciddi sonuçlar doğurur: atama iptal + o yıl yeniden atanma yasağı."});
+Q.push({c:"Disiplin ve Memur",q:"Memurun görevden uzaklaştırılması (açığa alınması) hangi süreyle sınırlıdır?",a:"En fazla 3 ay — uzatılabilir ama soruşturma devam etmelidir",o:["En fazla 1 ay — uzatılamaz","En fazla 3 ay — uzatılabilir ama soruşturma devam etmelidir","Süresiz uygulanabilir","En fazla 6 ay — uzatılabilir"],h:"Görevden uzaklaştırma disiplin cezası değil, geçici idari tedbirdir."});
+Q.push({c:"Disiplin ve Memur",q:"Devlet memurluğunda 'kariyer' ilkesi ne anlama gelir?",a:"Memurların görevde yükselmesinin liyakata ve sicile dayalı olması",o:["Memurların istedikleri göreve geçebilmesi","Memurların görevde yükselmesinin liyakata ve sicile dayalı olması","Memurların yaşla birlikte otomatik yükselmesi","Özel sektör deneyiminin tanınması"],h:"Sınıflandırma + kariyer + liyakat üçlüsü: memurluğun temel ilkeleri."});
+Q.push({c:"Disiplin ve Memur",q:"İstisnai devlet memurluğu kapsamındakilerin ortak özelliği nedir?",a:"Sınav ve kariyer koşullarına tabi olmaksızın atanırlar",o:["Maaşları daha yüksektir","Sınav ve kariyer koşullarına tabi olmaksızın atanırlar","Ömür boyu görev yaparlar","Yalnızca CB tarafından atanırlar"],h:"Valiler, büyükelçiler, TOKİ Başkanı, MİT mensupları, CB ve TBMM memurlukları istisnai kapsamda."});
+
+/* ===== BÖLGELER VE İDARİ YÖNETİM ===== */
+Q.push({c:"İdari Yapılanma",q:"Türkiye'de kaç büyükşehir belediyesi bulunmakta olup en son hangi ile büyükşehir statüsü verilmiştir?",a:"30 büyükşehir — en son Ordu",o:["16 büyükşehir — en son Ankara","30 büyükşehir — en son Ordu","81 büyükşehir — tüm iller","29 büyükşehir — en son İzmir"],h:"6360 sayılı Kanunla 14 ile daha büyükşehir statüsü verilerek toplam 30 oldu."});
+Q.push({c:"İdari Yapılanma",q:"Köy muhtarı ve ihtiyar heyetinin doğal üyeleri kimlerdir?",a:"İmam ve öğretmen ihtiyar heyetinin doğal üyesidir",o:["Muhtarın atadığı kişiler","İmam ve öğretmen ihtiyar heyetinin doğal üyesidir","Kaymakamın belirlediği kişiler","Seçimle belirlenen 5 kişi"],h:"Köy ihtiyar heyeti 4 seçilmiş üye + imam + öğretmen (doğal üye) = 6 kişiden oluşur."});
+Q.push({c:"İdari Yapılanma",q:"Yurt sınırı dışındaki tarla ve bahçelere gidip gelmek için verilen belgenin adı nedir?",a:"Pasavan",o:["Pasaport","Vize","Pasavan","Oturma izni"],h:"Sınır boyundaki köylülere tarla ve bahçelerine gidebilmeleri için özel bir belge (pasavan) verilir."});
+Q.push({c:"İdari Yapılanma",q:"Belediye ve köy kurma nüfus eşikleri sırasıyla nedir?",a:"Belediye: 5.000 — Büyükşehir: 750.000 — Köy: 150-2.000",o:["Belediye: 2.000 — Büyükşehir: 500.000 — Köy: 50-500","Belediye: 5.000 — Büyükşehir: 750.000 — Köy: 150-2.000","Belediye: 10.000 — Büyükşehir: 1.000.000 — Köy: 200-2.000","Belediye: 5.000 — Büyükşehir: 500.000 — Köy: 100-1.000"],h:"Mahalle için asgari nüfus: 500."});
+Q.push({c:"İdari Yapılanma",q:"'Taşra' ve 'merkez' teşkilatı arasındaki fark nedir?",a:"Merkez: başkentte faaliyet gösterir. Taşra: il ve ilçe düzeyinde merkezi idareyi temsil eder",o:["Taşra daha güçlüdür","Merkez: başkentte faaliyet gösterir. Taşra: il ve ilçe düzeyinde merkezi idareyi temsil eder","İkisi aynı anlama gelir","Taşra yerel yönetimdir"],h:"Vali ve Kaymakam taşra teşkilatının başındadır. Bunlar merkezi idareyi yerelde temsil eder."});
+Q.push({c:"İdari Yapılanma",q:"Bir ilçenin başka bir ile bağlanması hangi işlemle gerçekleşir?",a:"Kanun",o:["CB Kararı","Kanun","İçişleri Bakanlığı Kararı","Vali Kararı"],h:"İl ve ilçe sınırlarındaki her türlü değişiklik kanunla yapılır. CBK ile yapılamaz."});
+
+var CATS=[];Q.forEach(function(x){if(CATS.indexOf(x.c)===-1)CATS.push(x.c);});
+var sel={};CATS.forEach(function(c){sel[c]=true;});
+var qs=[],ci=0,co=0,wr=0,sk=0,ans=false,tmr=null,tl=20,ls=null,hintOpen=false;
+
+function shuf(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+
+function showCat(){
+  document.getElementById('cat-screen').style.display='block';
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('hstats').style.display='none';
+  renderCats();
+}
+
+function renderCats(){
+  var icons={'2017 Değişiklikleri':'📝','TBMM Sayıları':'🔢','Yüce Divan':'⚖️','CB Seçim Senaryoları':'🏆','Siyasi Partiler':'🎯','HSK ve Yargı Atamaları':'👨‍⚖️','CB Atama Listesi':'📋','Temel Hak Sınırlamaları':'🛡️','Kurum Üye Sayıları':'🔢','Disiplin ve Memur':'👨‍💼','İdari Yapılanma':'🏘️'};
+  var g=document.getElementById('cat-grid'),h='';
+  CATS.forEach(function(c){
+    var cnt=0;Q.forEach(function(x){if(x.c===c)cnt++;});
+    h+='<div class="cat-card'+(sel[c]?' selected':'')+'" onclick="tog(\''+c+'\',this)">';
+    h+='<div class="ci">'+(icons[c]||'📚')+'</div><div class="cn">'+c+'</div><div class="cc">'+cnt+' soru</div></div>';
+  });
+  g.innerHTML=h;
+}
+
+function tog(c,el){
+  var n=0;CATS.forEach(function(x){if(sel[x])n++;});
+  if(sel[c]){if(n===1)return;sel[c]=false;el.classList.remove('selected');}
+  else{sel[c]=true;el.classList.add('selected');}
+}
+
+function startQuiz(){
+  ls={};CATS.forEach(function(c){ls[c]=sel[c];});
+  var pool=[];Q.forEach(function(x){if(sel[x.c])pool.push(x);});
+  qs=shuf(pool).slice(0,Math.min(20,pool.length));
+  ci=0;co=0;wr=0;sk=0;
+  document.getElementById('cat-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('hstats').style.display='flex';
+  updS();showQ();
+}
+
+function replaySame(){if(ls)CATS.forEach(function(c){sel[c]=ls[c];});startQuiz();}
+
+function showQ(){
+  if(ci>=qs.length){showRes();return;}
+  ans=false;hintOpen=false;clearInterval(tmr);tl=20;
+  var q=qs[ci];
+  document.getElementById('cpill').textContent=q.c;
+  document.getElementById('qnum').textContent='SORU '+(ci+1)+' / '+qs.length;
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('pbar').style.width=((ci/qs.length)*100)+'%';
+  var hr=document.getElementById('hint-row');
+  var hb=document.getElementById('hint-box');
+  hr.className='hint-row';
+  hb.className='hint-box';
+  hb.textContent=q.h||'';
+  if(document.querySelector('.hint-toggle'))document.querySelector('.hint-toggle').textContent='💡 İpucunu göster';
+  var opts=shuf(q.o),keys=['A','B','C','D'],h='';
+  opts.forEach(function(o,i){
+    var s=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    h+='<button class="option-btn" onclick="pick(this,\''+s+'\')">';
+    h+='<span class="key">'+keys[i]+'</span>'+o+'</button>';
+  });
+  document.getElementById('opts').innerHTML=h;
+  document.getElementById('fb').className='feedback';
+  document.getElementById('nbtn').className='next-btn';
+  updT();tmr=setInterval(tick,1000);
+}
+
+function toggleHint(){
+  hintOpen=!hintOpen;
+  var hb=document.getElementById('hint-box');
+  var btn=document.querySelector('.hint-toggle');
+  if(hintOpen){hb.className='hint-box open';btn.textContent='💡 İpucunu gizle';}
+  else{hb.className='hint-box';btn.textContent='💡 İpucunu göster';}
+}
+
+function tick(){
+  tl--;updT();
+  if(tl<=0){
+    clearInterval(tmr);
+    if(!ans){
+      ans=true;sk++;updS();hlC();showFB(false,true);
+      document.getElementById('nbtn').className='next-btn show';
+      document.getElementById('hint-row').className='hint-row show';
+      var bs=document.getElementById('opts').getElementsByTagName('button');
+      for(var i=0;i<bs.length;i++)bs[i].disabled=true;
+    }
+  }
+}
+
+function updT(){var el=document.getElementById('tnum');el.textContent=tl;el.className='timer-num'+(tl<=5?' danger':'');}
+
+function pick(btn,ch){
+  if(ans)return;ans=true;clearInterval(tmr);
+  var q=qs[ci],ok=(ch===q.a);
+  if(ok){co++;btn.classList.add('correct');btn.querySelector('.key').style.cssText='background:var(--correct);color:#fff';}
+  else{wr++;btn.classList.add('wrong');btn.querySelector('.key').style.cssText='background:var(--wrong);color:#fff';hlC();}
+  updS();showFB(ok,false);
+  document.getElementById('nbtn').className='next-btn show';
+  document.getElementById('hint-row').className='hint-row show';
+  var bs=document.getElementById('opts').getElementsByTagName('button');
+  for(var i=0;i<bs.length;i++)bs[i].disabled=true;
+}
+
+function hlC(){
+  var q=qs[ci];
+  var bs=document.getElementById('opts').getElementsByTagName('button');
+  for(var i=0;i<bs.length;i++){if(bs[i].textContent.indexOf(q.a)!==-1)bs[i].classList.add('correct');}
+}
+
+function showFB(ok,to){
+  var fb=document.getElementById('fb'),q=qs[ci];
+  if(to){fb.textContent='⏰ Süre doldu! Doğru: '+q.a;fb.className='feedback wrong show';}
+  else if(ok){fb.textContent='✅ Doğru!';fb.className='feedback correct show';}
+  else{fb.textContent='❌ Yanlış! Doğru cevap: '+q.a;fb.className='feedback wrong show';}
+}
+
+function updS(){document.getElementById('sc').textContent=co;document.getElementById('sw').textContent=wr+sk;document.getElementById('st').textContent=ci;}
+function nextQ(){ci++;updS();showQ();}
+
+function showRes(){
+  clearInterval(tmr);
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  var pct=Math.round((co/qs.length)*100);
+  document.getElementById('rscore').textContent='%'+pct;
+  var e=pct>=80?'🏆':pct>=60?'💪':'📖';
+  var l=pct>=80?'Mükemmel! Tüm PDF tamamlandı.':pct>=60?'Çok iyi gidiyorsun!':'Biraz daha çalışmak gerekiyor.';
+  document.getElementById('remoji').textContent=e;
+  document.getElementById('rlabel').textContent=l;
+  document.getElementById('rc').textContent=co;
+  document.getElementById('rw').textContent=wr;
+  document.getElementById('rs').textContent=sk;
+  document.getElementById('pbar').style.width='100%';
+}
+
+showCat();
+</script>
+</body>
+</html>
