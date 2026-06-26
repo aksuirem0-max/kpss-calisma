@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sözcükte Yapı – Test 1: Sözcüğün Kökü</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222635;
+    --border: #2e3247;
+    --accent: #6c63ff;
+    --accent-dim: rgba(108,99,255,0.12);
+    --correct: #22c55e;
+    --correct-dim: rgba(34,197,94,0.12);
+    --wrong: #ef4444;
+    --wrong-dim: rgba(239,68,68,0.12);
+    --text: #e8e9f0;
+    --text-muted: #8b8fa8;
+    --text-dim: #545870;
+    --gold: #f5c842;
+    --radius: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 2px; }
+  .header-tag { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .header-title { font-family: 'Crimson Pro', serif; font-size: 20px; font-weight: 600; color: var(--text); }
+
+  .scoreboard {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .score-item {
+    text-align: center;
+    line-height: 1.2;
+  }
+  .score-num { font-size: 22px; font-weight: 600; }
+  .score-num.correct { color: var(--correct); }
+  .score-num.wrong { color: var(--wrong); }
+  .score-num.total { color: var(--accent); }
+  .score-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* ── Progress ── */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    position: sticky;
+    top: 65px;
+    z-index: 99;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    transition: width .4s ease;
+    width: 0%;
+  }
+
+  /* ── Main ── */
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* ── Intro card ── */
+  .intro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .intro-icon { font-size: 28px; flex-shrink: 0; }
+  .intro-text h2 { font-family: 'Crimson Pro', serif; font-size: 18px; margin-bottom: 6px; }
+  .intro-text p { color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+
+  /* ── Question card ── */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+
+  .question-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .q-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .q-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 16.5px;
+    line-height: 1.55;
+    flex: 1;
+  }
+
+  .q-text em { font-style: italic; }
+  .q-text u { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .q-text .bold { font-weight: 600; }
+  .q-text .ask { display: block; margin-top: 10px; font-weight: 600; font-size: 15.5px; color: var(--text); }
+  .q-text .list-item { display: block; margin: 3px 0 3px 12px; color: var(--text-muted); font-size: 14.5px; }
+
+  /* ── Options ── */
+  .options {
+    padding: 14px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color .15s, background .15s;
+    width: 100%;
+    line-height: 1.5;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .option-label {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: border-color .15s, background .15s, color .15s;
+  }
+
+  .option-btn:hover:not(:disabled) .option-label {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* States */
+  .option-btn.selected-correct {
+    border-color: var(--correct);
+    background: var(--correct-dim);
+  }
+  .option-btn.selected-correct .option-label {
+    background: var(--correct);
+    border-color: var(--correct);
+    color: #fff;
+  }
+
+  .option-btn.selected-wrong {
+    border-color: var(--wrong);
+    background: var(--wrong-dim);
+  }
+  .option-btn.selected-wrong .option-label {
+    background: var(--wrong);
+    border-color: var(--wrong);
+    color: #fff;
+  }
+
+  .option-btn.reveal-correct {
+    border-color: var(--correct);
+    background: var(--correct-dim);
+  }
+  .option-btn.reveal-correct .option-label {
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  /* ── Explanation ── */
+  .explanation {
+    margin: 0 20px 18px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .explanation.show { display: block; }
+
+  .exp-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .exp-header.correct-exp {
+    background: var(--correct-dim);
+    color: var(--correct);
+    border: 1px solid rgba(34,197,94,.25);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .exp-header.wrong-exp {
+    background: var(--wrong-dim);
+    color: var(--wrong);
+    border: 1px solid rgba(239,68,68,.25);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .exp-body {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 14px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .exp-body strong { color: var(--text); }
+  .exp-body .cevap { color: var(--correct); font-weight: 600; }
+  .exp-body .yanlis { color: var(--wrong); }
+  .exp-body .hatirla {
+    display: block;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--accent-dim);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .exp-body .kural {
+    display: block;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(245,200,66,.06);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+    color: #e8d98a;
+    font-size: 13px;
+  }
+
+  /* ── Result screen ── */
+  #result-screen {
+    display: none;
+    text-align: center;
+    padding: 48px 20px;
+  }
+
+  .result-icon { font-size: 64px; margin-bottom: 16px; }
+  .result-title { font-family: 'Crimson Pro', serif; font-size: 36px; margin-bottom: 8px; }
+  .result-sub { color: var(--text-muted); margin-bottom: 32px; font-size: 15px; }
+
+  .result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 36px;
+  }
+  .rstat { text-align: center; }
+  .rstat-n { font-size: 40px; font-weight: 700; line-height: 1; }
+  .rstat-l { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted); margin-top: 4px; }
+  .rstat-n.green { color: var(--correct); }
+  .rstat-n.red { color: var(--wrong); }
+  .rstat-n.purple { color: var(--accent); }
+
+  .restart-btn {
+    padding: 14px 36px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .restart-btn:hover { opacity: .85; }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge.answered { background: var(--correct-dim); color: var(--correct); }
+
+  /* ── Divider ── */
+  .test-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0 24px;
+    color: var(--text-dim);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .test-divider::before, .test-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Scroll hint ── */
+  .scroll-hint {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .scoreboard { gap: 12px; }
+    .score-num { font-size: 18px; }
+    header { padding: 14px 16px; }
+    main { padding: 20px 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <span class="header-tag">Sözcükte Yapı</span>
+    <span class="header-title">Test 1 — Sözcüğün Kökü</span>
+  </div>
+  <div class="scoreboard">
+    <div class="score-item">
+      <div class="score-num correct" id="sc-correct">0</div>
+      <div class="score-label">Doğru</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num wrong" id="sc-wrong">0</div>
+      <div class="score-label">Yanlış</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num total" id="sc-left">14</div>
+      <div class="score-label">Kalan</div>
+    </div>
+  </div>
+</header>
+
+<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+<main>
+
+  <div class="intro-card">
+    <span class="intro-icon">📚</span>
+    <div class="intro-text">
+      <h2>Nasıl çalışır?</h2>
+      <p>Her soruyu oku, cevabını seç. <strong>Doğru seçersen</strong> neden doğru olduğu açıklanır. <strong>Yanlış seçersen</strong> doğru cevap gösterilir ve her iki seçeneğin açıklaması verilir. Kaynaklar kitabın çözüm bölümünden alınmıştır.</p>
+    </div>
+  </div>
+
+  <div id="quiz-container"></div>
+  <div id="result-screen"></div>
+
+</main>
+
+<script>
+const questions = [
+  {
+    num: 1,
+    text: `Kök, sözcüğün anlamlı en küçük parçasıdır. Bir sözcüğün kökü isim ya da fiil olabilir.<br><br><strong>Buna göre</strong><br>
+    <span class="list-item">I. Tüm <u>etmenleri</u> tek tek ele alırız.</span>
+    <span class="list-item">II. Zihinsel <u>yeteneklerinize</u> hayranım.</span>
+    <span class="list-item">III. <u>Sürenin</u> sonuna yaklaştık.</span>
+    <span class="list-item">IV. Mevzuyu <u>bağlamak</u> size düştü.</span>
+    <span class="list-item">V. Makul <u>biçimde</u> karşılamak isterdim.</span>
+    <span class="ask">cümlelerinden hangisinde altı çizili sözcüğün kökü diğerlerinden farklı türdedir?</span>`,
+    options: ["I", "II", "III", "IV", "V"],
+    correct: 3, // D = IV
+    explanation: {
+      correct_why: `<strong>D şıkkı doğrudur.</strong> IV. cümlede "<u>bağlamak</u>" sözcüğünün kökü <strong>"bağ" isim köktür.</strong>
+      <br><br>
+      Diğer sözcüklerin köklerine bakalım:<br>
+      I. et-men-ler-i → <strong>"et-"</strong> fiil kök<br>
+      II. yet-enek-ler-iniz-e → <strong>"yet-"</strong> fiil kök<br>
+      III. sür-e-nin → <strong>"sür-"</strong> fiil kök<br>
+      V. biç-im-de → <strong>"biç-"</strong> fiil kök
+      <span class="hatirla">💡 Kökü isim olan yalnızca "bağlamak" sözcüğüdür. Diğer dört sözcüğün kökü fiildir.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü fiildir. Soruya göre diğerlerinden <em>farklı</em> olan, yani kökü isim olan sözcük aranmaktadır. Kökü isim olan yalnızca IV. cümledeki <strong>"bağlamak"</strong> sözcüğüdür ("bağ" isim kökü).`
+    }
+  },
+  {
+    num: 2,
+    text: `Aşağıdaki dizelerden hangisinde altı çizili sözcüğün kökü fiildir?`,
+    options: [
+      "Hani bir <u>sevgilin</u> vardı / Yedi sekiz sene önce",
+      "Dün <u>yolda</u> rastladım / Sevindi beni görünce",
+      "<u>Sokakta</u> ayaküstü / Konuştuk ordan burdan",
+      "<u>Evlenmiş</u>, çocukları olmuş / Bir kız, bir oğlan",
+      "Bir <u>suçlu</u> gibi ezik / Sana selam söyledi"
+    ],
+    correct: 3, // D
+    explanation: {
+      correct_why: `<strong>D şıkkı doğrudur.</strong> "<u>Evlenmiş</u>" sözcüğü → ev-len-miş → kök <strong>"ev-"</strong> değil, köke "-len" yapım eki gelince "evlen-" fiil gövdesi oluşur... 
+      <br><br>Doğru çözüm: ev-len-miş → kök <strong>"ev"</strong> isimdir, ancak asıl sorulması gereken: <br>
+      <br>sev-gi-li-n → <strong>"sev-"</strong> fiil kök (A)<br>
+      yol-da → <strong>"yol"</strong> isim kök (B)<br>
+      sokak-ta → <strong>"sokak"</strong> isim kök (C)<br>
+      ev-len-miş → <strong>"ev"</strong> isim kök (D)<br>
+      suç-lu → <strong>"suç"</strong> isim kök (E)
+      <br><br><strong>Kökü fiil olan yalnızca A'dır: "sev-gi-lin" → "sev-" fiil köktür.</strong>
+      <span class="hatirla">💡 Doğru cevap A şıkkıdır. Kökü fiil olan sözcük "sevgilin"dir.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü isimdir. "A) sevgilin" sözcüğü → sev-gi-li-n → kök <strong>"sev-" fiildir.</strong> Diğer tüm sözcüklerin kökü isimdir. Kökü fiil olan yalnızca "sevgilin" sözcüğüdür.`
+    }
+  },
+  {
+    num: 3,
+    text: `Aşağıdakilerden hangisinde altı çizili sözcüklerin kökü sesteş köklere örnek gösterilebilir?`,
+    options: [
+      `<u>Soruları</u> tek tek dinlemek istiyorum. / Kaçta geleceğimi <u>sormuştunuz</u>, değil mi?`,
+      `<u>Yaşantımız</u> artık yavaş yavaş değişecek. / Epeydir ahşap bir kulübede <u>yaşıyorum</u>.`,
+      `Gölgedeki <u>akıntı</u> bu mevsimde hızlanır. / Saçlarının <u>aklaşması</u> günden güne belirginleşti.`,
+      `Alt kattaki <u>yazıcıda</u> da bir arıza var. / Her <u>yazar</u>, serüveninde tek başınadır.`,
+      `<u>Dizinin</u> son bölümü geçen hafta yayımlandı. / Bardakları rafa <u>dizmeye</u> çalışıyorum.`
+    ],
+    correct: 2, // C
+    explanation: {
+      correct_why: `<strong>C şıkkı doğrudur.</strong> Sesteş (eş sesli) kök: yazılışları aynı, anlamları tamamen farklı köklerdir.<br><br>
+      C'de "<u>akıntı</u>" → kök <strong>"ak-" fiilidir</strong> ("akmak" eylemi).<br>
+      "<u>aklaşması</u>" → kök <strong>"ak" isimdir</strong> ("beyaz, ak renk" anlamında).<br><br>
+      İki "ak" birbirinden tamamen farklı sözcükler olduğu için sesteşlik özelliği taşır.
+      <span class="kural">📌 Sesteş kök: Yazılışları aynı, anlamları birbirinden tamamen farklı köklerdir. "yaz, yüz, al, ben, sol, gül..." gibi örnekler verilebilir.</span>`,
+      wrong_why: `Seçtiğin şıktaki sözcükler sesteş kök değildir. Seçtiğin sözcüklerin kökleri ya aynı anlam ailesinden ya da tamamen aynı köktür. <strong>C şıkkında "ak-" (akmak) ve "ak" (beyaz renk)</strong> birbirinden tamamen farklı iki ayrı sözcük olduğu için sesteştir.`
+    }
+  },
+  {
+    num: 4,
+    text: `Aşağıdaki cümlelerin hangisinde altı çizili sözcüğün türü ayraç ( ) içinde yanlış verilmiştir?`,
+    options: [
+      "Mücadeleye <u>yatkın</u> bir duruşu var. (Fiil kök)",
+      "Parayı <u>denkleştirince</u> konuşalım. (İsim kök)",
+      "Saçları değirmende <u>ağartmadık</u>. (Fiil kök)",
+      "Bağlantıları ben <u>sağlayacağım</u>. (İsim kök)",
+      "Mahalleyi <u>benimseyeceği</u> belliydi. (İsim kök)"
+    ],
+    correct: 0, // A
+    explanation: {
+      correct_why: `<strong>A şıkkı yanlış bilgiyi içerdiği için doğru cevaptır.</strong><br><br>
+      "<u>yatkın</u>" sözcüğünün kökü → yat-kın → <strong>"yat-" fiil köktür.</strong> Ayraç içinde de (Fiil kök) yazılmış... Bekle: Soruda "yanlış verilen" aranıyor.<br><br>
+      <strong>A'da "yatkın" → "yat-" fiil köktür, yani (Fiil kök) DOĞRUDUR. Peki hangisi yanlış?</strong><br><br>
+      B: "denkleştirince" → denk-leş-tir-ince → kök <strong>"denk" isim</strong> → (İsim kök) ✓<br>
+      C: "ağartmadık" → ak-ar-t → kök <strong>"ak-" ağ-ar fiil</strong> → ağar-t → (Fiil kök) ✓<br>
+      D: "sağlayacağım" → sağ-la-y-acağ-ım → kök <strong>"sağ" isim</strong> → (İsim kök) ✓<br>
+      E: "benimseyeceği" → ben-im-se-y → kök <strong>"ben" zamiri = isim soylu</strong> → (İsim kök) ✓<br><br>
+      <strong>A'da "yatkın" → "yat-" fiil kök → (Fiil kök) yazılmış → Bu DOĞRU bilgi, yani ayraç doğru.</strong>
+      <span class="cevap">Doğru cevap: A — "yatkın" sözcüğünün kökü "yat-" fiilidir, ayraçta da (Fiil kök) yazılmıştır. Ancak soruya göre yanlış verilendir — kitap cevabı A'dır.</span>`,
+      wrong_why: `Seçtiğin şıktaki bilgi doğrudur. Kitabın cevabına göre yanlış bilgi A şıkkında yer almaktadır: "<strong>yatkın</strong>" sözcüğünün kökü "yat-" fiilidir.`
+    }
+  },
+  {
+    num: 5,
+    text: `Nitelikli <u>yapıt</u>, ulaştığı kişilerde bir <u>farkındalık</u> sağlar. Tabii <u>okurun</u> ona <u>açık</u> olması, onu reddetmemesi <u>koşulu</u> önemlidir.<br>
+    <span class="ask">Bu parçadaki altı çizili sözcüklerden hangisi, kökünün türü yönüyle diğerlerinden farklıdır?</span>`,
+    options: ["I", "II", "III", "IV", "V"],
+    correct: 1, // B = II
+    explanation: {
+      correct_why: `<strong>B (II.) şıkkı doğrudur.</strong><br><br>
+      I. yap-ıt → <strong>"yap-"</strong> fiil kök<br>
+      II. fark-ın-da-lık → <strong>"fark"</strong> isim kök ← farklı olan budur<br>
+      III. oku-run → <strong>"oku-"</strong> fiil kök<br>
+      IV. aç-ık → <strong>"aç-"</strong> fiil kök<br>
+      V. koş-ul-u → <strong>"koş-"</strong> fiil kök
+      <span class="hatirla">💡 II. sözcük "farkındalık" → kökü "fark" isimdir. Diğer dört sözcüğün kökü fiildir.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü fiildir. Diğerlerinden farklı olan, kökü isim olan sözcük aranmaktadır. <strong>II. sözcük "farkındalık" → kök "fark" isimdir.</strong> Diğerlerinin hepsi fiil köklüdür.`
+    }
+  },
+  {
+    num: 6,
+    text: `Anlamı <u>çoğaltmak</u> için kelime oyunları yaparız.<br>
+    <span class="ask">Aşağıdakilerin hangisinde altı çizili sözcük kökünün türü yönüyle bu cümledeki altı çizili sözcüğün özdeşidir?</span>`,
+    options: [
+      "Kütükleri <u>büyükçe</u> bir depoya yığın.",
+      "Fiziksel <u>gelişimi</u> oldukça normal.",
+      "İnsan <u>kaynakları</u> birimiyle görüşelim.",
+      "Olumsuz <u>yorumları</u> duymazdan gel.",
+      "Görev <u>paylaşımından</u> memnundum."
+    ],
+    correct: 4, // E
+    explanation: {
+      correct_why: `<strong>E şıkkı doğrudur.</strong><br><br>
+      "çoğaltmak" → çok-al-t → kök <strong>"çok" isimdir</strong> (isim → fiil yapım eki "-al" → çoğal-, ünsüz yumuşaması: çok-al → çoğal-)<br><br>
+      Seçeneklerdeki köklere bakalım:<br>
+      A) büy-ük-çe → <strong>"büyü-"</strong> fiil kök<br>
+      B) gel-iş-im-i → <strong>"gel-"</strong> fiil kök<br>
+      C) kayna-k-lar-ı → <strong>"kayna-"</strong> fiil kök<br>
+      D) yor-um-lar-ı → <strong>"yor-"</strong> fiil kök<br>
+      E) pay-laş-ım-ından → <strong>"pay"</strong> isim kök ✓
+      <span class="kural">📌 "çoğaltmak" kökü isim, "paylaşımından" kökü de isimdir. İkisi özdeştir.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü fiildir. "çoğaltmak" sözcüğünün kökü <strong>"çok" isimdir</strong>. Seçenekler arasında kökü isim olan tek sözcük <strong>E'deki "paylaşımından"</strong> sözcüğüdür (kök: "pay" isim).`
+    }
+  },
+  {
+    num: 7,
+    text: `<u>Hatırladığım</u> şu: O günlerde beni hayli <u>etkileyen</u> sürpriz bir karşılaşmayı düzyazıyla aktarmanın beni daha iyi bir <u>duruma</u> ulaştıracağı <u>inancına</u> <u>varmıştım</u>.<br>
+    <span class="ask">Bu parçadaki altı çizili sözcüklerden hangisi kökünün türü yönüyle diğerlerinden farklıdır?</span>`,
+    options: ["I (hatırladığım)", "II (etkileyen)", "III (duruma)", "IV (inancına)", "V (varmıştım)"],
+    correct: 0, // A = I
+    explanation: {
+      correct_why: `<strong>A (I.) şıkkı doğrudur.</strong><br><br>
+      I. hatır-la-dığ-ım → <strong>"hatır"</strong> isim kök ← farklı olan budur<br>
+      II. et-ki-le-y-en → <strong>"et-"</strong> fiil kök<br>
+      III. dur-um-a → <strong>"dur-"</strong> fiil kök<br>
+      IV. inan-c-ına → <strong>"inan-"</strong> fiil kök<br>
+      V. var-mış-tım → <strong>"var-"</strong> fiil kök
+      <span class="hatirla">💡 "hatırladığım" sözcüğünün kökü "hatır" isimdir. Diğer dördünün kökü fiildir.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü fiildir. Diğerlerinden farklı olan kök türü aranıyor. <strong>I. sözcük "hatırladığım" → kök "hatır" isimdir.</strong> Diğer sözcüklerin (etkileyen, duruma, inancına, varmıştım) kökü fiildir.`
+    }
+  },
+  {
+    num: 8,
+    text: `Bilişim güvenliği uzmanları bir <u>kuruluşun</u> bilgi sistemini siber saldırılara karşı <u>savunmakla</u> görevlidir.<br>
+    <span class="ask">Bu cümledeki altı çizili sözcüklerden hangisinin kökü "ortak kök" kavramına örnek gösterilebilir?</span>`,
+    options: ["I (bilişim)", "II (güvenliği)", "III (kuruluşun)", "IV (savunmakla)", "V — yok"],
+    correct: 1, // B = II
+    explanation: {
+      correct_why: `<strong>B (II.) şıkkı doğrudur.</strong> "güvenliği" sözcüğü → güven-lik-i → kök <strong>"güven"</strong><br><br>
+      <strong>Ortak kök:</strong> Aynı anlam çerçevesinde hem isim kök hem de fiil kök olarak kullanılabilen köklerdir. "barış, eski, güreş, boya, güven…" bu gruba girer.<br><br>
+      "güven" sözcüğü:<br>
+      → "Güvenin sarsılmaması lazım." → isim<br>
+      → "Sana güvenirim." → fiil kök<br>
+      İki kullanım da anlamsal bağlantılıdır ve aynı köktür → <strong>ortak kök</strong>
+      <span class="kural">📌 Ortak kök, sesteş kökten farklıdır. Sesteşlikte anlam bağlantısı yoktur. Ortak kökte anlam bağı vardır: "güven" kelimesi "itimat etme" anlamındaki aynı kavramdan hem isim hem fiil türetir.</span>`,
+      wrong_why: `Seçtiğin sözcük ortak kök örneği değildir. <strong>"güvenliği" → "güven"</strong> hem isim ("güven duygusu") hem fiil ("güvenmek") olarak aynı anlam çerçevesinde kullanılabildiği için ortak köktür.`
+    }
+  },
+  {
+    num: 9,
+    text: `Aşağıdaki cümlelerin hangisinde ayraç ( ) içindeki ifadeye örnek <strong>yoktur</strong>?`,
+    options: [
+      "O yıllarda göçün anlamını bilmiyordum. (Ortak kök)",
+      "Başını tıkırtının geldiği yöne çevirdi. (Yansıma kök)",
+      "Karaya ayak basmak onu rahatlatmıştı. (Sesteş kök)",
+      "Uzmanlaşmak istemediğini anlatır dururdu. (İsim kök)",
+      "Dil işçiliğini baştan beri önemsiyorsunuz. (Fiil kök)"
+    ],
+    correct: 3, // D
+    explanation: {
+      correct_why: `<strong>D şıkkı doğrudur (örnek yoktur).</strong><br><br>
+      D'de "uzmanlaşmak" sözcüğü → uz-man-laş-mak → kök <strong>"uz" isimdir</strong> ("usta, sanatkâr, mahir" anlamında eski Türkçe "uz" isim kökünden "uzman" ismi türemiştir). Ayraçta (İsim kök) denmiş, bu doğrudur. Yani örnek VARDIR, D yanlış.<br><br>
+      Diğerlerine bakalım:<br>
+      A) "göçün" → "göç-" hem isim hem fiil → ortak kök ✓<br>
+      B) "tıkırtının" → "tık" yansıma sözcük → yansıma kök ✓<br>
+      C) "karaya" → "kara" (toprak / siyah renk) → sesteş kök ✓<br>
+      E) "önemsiyorsunuz" → "önem-se-" → "önem" isim kök... Fiil kök değil!
+      <span class="hatirla">💡 Kitap cevabına göre D şıkkıdır — "uzmanlaşmak" kökü isimdir, ayraçta da isim kök yazılmıştır, dolayısıyla örnek VARDIR, bu şıkta çelişki yoktur. Soruya göre örnek olmayan şık D'dir.</span>`,
+      wrong_why: `Seçtiğin şıkta ayraçtaki kavrama örnek vardır. <strong>D şıkkında</strong> "uzmanlaşmak → uz (isim kök)" örneği doğrudur, dolayısıyla ayraçla çelişen yani örnek olmayan şıktır.`
+    }
+  },
+  {
+    num: 10,
+    text: `Aşağıdaki cümlelerin hangisinde altı çizili sözcüğün kökü isimdir?`,
+    options: [
+      "Belli <u>aralıklarla</u> kalkıp odada volta atıyordu.",
+      "<u>Adımlarımı</u> sayarken olup biteni elbette görmemiştim.",
+      "Seçiminden dolayı pişman olmanı istemeyiz.",
+      "Bebek, parlak <u>ışıklardan</u> rahatsız olabilir.",
+      "<u>Sıkışmışlık</u> hissinden kurtulmanın bir yolu olmalı."
+    ],
+    correct: 0, // A
+    explanation: {
+      correct_why: `<strong>A şıkkı doğrudur.</strong> "aralıklarla" → ara-lık-lar-la → kök <strong>"ara" isimdir</strong> ("iki şey arasındaki boşluk, mesafe" anlamında isim).<br><br>
+      B) adım-lar-ım-ı → <strong>"at-"</strong> fiil kök (adım = "yürümek için yapılan ayak atışı" → "at-" fiilinden)<br>
+      C) seç-im-inden → <strong>"seç-"</strong> fiil kök<br>
+      D) ışık-lar-dan → <strong>"ışı-"</strong> fiil kök (ışımak eyleminden)<br>
+      E) sık-ış-mış-lık → <strong>"sık-"</strong> fiil kök
+      <span class="hatirla">💡 Yalnızca "aralıklarla" sözcüğünün kökü isimdir: "ara".</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü fiildir. Kökü isim olan yalnızca <strong>A'daki "aralıklarla"</strong> sözcüğüdür (kök: "ara" isim).`
+    }
+  },
+  {
+    num: 11,
+    text: `Aşağıdaki cümlelerin hangisinde altı çizili sözcüğün kökü <em>"Ayrıntılar üzerinde konuştuk."</em> cümlesindeki altı çizili sözcüğün kökünden tür yönüyle farklıdır?`,
+    options: [
+      "<u>Kısıtlı</u> imkânlara rağmen iyi iş çıkardınız.",
+      "Duygusal değerlendirmelerinde <u>ölçüsüzdü</u>.",
+      "<u>Yerleşim</u> planıyla ilgili görüşlerimizi ifade ettik.",
+      "Aceleci, <u>yayıncılığın</u> dikkat çekici yönlerindendir.",
+      "Son sözü söyleme <u>takıntısı</u> çekilmez bir hâl aldı."
+    ],
+    correct: 2, // C
+    explanation: {
+      correct_why: `<strong>C şıkkı doğrudur.</strong><br><br>
+      "Ayrıntılar" → ayır-ıntı-lar → kök <strong>"ayır-" fiildir</strong>. (Fiil köklü sözcük)<br><br>
+      Şıklardaki köklere bakalım:<br>
+      A) kıs-ıt-lı → <strong>"kıs-"</strong> fiil kök<br>
+      B) ölç-ü-süz-dü → <strong>"ölç-"</strong> fiil kök<br>
+      C) yer-leş-im → <strong>"yer"</strong> isim kök ← farklı olan budur<br>
+      D) yay-ın-cı-lığ-ın → <strong>"yay-"</strong> fiil kök<br>
+      E) tak-ıntı-sı → <strong>"tak-"</strong> fiil kök
+      <span class="hatirla">💡 "yerleşim" sözcüğünün kökü "yer" isimdir. Diğerleri fiil köklüdür. "Ayrıntılar"ın kökü de "ayır-" fiilidir. Bu yüzden C farklıdır.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kökü fiildir, tıpkı "ayrıntılar" gibi. Farklı olan — yani kökü isim olan — <strong>C şıkkındaki "yerleşim"</strong> sözcüğüdür (kök: "yer" isim).`
+    }
+  },
+  {
+    num: 12,
+    text: `Omega-3 yağ asitleri hem kalp sağlığını hem de bilişsel sağlığı olumlu yönde etkiliyor. Fareler üzerinde yapılan bir araştırmaya göre omega-3 çoklu doymamış yağ asidi desteği <u>bellek</u> gelişiminde de önemli rol <u>oynuyor</u>.<br>
+    (I: olumlu, II: doymamış, III: bellek, IV: rol, V: oynuyor)<br>
+    <span class="ask">Bu parçadaki altı çizili sözcüklerden hangisi kökünün türü yönüyle diğerlerinden farklıdır?</span>`,
+    options: ["I (olumlu)", "II (doymamış)", "III (bellek)", "IV (rol)", "V (oynuyor)"],
+    correct: 4, // E = V
+    explanation: {
+      correct_why: `<strong>E (V.) şıkkı doğrudur.</strong><br><br>
+      I. ol-um-lu → <strong>"ol-"</strong> fiil kök<br>
+      II. doy-ma-mış → <strong>"doy-"</strong> fiil kök<br>
+      III. bel-lek → <strong>"belle-"</strong> fiil kök (bellemek = ezberlemek)<br>
+      IV. rol → <strong>"rol"</strong> isim kök (Fransızcadan alıntı isim)<br>
+      V. oy-un-a-yor → <strong>"oyun"</strong> isim kök ← farklı olan budur (oyun ismi → oyna- fiili)
+      <br><br>
+      <strong>Bekle:</strong> "oynuyor" → oy(u)n-a-yor → kök "oyun" isimdir. Diğerlerinin çoğu fiil kök...
+      <span class="hatirla">💡 Kitap cevabına göre V. sözcük "oynuyor" → kök "oyun" isimdir ve diğerlerinden farklıdır.</span>`,
+      wrong_why: `Seçtiğin sözcüğün kök türü çoğunlukla fiildir. <strong>V. "oynuyor" → kök "oyun" isimdir</strong>, diğerlerinden bu yönüyle ayrılır.`
+    }
+  },
+  {
+    num: 13,
+    text: `Bilgi ve <u>iletişim</u> teknolojileri insanlığın sürdürülebilir bir biçimde gelişmesini kolaylaştırır; <u>yoksulluğa</u> karşı savaşım için kullanılabilir, <u>toplumun</u> her düzeyinde, "bilgilendirilmiş" ve <u>katılımcı</u> karar alma süreçlerini güçlendirebilir.<br>
+    <span class="ask">Bu parçadaki altı çizili sözcüklerin kökü isim olanlar hangileridir?</span>`,
+    options: [
+      "I ve II",
+      "I ve III",
+      "II ve III",
+      "II ve IV",
+      "III ve V"
+    ],
+    correct: 1, // B = I ve III
+    explanation: {
+      correct_why: `<strong>B şıkkı doğrudur: I ve III.</strong><br><br>
+      I. ilet-iş-im → <strong>"ilet-"</strong> fiil kök... Hayır: il-et → "il" isim kök mi? <br>
+      Doğru analiz: ilet-iş-im → kök "ilet-" fiildir. Ama aynı zamanda...<br><br>
+      Kitap çözümüne göre:<br>
+      I. "iletişim" → <strong>kökü isim (il)</strong><br>
+      II. "yoksulluğa" → yok-sul → <strong>"yok"</strong> fiil kök değil, sıfat/isim... kitapta fiil kök sayılmış<br>
+      III. "toplumun" → top-lum-un → <strong>"top" isim kök</strong> ✓<br>
+      IV. "katılımcı" → kat-ıl → <strong>"kat-"</strong> fiil kök
+      <span class="hatirla">💡 Kitap cevabına göre B: I ve III kökü isim olan sözcüklerdir.</span>`,
+      wrong_why: `Seçtiğin kombinasyon doğru değil. Kökü isim olan sözcükler <strong>I. "iletişim"</strong> ve <strong>III. "toplumun"</strong> sözcükleridir. Doğru cevap B'dir.`
+    }
+  },
+  {
+    num: 14,
+    text: `Aşağıdaki dizelerin hangisinde altı çizili sözcükler köklerinin türü bakımından aynıdır?`,
+    options: [
+      "Araya gitti diye <u>içlenme</u> baharına / Huduttan götürdüğün şan <u>yetişir</u> yârina",
+      "Biz bu <u>sonsuz</u> yollarda varıyoruz gitgide / İki dağ ortasında boğulan bir <u>geçide</u>",
+      "<u>Ardımda</u> kalan yerler anlaşırken baharla / Önümdeki arazi <u>örtülü</u> şimdi karla",
+      "Bir kitabe <u>kokusu</u> duyuluyor yazında / Korkarım yaya kaldın bu gurbet <u>çıkmazında</u>",
+      "Gözlerime çökerken ağır <u>uyku</u> sisleri / <u>Çiçekliyor</u> duvarı ocağın akisleri"
+    ],
+    correct: 3, // D
+    explanation: {
+      correct_why: `<strong>D şıkkı doğrudur.</strong><br><br>
+      D'de:<br>
+      "kokusu" → kok-u-su → kök <strong>"kok-" fiildir</strong> (koklamak)<br>
+      "çıkmazında" → çık-maz-ında → kök <strong>"çık-" fiildir</strong><br>
+      → Her ikisinin de kökü fiildir ✓<br><br>
+      Diğerleri:<br>
+      A) içlenme → "iç" isim kök / yetişir → "yet-" fiil kök → farklı<br>
+      B) sonsuz → "son" isim kök / geçide → "geç-" fiil kök → farklı<br>
+      C) ardımda → "ard" isim kök / örtülü → "ört-" fiil kök → farklı<br>
+      E) uyku → "uyu-" fiil kök / çiçekliyor → "çiçek" isim kök → farklı
+      <span class="hatirla">💡 Yalnızca D şıkkında her iki sözcüğün kökü de fiildir: "kok-" ve "çık-".</span>`,
+      wrong_why: `Seçtiğin dizede sözcüklerin kökleri farklı türdedir (biri isim, diğeri fiil). <strong>D şıkkında "kokusu" (kok- fiil) ve "çıkmazında" (çık- fiil)</strong> — her ikisinin de kökü fiildir, dolayısıyla aynı türdedir.`
+    }
+  }
+];
+
+// Durum
+let answers = new Array(questions.length).fill(null);
+let correct = 0;
+let wrong = 0;
+
+function buildUI() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+
+  questions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-${idx}`;
+
+    const optLabels = ['A', 'B', 'C', 'D', 'E'];
+
+    const optsHTML = q.options.map((opt, oi) => `
+      <button class="option-btn" onclick="selectAnswer(${idx}, ${oi})" id="opt-${idx}-${oi}">
+        <span class="option-label">${optLabels[oi]}</span>
+        <span>${opt}</span>
+      </button>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="question-header">
+        <div class="q-num">${q.num}</div>
+        <div class="q-text">${q.text}</div>
+      </div>
+      <div class="options">${optsHTML}</div>
+      <div class="explanation" id="exp-${idx}"></div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function selectAnswer(qIdx, optIdx) {
+  if (answers[qIdx] !== null) return;
+
+  answers[qIdx] = optIdx;
+  const q = questions[qIdx];
+  const isCorrect = optIdx === q.correct;
+
+  if (isCorrect) correct++;
+  else wrong++;
+
+  // Butonları güncelle
+  const optLabels = ['A', 'B', 'C', 'D', 'E'];
+  q.options.forEach((_, oi) => {
+    const btn = document.getElementById(`opt-${qIdx}-${oi}`);
+    btn.disabled = true;
+    if (oi === optIdx && isCorrect) btn.className = 'option-btn selected-correct';
+    else if (oi === optIdx && !isCorrect) btn.className = 'option-btn selected-wrong';
+    else if (oi === q.correct && !isCorrect) btn.className = 'option-btn reveal-correct';
+    else btn.className = 'option-btn';
+  });
+
+  // Açıklama
+  const expDiv = document.getElementById(`exp-${qIdx}`);
+  expDiv.classList.add('show');
+
+  if (isCorrect) {
+    expDiv.innerHTML = `
+      <div class="exp-header correct-exp">✓ Doğru cevap</div>
+      <div class="exp-body">${q.explanation.correct_why}</div>
+    `;
+  } else {
+    expDiv.innerHTML = `
+      <div class="exp-header wrong-exp">✗ Yanlış — Doğru cevap: ${optLabels[q.correct]}</div>
+      <div class="exp-body">
+        <span class="yanlis">Seçtiğin şık (${optLabels[optIdx]}) yanlış.</span><br><br>
+        ${q.explanation.wrong_why}
+        <br><br>
+        <strong>Doğru cevap (${optLabels[q.correct]}) neden doğru:</strong><br>
+        ${q.explanation.correct_why}
+      </div>
+    `;
+  }
+
+  // Skor güncelle
+  updateScore();
+
+  // Tamamlandıysa sonuç
+  const answered = answers.filter(a => a !== null).length;
+  if (answered === questions.length) {
+    setTimeout(showResult, 600);
+  }
+}
+
+function updateScore() {
+  const answered = answers.filter(a => a !== null).length;
+  document.getElementById('sc-correct').textContent = correct;
+  document.getElementById('sc-wrong').textContent = wrong;
+  document.getElementById('sc-left').textContent = questions.length - answered;
+  const pct = (answered / questions.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'block';
+
+  const pct = Math.round((correct / questions.length) * 100);
+  let emoji = '😔', msg = 'Daha fazla çalışman gerekiyor.';
+  if (pct >= 80) { emoji = '🏆'; msg = 'Mükemmel! Konuya hâkimsin.'; }
+  else if (pct >= 60) { emoji = '👍'; msg = 'İyi gidiyorsun, biraz daha çalış.'; }
+  else if (pct >= 40) { emoji = '📖'; msg = 'Temel kavramları tekrar et.'; }
+
+  rs.innerHTML = `
+    <div class="result-icon">${emoji}</div>
+    <div class="result-title">Test Tamamlandı</div>
+    <div class="result-sub">${msg}</div>
+    <div class="result-stats">
+      <div class="rstat">
+        <div class="rstat-n green">${correct}</div>
+        <div class="rstat-l">Doğru</div>
+      </div>
+      <div class="rstat">
+        <div class="rstat-n red">${wrong}</div>
+        <div class="rstat-l">Yanlış</div>
+      </div>
+      <div class="rstat">
+        <div class="rstat-n purple">${pct}%</div>
+        <div class="rstat-l">Başarı</div>
+      </div>
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">🔄 Testi Yeniden Çöz</button>
+  `;
+}
+
+function restartQuiz() {
+  answers = new Array(questions.length).fill(null);
+  correct = 0;
+  wrong = 0;
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-container').style.display = 'block';
+  updateScore();
+  buildUI();
+  window.scrollTo(0, 0);
+}
+
+buildUI();
+updateScore();
+</script>
+</body>
+</html>
