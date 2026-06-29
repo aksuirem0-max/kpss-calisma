@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esmâü'l-Hüsnâ — 99 İsim Çalışma Programı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gece:#0d1117;--yuzeygece:#161b22;--kenar:#21262d;
+  --altin:#c9a84c;--altin-acik:#e2c97e;--altin-koyu:#8a6e2f;
+  --turkuaz:#4fa3a0;--turkuaz-acik:#7bc8c5;
+  --metin:#e6edf3;--metin-ikincil:#8b949e;
+  --zat:#a78bfa;--celal:#f87171;--cemal:#34d399;--kemal:#60a5fa;
+  --r:0.75rem;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--gece);color:var(--metin);font-family:'Crimson Pro',Georgia,serif;min-height:100vh;font-size:17px;line-height:1.65;}
+.arapca{font-family:'Amiri',serif;direction:rtl;text-align:right;}
+code,kbd,cite{font-family:'IBM Plex Mono',monospace;}
+
+/* BAŞLIK */
+header{background:var(--yuzeygece);border-bottom:1px solid var(--kenar);padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100;}
+header h1{font-size:1.2rem;color:var(--altin);letter-spacing:.04em;font-weight:600;}
+header .ilerleme-bar{flex:1;height:6px;background:var(--kenar);border-radius:3px;overflow:hidden;}
+header .ilerleme-ic{height:100%;background:linear-gradient(90deg,var(--altin-koyu),var(--altin));transition:width .4s ease;}
+header .ilerleme-yazi{font-size:.8rem;color:var(--metin-ikincil);white-space:nowrap;font-family:'IBM Plex Mono',monospace;}
+
+/* FİLTRE ÇUBUĞU */
+.filtre-alan{background:var(--yuzeygece);border-bottom:1px solid var(--kenar);padding:.75rem 1.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.filtre-alan span{font-size:.8rem;color:var(--metin-ikincil);margin-right:.25rem;}
+.filtre-btn{padding:.3rem .8rem;border-radius:2rem;border:1px solid var(--kenar);background:transparent;color:var(--metin-ikincil);cursor:pointer;font-size:.8rem;transition:all .2s;font-family:'Crimson Pro',serif;}
+.filtre-btn:hover{border-color:var(--altin);color:var(--altin);}
+.filtre-btn.aktif{background:var(--altin-koyu);border-color:var(--altin);color:var(--altin-acik);}
+.filtre-btn.zat.aktif{background:#4c1d95;border-color:var(--zat);color:var(--zat);}
+.filtre-btn.celal.aktif{background:#7f1d1d;border-color:var(--celal);color:var(--celal);}
+.filtre-btn.cemal.aktif{background:#064e3b;border-color:var(--cemal);color:var(--cemal);}
+.filtre-btn.kemal.aktif{background:#1e3a5f;border-color:var(--kemal);color:var(--kemal);}
+.arama-alani{margin-left:auto;}
+.arama-alani input{background:var(--kenar);border:1px solid var(--kenar);color:var(--metin);padding:.3rem .75rem;border-radius:.4rem;font-family:'Crimson Pro',serif;font-size:.9rem;width:180px;}
+.arama-alani input:focus{outline:none;border-color:var(--altin-koyu);}
+
+/* ANA DÜZEN */
+.konteyner{display:flex;gap:0;min-height:calc(100vh - 110px);}
+
+/* SOL LİSTE */
+.esma-listesi{width:280px;min-width:200px;background:var(--yuzeygece);border-right:1px solid var(--kenar);overflow-y:auto;max-height:calc(100vh - 110px);position:sticky;top:110px;}
+.esma-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;cursor:pointer;border-bottom:1px solid var(--kenar);transition:background .15s;}
+.esma-item:hover{background:var(--kenar);}
+.esma-item.aktif{background:linear-gradient(90deg,rgba(201,168,76,.12),transparent);border-left:3px solid var(--altin);}
+.esma-item.ogrenildi{opacity:.55;}
+.esma-no{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--metin-ikincil);min-width:24px;}
+.esma-arapca-kucuk{font-family:'Amiri',serif;font-size:1.2rem;direction:rtl;color:var(--altin-acik);}
+.esma-latin{font-size:.85rem;color:var(--metin-ikincil);}
+.grup-nokta{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.gp-Zât{background:var(--zat);}
+.gp-Celâl{background:var(--celal);}
+.gp-Cemâl{background:var(--cemal);}
+.gp-Kemâl{background:var(--kemal);}
+.ogrenildi-isaret{margin-left:auto;font-size:.85rem;color:var(--cemal);}
+
+/* DETAY PANELİ */
+.detay-panel{flex:1;overflow-y:auto;max-height:calc(100vh - 110px);padding:2rem;}
+
+/* KART */
+.kart{max-width:820px;margin:0 auto;}
+.kart-baslik{display:flex;align-items:flex-start;gap:1.5rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--kenar);}
+.kart-no-grup{display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+.kart-no{font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--metin-ikincil);}
+.grup-etiket{font-size:.7rem;padding:.2rem .5rem;border-radius:.25rem;font-weight:600;letter-spacing:.05em;}
+.ge-Zât{background:rgba(167,139,250,.15);color:var(--zat);border:1px solid rgba(167,139,250,.3);}
+.ge-Celâl{background:rgba(248,113,113,.15);color:var(--celal);border:1px solid rgba(248,113,113,.3);}
+.ge-Cemâl{background:rgba(52,211,153,.15);color:var(--cemal);border:1px solid rgba(52,211,153,.3);}
+.ge-Kemâl{background:rgba(96,165,250,.15);color:var(--kemal);border:1px solid rgba(96,165,250,.3);}
+.kart-isim-blok{flex:1;}
+.kart-arapca{font-family:'Amiri',serif;font-size:3rem;direction:rtl;text-align:right;color:var(--altin-acik);line-height:1.3;margin-bottom:.4rem;}
+.kart-latin{font-size:1.4rem;font-weight:600;color:var(--altin);margin-bottom:.2rem;}
+.kart-anlam{font-size:1rem;color:var(--metin-ikincil);font-style:italic;}
+
+/* BÖLÜMLER */
+.bolum{margin-bottom:1.75rem;}
+.bolum-baslik{font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.12em;color:var(--altin-koyu);text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid var(--kenar);}
+.kok-metin{font-size:.95rem;color:var(--metin-ikincil);line-height:1.7;}
+
+/* AYET */
+.ayet-kart{background:var(--yuzeygece);border:1px solid var(--kenar);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;}
+.ayet-arapca{font-family:'Amiri',serif;font-size:1.6rem;direction:rtl;text-align:right;line-height:1.8;margin-bottom:.75rem;color:var(--metin);}
+.ayet-meal{font-style:italic;color:var(--metin-ikincil);margin-bottom:.5rem;font-size:.95rem;}
+.ayet-kaynak{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--altin-koyu);margin-bottom:.75rem;}
+.ayet-tefsir{font-size:.92rem;color:var(--metin);line-height:1.75;border-left:2px solid var(--altin-koyu);padding-left:.9rem;}
+
+/* HADİS */
+.hadis-kart{background:var(--yuzeygece);border:1px solid var(--kenar);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.75rem;display:flex;flex-direction:column;gap:.4rem;}
+.hadis-metin{font-size:.97rem;line-height:1.7;}
+.hadis-alt{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.hadis-kaynak{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--metin-ikincil);}
+.hadis-derece{font-size:.72rem;padding:.15rem .45rem;border-radius:.2rem;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+.hd-Sahih{background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3);}
+.hd-Hasen{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
+.hd-Zayıf{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);}
+
+/* GEYLANİ */
+.geylani-kutu{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid var(--altin-koyu);border-radius:var(--r);padding:1.1rem 1.25rem;font-style:italic;font-size:.97rem;color:var(--altin-acik);position:relative;}
+.geylani-kutu::before{content:'"';font-family:'Amiri',serif;font-size:3rem;color:var(--altin-koyu);position:absolute;top:-.2rem;left:.75rem;line-height:1;}
+.geylani-metin{padding-left:1.5rem;}
+.geylani-imza{margin-top:.5rem;font-size:.75rem;font-family:'IBM Plex Mono',monospace;color:var(--altin-koyu);font-style:normal;padding-left:1.5rem;}
+
+/* ALT KONTROLLER */
+.kart-alt{display:flex;align-items:center;justify-content:space-between;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--kenar);}
+.nav-buton{display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:.4rem;border:1px solid var(--kenar);background:transparent;color:var(--metin-ikincil);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.9rem;transition:all .2s;}
+.nav-buton:hover{border-color:var(--altin);color:var(--altin);}
+.ogrenildi-buton{padding:.5rem 1.25rem;border-radius:.4rem;border:1px solid var(--cemal);background:rgba(52,211,153,.1);color:var(--cemal);cursor:pointer;font-family:'Crimson Pro',serif;font-size:.9rem;transition:all .2s;}
+.ogrenildi-buton:hover{background:rgba(52,211,153,.2);}
+.ogrenildi-buton.isaret{background:rgba(52,211,153,.25);font-weight:600;}
+
+/* BOŞ DURUM */
+.bos-durum{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:1rem;color:var(--metin-ikincil);padding:3rem;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--yuzeygece);}
+::-webkit-scrollbar-thumb{background:var(--kenar);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#30363d;}
+
+@media(max-width:700px){
+  .esma-listesi{display:none;}
+  .detay-panel{padding:1rem;}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Esmâü'l-Hüsnâ</h1>
+  <div class="ilerleme-bar"><div class="ilerleme-ic" id="ilerlemeIc" style="width:0%"></div></div>
+  <span class="ilerleme-yazi" id="ilerlemeYazi">0/99</span>
+</header>
+
+<div class="filtre-alan">
+  <span>Grup:</span>
+  <button class="filtre-btn aktif" data-filtre="hepsi">Tümü</button>
+  <button class="filtre-btn zat" data-filtre="Zât">Zât</button>
+  <button class="filtre-btn celal" data-filtre="Celâl">Celâl</button>
+  <button class="filtre-btn cemal" data-filtre="Cemâl">Cemâl</button>
+  <button class="filtre-btn kemal" data-filtre="Kemâl">Kemâl</button>
+  <button class="filtre-btn" data-filtre="ogrenildi">Öğrenildiler</button>
+  <div class="arama-alani"><input id="aramaInput" type="text" placeholder="İsim ara..." autocomplete="off"></div>
+</div>
+
+<div class="konteyner">
+  <aside class="esma-listesi" id="esmaListesi"></aside>
+  <main class="detay-panel" id="detayPanel">
+    <div class="bos-durum">
+      <div style="font-size:3rem;opacity:.2;">☽</div>
+      <p>Soldan bir isim seçin</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const ESMALAR = [
+{
+  no:1, arapca:"ٱللَّه", latin:"Allah", anlam:"Tek İlah — bütün varlığın mutlak sahibi ve tek ma'budu", grup:"Zât",
+  kok:"İki görüş: (1) 'İlâh' kökünden türemiş, elif-lam belirlilik takısıyla 'el-İlâh' → 'Allah' biçimine geçmiş. (2) Arap dilinde başka hiçbir kelimeye benzeşmeyen, türetilemeyen özel isim (ism-i âlem). İkinci görüş İbn Kayyım, Sîbeveyhi ve cumhur-u ulemânın tercihidir. İsmin özel olması, Allah'ın zâtının eşsizliğine işaret eder.",
+  ayetler:[
+    {arapca:"ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ", meal:"Allah — O'ndan başka ilah yoktur. O, Hayy'dır, Kayyûm'dur.", kaynak:"Bakara 2:255",
+     tefsir:"İbn Kesîr: 'Bu âyet, Kur'ân'ın en büyük âyetidir. Allah ismi zât isminin zirvesidir; Hayy ve Kayyûm sıfatları bu ismin iki direği gibidir — Hayy yaşamı, Kayyûm ise her şeyi ayakta tutmayı ifade eder.' Kurtubî: 'Müfessirlerin büyük çoğunluğu Allah isminin alem (özel isim) olduğunu ve türetilmediğini söylemiştir; bu isim aynı zamanda bütün esmâü'l-hüsnânın anahtarıdır, nitekim âyetin devamındaki tüm sıfatlar bu isimle bağlanmaktadır.'"},
+    {arapca:"شَهِدَ ٱللَّهُ أَنَّهُۥ لَآ إِلَـٰهَ إِلَّا هُوَ", meal:"Allah, kendisinden başka ilah olmadığına bizzat şahitlik etti.", kaynak:"Âl-i İmrân 3:18",
+     tefsir:"Taberî: 'Allah'ın kendi zâtına şahitlik etmesi, bu tevhid hükmünün en büyük delili olduğunu gösterir. Meleklerin ve ilim sahiplerinin şahitliği de aynı âyette zikredilmiş, böylece üç mertebeye dikkat çekilmiştir.' Râzî: 'Şahitliğin Allah ile başlaması, insanın aklının bu hakikati kavrayabilmesi için önce ilahî beyana muhtaç olduğuna işaret eder; sonra melek, sonra âlim sıralaması, bilginin kaynaktan alıcıya doğru aktığını gösterir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'ın doksan dokuz ismi vardır; kim onları ihsâ ederse (sayar, anlar, yaşarsa) cennete girer.", kaynak:"Buhârî, Daavât 68; Müslim, Zikir 5", derece:"Sahih"},
+    {metin:"En büyük isim şu üç sûrede geçmektedir: Bakara, Âl-i İmrân ve Tâhâ.", kaynak:"İbn Mâce, Duâ 9; Hâkim, Müstedrek", derece:"Hasen"}
+  ],
+  geylani:"'Allah' ismini dilden değil, yürekten söyle; zira bu isim kalpte taht kurarsa dünya ve ahiretin yükü hafifler."
+},
+{
+  no:2, arapca:"ٱلرَّحْمَـٰن", latin:"er-Rahmân", anlam:"Rahmet eden — dünya ve ahirette sonsuz rahmetiyle her şeyi kuşatan", grup:"Cemâl",
+  kok:"R-H-M kökü. 'Rahm' (rahim — ana rahmi) kelimesiyle aynı kök; sevgi, şefkat ve koruma anlamlarını taşır. 'Fe'lân' kalıbı (Rahmân) Arapçada geçici değil kalıcı ve yoğun bir sıfatı ifade eder; bu nedenle rahmeti hiçbir zaman kesilmeyen demektir. İbn Fâris: 'Bu kökün temel anlamı yumuşaklık ve merhametle sarıp sarmalamaktır.'",
+  ayetler:[
+    {arapca:"ٱلرَّحْمَـٰنُ عَلَى ٱلْعَرْشِ ٱسْتَوَىٰ", meal:"Rahmân, Arş'a istivâ etti.", kaynak:"Tâhâ 20:5",
+     tefsir:"İbn Kesîr: 'Arş üzerinde istivânın Rahmân ismiyle bağlanması tesadüf değildir; Arş'ı tutan ve geniş tutan yalnızca rahmetin ta kendisidir. Selef-i sâlihin istivâyı bilmeden ve keyfiyetsiz kabul etmiştir.' Kurtubî: 'Rahmân isminin Arş ile birlikte zikredilmesi şunu gösterir: Eğer rahmet olmasaydı kâinat hükümle değil gazapla idare edilirdi; oysa her şeyi kuşatan rahmet, Arş'ın genişliği gibi sınırsızdır.'"},
+    {arapca:"قُلِ ٱدْعُوا۟ ٱللَّهَ أَوِ ٱدْعُوا۟ ٱلرَّحْمَـٰنَ", meal:"De ki: 'Allah'a dua edin, Rahmân'a dua edin; hangisini çağırırsanız çağırın, en güzel isimler O'nundur.'", kaynak:"İsrâ 17:110",
+     tefsir:"Taberî: 'Müşrikler Peygamber'in bazen Allah, bazen Rahmân diye dua ettiğini duyunca iki ilaha mı dua ediyor sandılar. Âyet, her iki ismin de aynı zâta ait olduğunu açıkladı.' Râzî: 'Bu âyet aynı zamanda tüm esmâü'l-hüsnânın tek bir zâtta toplandığının delilidir; isimler farklı, müsemmâ (isimlendirilen) birdir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah rahmetini yüz parçaya böldü; doksan dokuzunu kendi katında sakladı, bir parçasını yeryüzüne indirdi. O bir parçadan dolayı mahlûkat birbirine merhamet eder.", kaynak:"Buhârî, Edeb 19; Müslim, Tevbe 17", derece:"Sahih"},
+    {metin:"Rahmân'a, rahim diyenlere (akraba bağını koruyanlara) rahim (merhamet) eder.", kaynak:"Buhârî, Edeb 13; Tirmizî, Birr 16", derece:"Sahih"}
+  ],
+  geylani:"Rahmân ismi, sâlikin (yolcunun) en karanlık anlarında tutunduğu ip gibidir; bu ismi çok zikreden kimse, Allah'ın yarattığı hiçbir canlıya sertlik edemez hale gelir."
+},
+{
+  no:3, arapca:"ٱلرَّحِيم", latin:"er-Rahîm", anlam:"Çok merhametli — ahirette mü'minlere özel rahmet eden", grup:"Cemâl",
+  kok:"R-H-M kökü, 'Fa'îl' kalıbı. Rahmân ile aynı kökten gelir ancak kalıp farkı anlam farkı doğurur: Rahmân dünyadaki genel ve geniş rahmeti, Rahîm ahiretteki mü'minlere özel ve derinlikli rahmeti ifade eder. Bu ayrımı İmam Kurtubî ve İbn Kayyım açıkça yapmıştır.",
+  ayetler:[
+    {arapca:"وَكَانَ بِٱلْمُؤْمِنِينَ رَحِيمًا", meal:"O, mü'minlere karşı son derece merhametlidir.", kaynak:"Ahzâb 33:43",
+     tefsir:"İbn Kesîr: 'Bu âyette Rahîm isminin doğrudan mü'minlere nispet edilmesi, bu rahmetin evrensel değil özel olduğunu doğrular. Rahmân bütün mahlûkatı kucaklar; Rahîm yalnızca mü'minlerin kalbine işler.' Kurtubî: 'Âyetin bağlamı, Allah'ın Peygamber aracılığıyla mü'minleri karanlıktan aydınlığa çıkarmasını anlatmaktadır; bu çıkış yalnızca rahmetle mümkündür, başka bir güçle değil.'"},
+    {arapca:"إِنَّهُۥ هُوَ ٱلتَّوَّابُ ٱلرَّحِيمُ", meal:"Şüphesiz O, tevbeleri çok kabul eden ve çok merhametli olandır.", kaynak:"Bakara 2:37",
+     tefsir:"Taberî: 'Âdem'in tevbesinin kabulü anlatıldıktan sonra Rahîm isminin gelmesi, rahmetin tevbeye kapı araladığını gösterir. Tevvâb ve Rahîm isimleri Kur'ân'da çoğunlukla birlikte gelir.' Râzî: 'Tevbe kapısının açık olmasının sebebi Rahîm sıfatıdır; bu sıfat olmasaydı hiçbir günah affedilemezdi.'"}
+  ],
+  hadisler:[
+    {metin:"Allah, anneden evladına olan merhametten daha fazla kullarına merhamet eder.", kaynak:"Buhârî, Edeb 18; Müslim, Tevbe 22", derece:"Sahih"},
+    {metin:"(Kıyamette Allah) 'Rahmetim gazabımın önüne geçti' buyuracaktır.", kaynak:"Buhârî, Tevhid 15; Müslim, Tevbe 14", derece:"Sahih"}
+  ],
+  geylani:"Rahmân ismi yağmur gibi herkese yağar; Rahîm ismi ise özel bir pınar gibidir — ancak arayan, yönelen ve tevbe eden içer."
+},
+{
+  no:4, arapca:"ٱلْمَلِك", latin:"el-Melik", anlam:"Mutlak hükümdar — mülkün gerçek sahibi ve tek egemen", grup:"Celâl",
+  kok:"M-L-K kökü. Üç anlamı birden taşır: (1) Güç ve kuvvet sahibi olmak, (2) Emretme yetkisi, (3) Sahiplik. 'Mülk' (varlıksal egemenlik) ve 'milk' (sahiplik) aynı kökten türer. İbn Fâris: 'Mâlik sahipliği, Melik ise yönetimi ve yetkiyi öne çıkarır.'",
+  ayetler:[
+    {arapca:"فَتَعَـٰلَى ٱللَّهُ ٱلْمَلِكُ ٱلْحَقُّ", meal:"Allah, gerçek hükümdar olarak her şeyden yücedir.", kaynak:"Tâhâ 20:114",
+     tefsir:"İbn Kesîr: 'Melik ve Hakk isminin birleşmesi önemlidir: Dünya hükümdarları geçici ve sınırlıdır, Allah'ın egemenliği ise mutlak ve değişmez gerçektir.' Kurtubî: 'Bu âyet Kur'ân öğretimi bağlamında inmistir; Allah, Peygamber'e acele etmemesini buyurmuş ve ardından kendi ismiyle öğüt vermiştir. Melik ismi, öğretinin kaynağının da yalnızca O olduğunu vurgular.'"},
+    {arapca:"مَـٰلِكِ يَوْمِ ٱلدِّينِ", meal:"Din gününün (hesap gününün) sahibi.", kaynak:"Fâtiha 1:4",
+     tefsir:"Taberî: 'Fâtiha'daki Mâlik ve Melik kıraatleri âlimlerin tartıştığı konulardandır; her iki okuyuş da sahihtir. Mâlik sahipliği, Melik ise hâkimiyeti öne çıkarır — her ikisi de kıyamette yalnızca Allah'a ait olduğunu söyler.' Râzî: 'Hesap gününün yalnızca Allah'a ait olduğunu belirtmek, dünya hükümdarlarının bu günde hiçbir yetkisinin kalmayacağını hatırlatır — bu, zalimlere en büyük uyarıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah (kıyamette) 'Mülkün sahibi benim, dünya hükümdarları nerede?' diye soracak; sonra onları avucunda sıkıştıracaktır.", kaynak:"Buhârî, Tefsir, Zümer; Müslim, Sıfatü'l-münâfikîn", derece:"Sahih"},
+    {metin:"Allah'ın katında en rezil isim, 'melikü'l-emlâk' (hükümdarlar hükümdarı) diye isimlendirilen kişidir.", kaynak:"Buhârî, Edeb 114; Müslim, Edeb 20", derece:"Sahih"}
+  ],
+  geylani:"Gönlündeki tahttan dünyayı indir; ancak o taht boş kalınca Melik oraya gelir ve yerleşir."
+},
+{
+  no:5, arapca:"ٱلْقُدُّوس", latin:"el-Kuddûs", anlam:"Her noksanlıktan münezzeh — mutlak temiz ve kutsal olan", grup:"Celâl",
+  kok:"Q-D-S kökü. 'Kuds' kelimesinin temel anlamı maddî ve manevî kirlerden arınmış olmaktır. 'Fu'ûl' kalıbı (Kuddûs), mübalağa (abartı değil, yoğunluk) ifade eder. Kudüs şehri ve 'Rûhu'l-Kuds' (Cebrâil) aynı kökten gelir. İbn Fâris: 'Bereket ve temizlik bu kökün iki ana anlamıdır.'",
+  ayetler:[
+    {arapca:"يُسَبِّحُ لِلَّهِ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ ٱلْمَلِكِ ٱلْقُدُّوسِ", meal:"Göklerde ve yerde ne varsa Allah'ı tesbih eder — O Melik'tir, Kuddûs'tur.", kaynak:"Cum'a 62:1",
+     tefsir:"İbn Kesîr: 'Tesbih (sübhânallah demek), Allah'ı eksikliklerden tenzih etmektir. Kuddûs ismi bu tenzîhin özüdür; varlıktaki her şey buna şahitlik eder.' Kurtubî: 'Melik ve Kuddûs isminin birleşmesi şunu anlatır: Gerçek hükümdar kusursuz olmalıdır — dünya hükümdarları ise hata yapar, zulüm eder; yalnızca Allah her ikisini mükemmel olarak bir arada taşır.'"},
+    {arapca:"هُوَ ٱللَّهُ ٱلَّذِى لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْمَلِكُ ٱلْقُدُّوسُ ٱلسَّلَـٰمُ", meal:"O Allah ki, O'ndan başka ilah yoktur. O Melik'tir, Kuddûs'tur, Selâm'dır.", kaynak:"Haşr 59:23",
+     tefsir:"Taberî: 'Bu âyet sıfat dizisi içinde Kuddûs'u Melik'ten hemen sonra getirir; egemenliğin temiz ve kusursuz olduğunu göstermek için.' Râzî: 'Kuddûs isminin sırları üç katmanda ele alınabilir: (1) Zâtının kutsallığı, (2) Sıfatlarının kutsallığı, (3) Fiillerinin kutsallığı — üçü bir arada Allah'tan başkasında bulunmaz.'"}
+  ],
+  hadisler:[
+    {metin:"(Rükûda) Sübhûne Kuddûsün Rabbü'l-melâiketi ve'r-rûh — (Tesbih ederim seni, Sen Kuddûssün, meleklerin ve Rûh'un Rabbisin).", kaynak:"Müslim, Salât 223; Nesâî, İftitâh 17", derece:"Sahih"},
+    {metin:"Peygamber gece namazında 'Allahümme ente'l-Melikü'l-Kuddûs' diye dua ederdi.", kaynak:"Müslim, Müsâfirîn 201; Ebû Dâvûd, Tatavvu 24", derece:"Sahih"}
+  ],
+  geylani:"Kuddûs'u zikreden kalp, kendi kirlerini görmeye başlar. Bu görüş, tevbenin başlangıcıdır."
+},
+{
+  no:6, arapca:"ٱلسَّلَام", latin:"es-Selâm", anlam:"Esenlik kaynağı — her türlü ayıp ve eksiklikten salim olan", grup:"Cemâl",
+  kok:"S-L-M kökü. İslam, Müslim, selâm, silm (barış) hepsi aynı kökten gelir. Temel anlam: teslim olmak ve sağ-salim olmak. Allah'a isim olduğunda iki boyutu vardır: (1) Zâtının her kusurdan salim olması, (2) Kullarına esenlik veren olması. İbn Kayyım: 'Bu isim hem bir sıfatı hem de bir vaadi içerir.'",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلَّذِى لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْمَلِكُ ٱلْقُدُّوسُ ٱلسَّلَـٰمُ", meal:"O Allah ki, O'ndan başka ilah yoktur; O Melik, Kuddûs, Selâm'dır.", kaynak:"Haşr 59:23",
+     tefsir:"İbn Kesîr: 'Selâm isminin Kuddûs'ten sonra gelmesi anlamlıdır: Önce O'nun her eksiklikten münezzeh olduğu söylenir, ardından O'ndan esenliğin fışkırdığı anlatılır.' Kurtubî: 'Selamın kullar arasında yayılması bu ismin bir tecellisidir (yansımasıdır); nitekim Peygamber selamı yaymayı emretmiş, bunun sevgiye ve cennete kapı olduğunu söylemiştir.'"},
+    {arapca:"وَٱللَّهُ يَدْعُوٓا۟ إِلَىٰ دَارِ ٱلسَّلَـٰمِ", meal:"Allah, esenlik yurduna (cennete) davet eder.", kaynak:"Yûnus 10:25",
+     tefsir:"Taberî: 'Dârü's-selâm (esenlik yurdu), cennetin isimlerinden biridir; Allah'ın ismi Selâm olduğundan, O'nun evi de Selâm'ın evi olacaktır — bu isim ile cennet arasında doğrudan bir bağ kurulmuştur.' Râzî: 'Dünya dârü'l-belâdır (bela yurdu); cennet ise her türlü elem, hastalık ve ölümden korunmuş esenlik yurdudur. Allah'ın Selâm ismi bu vaadin güvencesidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah es-Selâm'dır; selâm O'ndandır. Biriniz namazdan çıktığında 'es-Selâmü aleyküm' desin.", kaynak:"Müslim, Mesâcid 135; Nesâî, Sehv 83", derece:"Sahih"},
+    {metin:"Aranıza imanı yerleştirmedikçe cennete giremezsiniz; birbirinizi sevmedikçe iman etmiş olmazsınız. Selamı yaymanızı söyleyeyim mi? Birbirinize selam verin.", kaynak:"Müslim, İman 93; Tirmizî, Et'ime 45", derece:"Sahih"}
+  ],
+  geylani:"Selâm ismini taşıyanın kapısından, ona yönelen hiç eli boş dönmez. Kalp huzuru arayanın adresi bu isimdir."
+},
+{
+  no:7, arapca:"ٱلْمُؤْمِن", latin:"el-Mü'min", anlam:"Güven veren — kullarını korkudan emin kılan ve vahyini doğrulayan", grup:"Celâl",
+  kok:"E-M-N kökü. İman (inanmak), emân (güvenlik), emânet (emanet) aynı kökten. İki anlam bir arada: (1) Doğrulayıcı — kendi kendini doğrulayan, vahyini doğrulayan; (2) Güvence veren — kullarına korkmayın diyen. İbn Fâris: 'Bu kök kalp huzurunun ve dışa yansıyan güvencenin köküdür.'",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلَّذِى لَآ إِلَـٰهَ إِلَّا هُوَ ... ٱلْمُؤْمِنُ", meal:"O Allah, O'ndan başka ilah olmayan ... el-Mü'min'dir.", kaynak:"Haşr 59:23",
+     tefsir:"İbn Kesîr: 'Mü'min isminin iki tefsiri vardır: (1) Peygamberlerini mucizelerle tasdik eden, (2) Azabından korkan kullarına güven veren. Her iki anlam da âlimlerce benimsenmiştir.' Kurtubî: 'Allah'ın Mü'min olması, O'nun vaadinin gerçek ve hiçbir zaman bozulmayacağı anlamına gelir. Bu, kula imanın sarsılmaz bir temele dayandığını öğretir.'"},
+    {arapca:"أَلَآ إِنَّ أَوْلِيَآءَ ٱللَّهِ لَا خَوْفٌ عَلَيْهِمْ وَلَا هُمْ يَحْزَنُونَ", meal:"Dikkat edin: Allah'ın velileri için ne korku vardır ne de onlar üzülür.", kaynak:"Yûnus 10:62",
+     tefsir:"Taberî: 'Bu âyet Mü'min isminin işlevini özetler: Allah'ın güvencesi altına girenler, dünyanın ve ahiretin korkularından emin olur.' Râzî: 'Velâyet (velilik) Allah'ın Mü'min ismiyle ilişkilidir; zira ancak güven veren bir Rab'be gönülden bağlananlar gerçek anlamda O'nun velisi olabilir.'"}
+  ],
+  hadisler:[
+    {metin:"Mü'min, insanların malları ve canları konusunda kendisinden emin olduklarıdır.", kaynak:"Nesâî, İman 8; Ahmed b. Hanbel, Müsned 2/379", derece:"Sahih"},
+    {metin:"Komşusu açken tok yatan kimse mü'min değildir.", kaynak:"Bezzâr, Müsned; Hâkim, Müstedrek 2/15", derece:"Hasen"}
+  ],
+  geylani:"Mü'min olan Allah'a sığınan korkmaz; bu ismin sırrını bilen kimse, yaratan dışında hiçbir şeyden ürkmez."
+},
+{
+  no:8, arapca:"ٱلْمُهَيْمِن", latin:"el-Müheymin", anlam:"Gözetip koruyan — her şeyi kontrol altında tutan ve muhafaza eden", grup:"Celâl",
+  kok:"H-Y-M-N kökü. Nadir kullanılan bir kök; 'hâfız, rakîb ve şehîd' anlamlarının kesişim noktasında durur. Kuş yuvasını kanatlarıyla örter gibi koruma ve gözetim ifade eder. İbn Fâris: 'Müheymin, bir şeyin üzerine hâkim olup onu denetim altında tutan demektir.' Aynı kök, Kur'ân'ın önceki kitapları 'denetim altında tutması' için de kullanılmıştır (Mâide 5:48).",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلَّذِى لَآ إِلَـٰهَ إِلَّا هُوَ ... ٱلْمُهَيْمِنُ", meal:"O Allah, O'ndan başka ilah yoktur ... el-Müheymin'dir.", kaynak:"Haşr 59:23",
+     tefsir:"İbn Kesîr: 'Müheymin, kullarının amellerini, rızıklarını, ecellerini bilen ve hepsini gözetip koruyan demektir.' Kurtubî: 'Haşr sûresinin bu dizisi içinde Müheymin; Mü'min (güven veren) ile Azîz (güçlü) arasına yerleşmiştir. Sıra önemlidir: Önce güven, sonra gözetim, sonra güç — Allah'ın kullarıyla ilişkisinin üç boyutu.'"},
+    {arapca:"وَأَنزَلْنَآ إِلَيْكَ ٱلْكِتَـٰبَ بِٱلْحَقِّ مُصَدِّقًا لِّمَا بَيْنَ يَدَيْهِ مِنَ ٱلْكِتَـٰبِ وَمُهَيْمِنًا عَلَيْهِ", meal:"Sana da önceki kitabı doğrulayıcı ve onu denetim altında tutan olarak bu Kitab'ı indirdik.", kaynak:"Mâide 5:48",
+     tefsir:"Taberî: 'Kur'ân'ın Müheymin olması, onu tasdik ettiği kitaplara hâkim olması, onlardaki hataları düzeltmesi ve orijinal hakikati muhafaza etmesi demektir.' Râzî: 'Allah'ın hem ismi hem de Kitabı Müheymin'dir; bu isimlerin örtüşmesi, Kur'ân'ın ilahî koruma altında olduğunun en açık delilidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'ın hiçbir kulunun yaptığı O'ndan gizli kalmaz; (O her şeye) şahittir.", kaynak:"Müslim, Cennet 76; Tirmizî, Sıfatu'l-cennet 4", derece:"Sahih"},
+    {metin:"Allah, kulunun gizlisini de açığını da bilir.", kaynak:"Buhârî, Rikâk 38; İbn Mâce, Zühd 31", derece:"Sahih"}
+  ],
+  geylani:"Müheymin'in gözünden hiçbir şey kaçmaz. Bu bilinçle yaşayan insan, yalnız kaldığında bile edebini korur."
+},
+{
+  no:9, arapca:"ٱلْعَزِيز", latin:"el-Azîz", anlam:"Üstün ve yenilmez — hiçbir şeyin O'na galip gelemeyeceği mutlak güç sahibi", grup:"Celâl",
+  kok:"A-Z-Z kökü. Üç anlam katmanı: (1) Güçlü ve yenilmez olmak, (2) Ender ve kıymetli olmak, (3) Sevgili ve saygıdeğer olmak. Arap dilinde 'eziyet' kelimesi de bu kökten türer — yenilmez güce itiraz edince acı çekilir. İbn Fâris: 'Azîz, ona galip gelinemeyecek derecede güçlü olan demektir.'",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلْعَزِيزُ ٱلْحَكِيمُ", meal:"O, Azîz'dir ve Hakîm'dir.", kaynak:"İbrahim 14:4",
+     tefsir:"İbn Kesîr: 'Azîz ve Hakîm isimleri Kur'ân'da onlarca yerde birlikte gelir. Sebebi şudur: Güç tek başına zulme dönüşebilir; hikmet ise güce yön verir. Allah'ın Azîz'liği Hakîm'liğiyle dengelenmektedir.' Kurtubî: 'Peygamberlerin bazen başarısız göründüğü anlar için bu isim teselli olarak verilmiştir — asıl güç Allah'tadır, kulların zaferi veya yenilgisi yalnızca O'nun takdiriyle olur.'"},
+    {arapca:"إِن يَنصُرْكُمُ ٱللَّهُ فَلَا غَالِبَ لَكُمْ", meal:"Eğer Allah size yardım ederse, sizi yenecek hiçbir kimse yoktur.", kaynak:"Âl-i İmrân 3:160",
+     tefsir:"Taberî: 'Bu âyet Azîz isminin pratik yansımasıdır: Allah'ın yardımı yenilmez bir kalkan gibidir; O'nun desteğindeki topluluk mağlup edilemez.' Râzî: 'Âyet; zafer için gerekli olanın sayı ya da silah değil, Allah'ın desteği olduğunu öğretir. Bu, Azîz isminin insana verdiği en büyük güven duygusudur.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'tan yardım iste ve aciz düşme.", kaynak:"Müslim, Kader 34; İbn Mâce, Mukaddime 10", derece:"Sahih"},
+    {metin:"İzzet (şeref) Allah'a, Rasûlü'ne ve mü'minlere aittir.", kaynak:"Münâfikûn sûresi (63:8) bağlamında; Taberî Tefsiri", derece:"Kur'ânî hüküm"}
+  ],
+  geylani:"İzzet dileyenin Allah'tan başkasına el açması, Azîz'in kapısını çalıp dilenciden ekmek istemek gibidir."
+},
+{
+  no:10, arapca:"ٱلْجَبَّار", latin:"el-Cebbâr", anlam:"Her şeyi gücüyle düzelten ve her şeyin üzerinde zorlayıcı güce sahip olan", grup:"Celâl",
+  kok:"C-B-R kökü. İki zıt anlam içerir: (1) Kırmak ve zorla boyun eğdirmek (ceberut), (2) Kırıkları onarmak, doldurmak (cebr). Ortopedik 'cebir' ameliyatı da buradan gelir. Allah hakkında her iki anlam da geçerlidir: Zalimlere karşı ceberut (boyun eğdirici güç), kırık kalplere karşı cebr (onarıcı kudret). İbn Kayyım bu ikili anlamı genişçe ele almıştır.",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلَّذِى لَآ إِلَـٰهَ إِلَّا هُوَ ... ٱلْجَبَّارُ", meal:"O Allah, O'ndan başka ilah yoktur ... el-Cebbâr'dır.", kaynak:"Haşr 59:23",
+     tefsir:"İbn Kesîr: 'Cebbâr isminin iki boyutu vardır: Allah, istediğini yaptırır; kimse O'na itiraz edemez. Öte yandan kırık kalpleri O onarır, ezilenleri O kaldırır.' Kurtubî: 'Kullara nispet edilince Cebbâr olumsuz bir sıfattır (zorba, diktatör). Allah'a nispet edilince ise hem mutlak egemenliği hem de kırıkları sarma kudretini içeren yüce bir isimdir — bu dil inceliğine dikkat edilmelidir.'"},
+    {arapca:"وَمَا أَنتَ عَلَيْهِم بِجَبَّارٍ", meal:"(Ey Peygamber,) sen onları zorlamaya yetkili değilsin.", kaynak:"Kaf 50:45",
+     tefsir:"Taberî: 'Bu âyet, Cebbâr isminin insanlar için kullanıldığında olumsuz çağrışım taşıdığını açıkça gösterir. Peygamber'e zorbalık yasaklanırken, Allah'ın Cebbâr olması meşru ve zorunlu bir egemenliği ifade eder.' Râzî: 'İnsana Cebbâr yakışmaz çünkü insanın elinde gerçek bir güç yoktur; Allah Cebbâr'dır çünkü gerçek güç yalnızca O'nundur.'"}
+  ],
+  hadisler:[
+    {metin:"Sübhâneke'llâhümme ve bihamdike — ya Cebbâr, ya Cebbâr (Ey Cebbâr, ey Cebbâr, seni tesbih ederim) diye dua ederdi.", kaynak:"Nesâî, İftitâh 17; Ahmed b. Hanbel, Müsned 6/17", derece:"Hasen"},
+    {metin:"(Allah buyurur:) Kibriyâ (büyüklük) ridâm, azamet izârımdır; bu ikisinde benimle ortak olmaya kalkanı mahvederim.", kaynak:"Müslim, Birr 136; Ebû Dâvûd, Libâs 25", derece:"Sahih"}
+  ],
+  geylani:"Cebbâr'ın önünde boyun eğen, başka hiçbir gücün önünde eğilmez. Kırık kalplerle bu ismi çağır — o kırıkları ancak Cebbâr onarır."
+},
+{
+  no:11, arapca:"ٱلْمُتَكَبِّر", latin:"el-Mütekebbir", anlam:"Büyüklük yalnızca O'na yakışır — kibriyânın tek sahibi", grup:"Celâl",
+  kok:"K-B-R kökü. 'Büyük olmak' anlamından 'büyüklük iddia etmek' anlamına geçen bir kalıp. İnsan için kullanıldığında kötü (kibir, büyüklük taslama); Allah için kullanıldığında hem doğru hem zorunlu, çünkü gerçekte büyük olan yalnızca O'dur. İbn Kayyım: 'Allah büyüklük iddia eder, ama bu iddia gerçeğin ta kendisidir; insan büyüklük iddia eder ama bu yalandır.'",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلَّذِى لَآ إِلَـٰهَ إِلَّا هُوَ ... ٱلْمُتَكَبِّرُ", meal:"O Allah, O'ndan başka ilah yoktur ... el-Mütekebbir'dir.", kaynak:"Haşr 59:23",
+     tefsir:"İbn Kesîr: 'Mütekebbir Haşr sûresinin bu ismî dizisinin sonuncusudur; listenin zirvesini oluşturur. Allah'ın büyüklüğü hakiki büyüklüktür; her şey O'nun karşısında küçük kalır.' Kurtubî: 'Mütekebbir ile Cebbâr arasındaki fark şudur: Cebbâr güçle ilgilidir, Mütekebbir ise büyüklük ve yücelikle. Her ikisi de yalnızca Allah'a yaraşır.'"},
+    {arapca:"إِنَّهُۥ لَا يُحِبُّ ٱلْمُسْتَكْبِرِينَ", meal:"Şüphesiz Allah, büyüklük taslayan kimseleri sevmez.", kaynak:"Nahl 16:23",
+     tefsir:"Taberî: 'İnsanın kibirlenmesinin yasaklanması, büyüklüğün Allah'a has olduğunu ilan eder. Kul büyüklük tasladığında Allah'ın sıfatına ortak olmaya kalkışmış olur — bu en tehlikeli günahlardandır.' Râzî: 'Kibir ile Mütekebbir ismini birlikte düşünün: Kulun kibri çalmak istediği bir mevkie el uzatmaktır; Allah'ın Mütekebbir'liği ise o mevkiin gerçek sahibi olduğunun ilanıdır.'"}
+  ],
+  hadisler:[
+    {metin:"(Allah buyurur:) Kibriyâ ridâm, azamet izârımdır; bu ikisinde benimle ortaklık iddia edenin canını alırım.", kaynak:"Müslim, Birr 136; Ebû Dâvûd, Libâs 25", derece:"Sahih"},
+    {metin:"Kalbinde zerre kadar kibir taşıyan kimse cennete giremez.", kaynak:"Müslim, İman 147; Tirmizî, Birr 61", derece:"Sahih"}
+  ],
+  geylani:"Allah Mütekebbir'dir; kul bu ismi anlayınca yerden göğe uzanan büyüklük köprüsünün yalnızca bir ucunu tutabileceğini fark eder. O andan itibaren gerçek tevazu başlar."
+},
+{
+  no:12, arapca:"ٱلْخَالِق", latin:"el-Hâlik", anlam:"Yoktan var eden — her şeyi ölçüp biçerek yaratan", grup:"Kemâl",
+  kok:"H-L-K kökü. Temel anlam: ölçüp biçmek, sonra yaratmak. Deri ustasının ölçüp biçtikten sonra kesmesine de 'halk' denirdi. Allah'a nispet edilince; yoktan ölçerek ve planlayarak var etmek anlamı kazanır. Bu nedenle 'takdir' (ölçüp belirleme) fiili ile halk fiili anlam bakımından akrabadır. İbn Fâris: 'Halk, aslî anlamda düzgün ve ölçülü bir şekil vermektir.'",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلْخَـٰلِقُ ٱلْبَارِئُ ٱلْمُصَوِّرُ", meal:"O, yaratan (Hâlik), kusursuzca var eden (Bâri'), biçim veren (Musavvir) Allah'tır.", kaynak:"Haşr 59:24",
+     tefsir:"İbn Kesîr: 'Bu üç ismin ard arda gelmesi yaratmanın üç aşamasını anlatır: Önce tasarım (Hâlik), sonra yoktan var etme (Bâri'), sonra biçimlendirme (Musavvir). Bu sıra hem mantıksal hem de ontolojik bir düzeni yansıtır.' Kurtubî: 'Hâlik ismi yaratan demektir; ancak Arap dilinde halk hem yoktan yaratmayı hem de var olanı şekillendirmeyi kapsayabilir. Bu üçlü dizide Hâlik genel, Bâri' ise daha özel bir anlam taşır.'"},
+    {arapca:"ٱللَّهُ خَـٰلِقُ كُلِّ شَىْءٍ", meal:"Allah, her şeyin yaratıcısıdır.", kaynak:"Zümer 39:62",
+     tefsir:"Taberî: 'Bu âyet 'her şey' ifadesiyle mutlak yaratıcılığı Allah'a tahsis eder; putların, meleklerin ya da başka varlıkların yaratıcılıkta hiçbir payı olmadığını ilan eder.' Râzî: 'Kulun iradesiyle yaptığı eylemler dahil her şeyin Allah'ın yaratması altında olduğunu belirtmek gerekir; bu, kader meselesinin en temel ilkesidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah her şeyi takdir etti; göklerin ve yerin yaratılmasından elli bin yıl önce kalemin yazdıklarını.", kaynak:"Müslim, Kader 16; Tirmizî, Kader 17", derece:"Sahih"},
+    {metin:"Resim yapanlar kıyamette en şiddetli azaba uğrayacak olanlardır; onlara 'Yarattıklarınıza can verin' denilir.", kaynak:"Buhârî, Libâs 89; Müslim, Libâs 96", derece:"Sahih"}
+  ],
+  geylani:"Hâlik'ın yarattığına bak; gördüğün her şeyde O'nun izini ara. Göz bunu yaparken, kalp başkasına yönelmez."
+},
+{
+  no:13, arapca:"ٱلْبَارِئ", latin:"el-Bâri'", anlam:"Kusursuz var eden — her şeyi birbirinden ayırt ederek yoktan yaratan", grup:"Kemâl",
+  kok:"B-R-E kökü. 'Beri olmak, ayrılmak, kurtulmak' anlamlı kök. Allah'a nispet edilince: yaratıkları hiçbir örnek olmaksızın birbirinden farklı ve kusursuz biçimde var etmek. İbn Fâris: 'Ber' kökü yaratmanın yanı sıra bir şeyi diğerinden ayırt etmeyi de ifade eder.' İnsan ve hayvan da bu kökten 'beriyye' (yaratılmış) diye anılır.",
+  ayetler:[
+    {arapca:"هُوَ ٱللَّهُ ٱلْخَـٰلِقُ ٱلْبَارِئُ ٱلْمُصَوِّرُ", meal:"O, Hâlik, Bâri', Musavvir Allah'tır.", kaynak:"Haşr 59:24",
+     tefsir:"İbn Kesîr: 'Bâri', önce madde ve suret olmaksızın mutlak yokluktan var etmeyi ifade eder. Bu nedenle Hâlik'tan (tasarlayan) sonra, Musavvir'den (biçim veren) önce gelir.' Kurtubî: 'Bâri isminin sırrı, her yaratığın eşsiz olmasında saklıdır. İki yaprak, iki parmak izi birbirinin aynı değildir; bu benzersizlik Bâri isminin tecellisidir.'"},
+    {arapca:"فَتَبَارَكَ ٱللَّهُ أَحْسَنُ ٱلْخَـٰلِقِينَ", meal:"Yaratanların en güzeli olan Allah ne yücedir!", kaynak:"Mü'minûn 23:14",
+     tefsir:"Taberî: 'Âyet yaratma fiilini insana da mecazi olarak nispet eder (insanın el sanatları), ama ardından Allah'ın en güzel yaratıcı olduğunu ilan eder. Bâri isminin mükemmeliyeti burada ortaya çıkar.' Râzî: 'İnsan yaratır ama ham maddeden; Allah ise sıfır noktasından. İkisi arasındaki fark Bâri isminin farkıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah evi (insan bedeni) sanatını mükemmel yaratmıştır.", kaynak:"Müslim, Kader 18; Buhârî, Bed'ü'l-halk 6", derece:"Sahih"},
+    {metin:"Allah Âdem'i Rahman'ın sureti üzerine yarattı.", kaynak:"Müslim, Birr 115; Ahmed, Müsned 2/244", derece:"Sahih"}
+  ],
+  geylani:"Bâri'nin eserini düşün: Milyarlarca insan arasında ikisi birbirinin aynı değil. Bu, O'nun sonsuz sanatının belgesidir."
+},
+{
+  no:14, arapca:"ٱلْمُصَوِّر", latin:"el-Musavvir", anlam:"Biçim veren — yarattığı her şeye eşsiz bir şekil giydiren", grup:"Kemâl",
+  kok:"S-V-R kökü. 'Suret' (görünüş, biçim, resim) aynı kökten gelir. Musavvir 'biçim veren, şekillendiren' demek. Yaratmanın son aşamasıdır: Hâlik tasarlar, Bâri' yoktan var eder, Musavvir biçimlendirir. Fotoğrafçı ve ressam da dilde bu kökten türer; ancak Allah'ın tasviri hiçbir modeli olmaksızın gerçekleşir.",
+  ayetler:[
+    {arapca:"هُوَ ٱلَّذِى يُصَوِّرُكُمْ فِى ٱلْأَرْحَامِ كَيْفَ يَشَآءُ", meal:"O, rahimlerde size dilediği gibi suret veren Allah'tır.", kaynak:"Âl-i İmrân 3:6",
+     tefsir:"İbn Kesîr: 'Anne rahmindeki suret verme Musavvir isminin en somut delilidir. Aynı anne, aynı baba — ancak her çocuk farklı yüz, farklı parmak izi, farklı ses. Bu farklılığı yaratan Musavvir ismidir.' Kurtubî: 'Dilediği gibi ifadesi, yaratmada sınırsız özgürlüğü vurgular. Hiçbir kalıba, hiçbir kurala bağlı değildir; yaratma kudretinin kendisi kuraldır.'"},
+    {arapca:"لَقَدْ خَلَقْنَا ٱلْإِنسَـٰنَ فِىٓ أَحْسَنِ تَقْوِيمٍ", meal:"Gerçekten insanı en güzel biçimde yarattık.", kaynak:"Tîn 95:4",
+     tefsir:"Taberî: 'Ahsenü takvîm (en güzel biçim) hem fiziksel hem de akıl ve ahlak bakımından mükemmelliği kapsar. Musavvir yalnızca dışı şekillendirmez; içi de.' Râzî: 'İnsan suretinin güzelliği, Allah'ın Musavvir isminin yansımasıdır. Bu yüzden insan kendi bedenine bakarken Allah'a şükür duymalıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah sureti (resmi) yaratanları kıyamette en şiddetli şekilde azaplandıracaktır.", kaynak:"Buhârî, Libâs 89; Müslim, Libâs 96", derece:"Sahih"},
+    {metin:"Nutfe (sperm) rahme yerleşince melek şöyle der: 'Rabbim! Bu erkek mi dişi mi? Şakî mi saidî mi? Rızkı ne kadar? Eceli ne zaman?' diye yazar.", kaynak:"Buhârî, Kader 1; Müslim, Kader 1", derece:"Sahih"}
+  ],
+  geylani:"Yüzüne bak: bu suret senin eserin değil. Musavvir seni seçti ve şekillendirdi. Beğenmediğin yanın bile O'nun hikmetinin bir parçasıdır."
+},
+{
+  no:15, arapca:"ٱلْغَفَّار", latin:"el-Gaffâr", anlam:"Çok bağışlayan — günahları defalarca ve tekrar tekrar örten", grup:"Cemâl",
+  kok:"G-F-R kökü. 'Gafr' kelimesi: örtmek, kapamak, boyamak (pas önlemek için metal boyama da 'gafrlemek' dir). Günahı örtmek, üzerini kapatmak — hem dünyada (insanlara göstermeyerek) hem ahirette (azap vermeyerek). 'Gaffâr' kalıbı (fâ'âl) çokluk ve tekrar ifade eder: çok çok bağışlayan, her seferinde bağışlayan.",
+  ayetler:[
+    {arapca:"وَإِنِّى لَغَفَّارٌ لِّمَن تَابَ وَءَامَنَ وَعَمِلَ صَـٰلِحًا ثُمَّ ٱهْتَدَىٰ", meal:"Tevbe eden, iman eden, salih amel işleyen ve doğru yola giren kimseye elbette Gaffâr'ım.", kaynak:"Tâhâ 20:82",
+     tefsir:"İbn Kesîr: 'Bu âyet Gaffâr isminin koşulsuz olmadığını gösterir; tevbe, iman, amel ve hidayet dört şartı bir arada zikreder. Ancak bu şartları taşıyana Allah'ın mağfireti mutlak ve kesindir.' Kurtubî: 'Gaffâr isminin fâ'âl kalıbı sonsuz tekrarı anlatır: İnsan her düşüşünde kalkabilir, her günahtan sonra bağışlanabilir; kapı hiç kapanmaz.'"},
+    {arapca:"قُلْ يَـٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ", meal:"De ki: 'Ey nefislerine karşı aşırı giden kullarım! Allah'ın rahmetinden umudunuzu kesmeyin.'", kaynak:"Zümer 39:53",
+     tefsir:"Taberî: 'Bu âyet Hz. Peygamber'in en çok okuduğu ve sevdiği âyetlerdendir. Gaffâr isminin içeriğini pratik olarak açıklar: Ne kadar günah işlemiş olursa olsun hiçbir kul umutsuzluğa kapılmamalıdır.' Râzî: 'İsrâf (aşırıya kaçmak) ifadesi, sıradan günah değil büyük günah işleyenleri kapsar. Allah en büyük günahkâra bile bu kapıyı açık bırakmıştır — bu Gaffâr isminin sonsuzluğunun delilidir.'"}
+  ],
+  hadisler:[
+    {metin:"Eğer siz hiç günah işlemeseydiniz, Allah sizi yok eder, günah işleyip sonra bağışlanma dileyen bir topluluk yaratırdı.", kaynak:"Müslim, Tevbe 9; Tirmizî, Daavât 98", derece:"Sahih"},
+    {metin:"Bir kul günah işler ve 'Ya Rabbi, günah işledim, bağışla' derse Allah onu bağışlar. Sonra yine işler, yine söyler; Allah yine bağışlar — bu süreç devam eder.", kaynak:"Buhârî, Tevhid 35; Müslim, Tevbe 7", derece:"Sahih"}
+  ],
+  geylani:"Gaffâr isminden umut kesenin, günahından değil Allah'ı tanımamaktan korkması gerekir."
+},
+{
+  no:16, arapca:"ٱلْقَهَّار", latin:"el-Kahhâr", anlam:"Her şeye hâkim olan — her şeyi zor altında tutan yenilmez güç", grup:"Celâl",
+  kok:"K-H-R kökü. 'Kahretmek' — galip gelmek, boyun eğdirmek, direnişi kırmak. Kahhâr, 'fâ'âl' (çokluk) kalıbı; tekrar tekrar, her durumda galip gelen demektir. Doğa, insan, cin, melek — hepsi O'nun kahrine tabidir. Kader olaylarının olumsuz görünenleri de bu ismin tecellisi olarak okunabilir.",
+  ayetler:[
+    {arapca:"قُلِ ٱللَّهُ خَـٰلِقُ كُلِّ شَىْءٍ وَهُوَ ٱلْوَٰحِدُ ٱلْقَهَّـٰرُ", meal:"De ki: 'Allah her şeyin yaratıcısıdır; O, Vâhid'dir ve Kahhâr'dır.'", kaynak:"Ra'd 13:16",
+     tefsir:"İbn Kesîr: 'Tevhid ile Kahhâr isminin birleşmesi güçlüdür: Tek olan Allah, aynı zamanda her şeye galip gelendir; çokluk iddiasındaki şirk sistemi bu güç karşısında çözülür.' Kurtubî: 'Müşriklere karşı tartışma bağlamında gelen bu âyet, putların hiçbir güce sahip olmadığını ve yalnızca Allah'ın Kahhâr olduğunu ilan eder.'"},
+    {arapca:"لِّمَنِ ٱلْمُلْكُ ٱلْيَوْمَ ۖ لِلَّهِ ٱلْوَٰحِدِ ٱلْقَهَّـٰرِ", meal:"Bugün hükümranlık kimindir? Vâhid ve Kahhâr olan Allah'ındır.", kaynak:"Mü'min 40:16",
+     tefsir:"Taberî: 'Kıyamet gününün tasvirinde Kahhâr isminin gelmesi manidardır; o gün her türlü sahte egemenlik çöker ve yalnızca Allah'ın gücü kalır.' Râzî: 'Bu âyet Kahhâr isminin zirve tecellisini anlatır: Dünyada güçlüler vardır, zalimler dahi hükmeder; ama kıyamette yalnızca Kahhâr kalır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah son gün suçluların birbirinden ayrılmasını emreder — onlar Kahhâr'ın hükmüne teslim olurlar.", kaynak:"Buhârî, Rikâk 48; Müslim, Cennet 51", derece:"Sahih"},
+    {metin:"Dünya ahiretin tarla(sı)dır — dünyada ekmeyen ahirette biçemez.", kaynak:"Beyhakî, Şuabü'l-İman 3/16; Münzirî, et-Terğîb", derece:"Hasen"}
+  ],
+  geylani:"Kahhâr ismini anan kalp, dünya güçlerinin gerçekte ne kadar küçük olduğunu görür. Bu görüş korku değil, hürriyet verir."
+},
+{
+  no:17, arapca:"ٱلْوَهَّاب", latin:"el-Vehhâb", anlam:"Karşılıksız bağışlayan — hiçbir bedel beklemeksizin sürekli lütuf veren", grup:"Cemâl",
+  kok:"V-H-B kökü. 'Hibe etmek' — karşılıksız vermek. İnsan da hibe eder, ancak ya menfaat gözetir ya da sınırlı verir. Vehhâb; hem çok hem sürekli hem de tamamen karşılıksız bağışlamanın adıdır. Fâ'âl kalıbı çokluk ve sürekliliği ifade eder.",
+  ayetler:[
+    {arapca:"رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ ٱلْوَهَّابُ", meal:"Rabbimiz! Bizi hidayete erdirdikten sonra kalplerimizi saptırma; bize katından bir rahmet bağışla. Şüphesiz sen Vehhâb'sın.", kaynak:"Âl-i İmrân 3:8",
+     tefsir:"İbn Kesîr: 'Âyetin duası iki şeyi birden ister: Sapmadan korunmak ve rahmet lütfedilmek. Her ikisi de Vehhâb ismiyle kapatılmış; yani bu lütufların bedelsiz ve kayıtsız şartsız verileceğini itiraf eden bir duadır.' Kurtubî: 'Vehhâb ismini bu âyetin sonunda zikretmek, Allah'tan dilenen her şeyin bedelini ödeyemeyeceğimizi, yalnızca O'nun lütfuyla alabileceğimizi hatırlatır.'"},
+    {arapca:"أَمْ عِندَهُمْ خَزَآئِنُ رَحْمَةِ رَبِّكَ ٱلْعَزِيزِ ٱلْوَهَّابِ", meal:"Yoksa onların elinde Rabbinin rahmetinin hazineleri mi var; O ki Azîz'dir, Vehhâb'dır?", kaynak:"Sâd 38:9",
+     tefsir:"Taberî: 'Bu âyet müşriklerin peygamberliği başkasına vermek istemelerini reddeder. Vehhâb ismi burada, nübüvvetin (peygamberlik) bedelsiz bir hibe olduğunu ve yalnızca Allah'ın vermesiyle gerçekleştiğini vurgular.' Râzî: 'Hazineler ifadesi, Allah'ın lütfunun sonsuzluğuna işaret eder; bir hazineden ne kadar alınırsa alınsın bitmez.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme innî es'elüke yâ Vehhâb — Ey Vehhâb, senden istiyorum (duası).", kaynak:"Nesâî, Sehv 62; İbn Mâce, Duâ 3", derece:"Sahih"},
+    {metin:"Allah sabah namazından sonra rızkı dağıtır; dilediğine bol, dilediğine dar verir.", kaynak:"Buhârî, Teheccüd 14; Müslim, Müsâfirîn 166", derece:"Sahih"}
+  ],
+  geylani:"Vehhâb'tan isterken hesap yapma; O vermek için bahane arar, sen istemek için. Sen iste; O'nun cömertliği bahanen olsun."
+},
+{
+  no:18, arapca:"ٱلرَّزَّاق", latin:"er-Rezzâk", anlam:"Rızkı veren — her canlının geçimini üstlenen sonsuz rızık kaynağı", grup:"Cemâl",
+  kok:"R-Z-K kökü. 'Rızık' hem maddi (yiyecek, içecek) hem manevî (ilim, hidayet, sağlık) her türlü verilen nimeti kapsar. Rezzâk, fâ'âl kalıbı: çok çok ve tekrar tekrar rızık veren. Allah'a mahsus bu isim, mahlûkatın herhangi bir şeyi rızık olarak vermesinden farklı olarak hiçbir kayba uğramadan sürekli verendir.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ هُوَ ٱلرَّزَّاقُ ذُو ٱلْقُوَّةِ ٱلْمَتِينُ", meal:"Şüphesiz Allah rızık verenin ta kendisidir; O güç sahibi ve sarsılmaz olandır.", kaynak:"Zâriyât 51:58",
+     tefsir:"İbn Kesîr: 'Bu âyet tevekküle davetiyedir: Rızık veren Allah'tır, biz yalnızca araç oluyoruz. Güç ve sağlamlık ile birlikte zikredilmesi şunu söyler: Bu vaad asla bitmez, asla zayıflamaz.' Kurtubî: 'Materyalistlere karşı ilahî argüman: Rızkın kaynağı Allah'tır; insan çalışabilir, ama rızkı yaratamaz.'"},
+    {arapca:"وَمَا مِن دَآبَّةٍ فِى ٱلْأَرْضِ إِلَّا عَلَى ٱللَّهِ رِزْقُهَا", meal:"Yeryüzünde hiçbir canlı yoktur ki onun rızkı Allah'a ait olmasın.", kaynak:"Hûd 11:6",
+     tefsir:"Taberî: 'Dâbbe (yürüyen, sürünen) en küçük böcekten en büyük hayvana kadar her canlıyı kapsar. Allah tek tek hepsinin rızkını üstlenmiştir.' Râzî: 'Bu âyet hem müminleri teselli eder hem de çalışmayı teşvik eder: Rızık garantidir; ama araçlar (çalışmak, ziraat, ticaret) Allah'ın sünneti gereğidir.'"}
+  ],
+  hadisler:[
+    {metin:"Eğer Allah'a gerçek anlamda tevekkül etseydiniz, sizi kuşu rızıklandırdığı gibi rızıklandırırdı: Sabah aç çıkar, akşam tok dönerdi.", kaynak:"Tirmizî, Zühd 33; İbn Mâce, Zühd 14", derece:"Hasen"},
+    {metin:"Rızık talep etmeyi, geciktiğinde bile bırakma; zira insan annesinin karnından bile rızkıyla birlikte çıkar.", kaynak:"Hâkim, Müstedrek 2/4; Beyhakî, Şuab", derece:"Hasen"}
+  ],
+  geylani:"Rezzâk'a güvenenin eli açık olur — ama avucu yukarı değil, dağıtmak için aşağı. Veren Allah'tır; sen sadece araç ol."
+},
+{
+  no:19, arapca:"ٱلْفَتَّاح", latin:"el-Fettâh", anlam:"Her şeyi açan — kalpleri, kapıları, zorlukları açan en büyük hâkim", grup:"Kemâl",
+  kok:"F-T-H kökü. Temel anlam: kapalı bir şeyi açmak. Fetih (zafer) de buradan gelir; şehrin kapısı açılır. Allah için üç anlam bir arada: (1) Kilitli kapıları açan, (2) Kalplere hidayet açan, (3) Kullar arasında hüküm veren hâkim. İbn Fâris: 'Feth, kapalılığı gidermek ve akışı başlatmaktır.'",
+  ayetler:[
+    {arapca:"مَّا يَفْتَحِ ٱللَّهُ لِلنَّاسِ مِن رَّحْمَةٍ فَلَا مُمْسِكَ لَهَا", meal:"Allah insanlara ne rahmet kapısı açarsa onu tutacak hiç kimse yoktur.", kaynak:"Fâtır 35:2",
+     tefsir:"İbn Kesîr: 'Bu âyet Fettâh isminin özüdür: Açılan kapıyı kimse kapayamaz. Bu hem rızık hem sağlık hem hidayet hem de dua için geçerlidir.' Kurtubî: 'Âyetin devamında kapanan şeyleri açacak kimsenin de olmadığı söylenir. İkisi birlikte; her şeyin anahtarının Allah'ta olduğunu ilan eder.'"},
+    {arapca:"إِن تَسْتَفْتِحُوا۟ فَقَدْ جَآءَكُمُ ٱلْفَتْحُ", meal:"Eğer (Allah'tan) bir zafer-hüküm istediyseniz, işte fetih (hüküm) size geldi.", kaynak:"Enfâl 8:19",
+     tefsir:"Taberî: 'Müşrikler Bedir'den önce \"hangimiz haklıysa ona yardım et\" diye dua etmişlerdi. Bu âyet, hükmün Bedir zaferiyle geldiğini ilan eder. Fettâh burada hem hâkim hem de zafer verendir.' Râzî: 'Fettâh isminin hâkim boyutu bu âyette öne çıkar; insanlar hangi tarafın doğru olduğunu anlamak için Allah'ın hükmüne muhtaçtır.'"}
+  ],
+  hadisler:[
+    {metin:"Ya Fettâh, ya Alîm — (Ey her şeyi açan, ey her şeyi bilen) diye dua edin.", kaynak:"Tirmizî, Daavât 34; Ebû Dâvûd, Salât 358", derece:"Hasen"},
+    {metin:"Dua ibadetin özüdür.", kaynak:"Tirmizî, Daavât 1; İbn Mâce, Duâ 1", derece:"Sahih"}
+  ],
+  geylani:"Fettâh'ın anahtarı kalpte saklanır. Duayı içtenlikle yapan kalp, o anahtarı bulmuş demektir."
+},
+{
+  no:20, arapca:"ٱلْعَلِيم", latin:"el-Alîm", anlam:"Her şeyi bilen — geçmişi, şimdiyi, geleceği, gizliyi ve açığı tam olarak bilen", grup:"Kemâl",
+  kok:"A-L-M kökü. 'İlim' aynı kökten; bilgi ve bilmek. 'Alîm' fa'îl kalıbı: çok bilen, tam bilen. Allah'ın ilmi; öğrenilmiş değil, zâtına özgü ezeli bir sıfattır. İbn Fâris: 'İlim bir şeyin hakikatine tam nüfuz etmektir.' Bu isim Kur'ân'da 150'den fazla yerde geçer — en çok tekrarlanan isimlerden biridir.",
+  ayetler:[
+    {arapca:"وَعِندَهُۥ مَفَاتِحُ ٱلْغَيْبِ لَا يَعْلَمُهَآ إِلَّا هُوَ", meal:"Gaybın anahtarları O'nun katındadır; onları O'ndan başkası bilmez.", kaynak:"En'âm 6:59",
+     tefsir:"İbn Kesîr: 'Mefâtihu'l-gayb (gayb anahtarları) beştir — Kıyametin vakti, yağmurun ne zaman yağacağı, rahmerdeki çocuk, kişinin yarın ne kazanacağı, nerede öleceği (Lokman 31:34). Bu beş şey yalnızca Alîm olan Allah'a aittir.' Kurtubî: 'Gaybın anahtarlarını Allah'a tahsis etmek, falcılık, astroloji ve kehanete en güçlü Kur'ânî cevaptır.'"},
+    {arapca:"يَعْلَمُ مَا فِى ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ وَيَعْلَمُ مَا تُسِرُّونَ وَمَا تُعْلِنُونَ", meal:"Göklerde ve yerde olanı bilir; gizlediğinizi de açıkladığınızı da bilir.", kaynak:"Teğâbün 64:4",
+     tefsir:"Taberî: 'Bu âyet Alîm isminin kapsamını üç boyutta açıklar: Mekânsal genişlik (gökler-yer), niteliksel derinlik (gizli-açık). Hiçbir şey bu üç sınırın dışında değildir.' Râzî: 'Allah'ın bilmesi, insanın bilmesi gibi değildir. İnsan öğrenir, hatırlar, unutur. Allah'ın ilmi ezeli ve kâmildir; artmaz, eksilmez.'"}
+  ],
+  hadisler:[
+    {metin:"Allah kulunun yaşayacaklarını, öleceği yeri, amellerini ve rızkını ana rahminde iken yazar.", kaynak:"Buhârî, Kader 1; Müslim, Kader 1", derece:"Sahih"},
+    {metin:"Allah gizli ve açık olanı bilir; kuldan hiçbir şey gizli kalmaz.", kaynak:"Buhârî, İlim 2; Müslim, İman 1", derece:"Sahih"}
+  ],
+  geylani:"Alîm olan Allah'ı bilen insan, hiçbir gizli günahın gerçekten gizli olmadığını anlar. Bu anlayış, ihlâsın (samimiyet) başlangıcıdır."
+},
+{
+  no:21, arapca:"ٱلْقَابِض", latin:"el-Kâbız", anlam:"Daraltan — rızıkları, ruhları ve kalpleri kabzeden (tutan)", grup:"Celâl",
+  kok:"K-B-D (ya da K-B-Z) kökü. 'Kabz' tutmak, kavramak, daraltmak anlamında. Üç kullanımı: (1) Rızkı tutmak (daraltmak), (2) Ölümde ruhu tutmak (kabzetmek), (3) Kalbi sıkıştırmak (manevî daralma). Kâbız ve Bâsıt (açan) Kur'ân'da çifttir; biri olmadan diğeri anlaşılmaz.",
+  ayetler:[
+    {arapca:"ٱللَّهُ يَقْبِضُ وَيَبْصُۜطُ وَإِلَيْهِ تُرْجَعُونَ", meal:"Allah daraltır (kabzeder) ve genişletir (bast eder); O'na döndürüleceksiniz.", kaynak:"Bakara 2:245",
+     tefsir:"İbn Kesîr: 'Bu âyet infak bağlamında gelmiştir. Allah, sadakayı kısmayanların malını kabzeder; verenleri ise genişletir. Burada Kâbız ve Bâsıt isimlerinin hikmeti ortaya çıkar: İkisi birlikte dengeyi sağlar.' Kurtubî: 'Kabz ve bast yalnızca maddî değil ruhî alanı da kapsar: Bazen Allah kalbi sıkar — bu bir imtihan ve tezküre (hatırlatma) dır; bazen de ferah açar — bu bir lütuftur.'"},
+    {arapca:"وَٱللَّهُ يَقْبِضُ وَيَبْسُطُ", meal:"Allah daraltır ve genişletir.", kaynak:"Bakara 2:245 (aynı)",
+     tefsir:"Taberî: 'Kabz ve bast birlikte; her ikisi de O'nun iradesinin ürünüdür. İnsan ne kadar çalışırsa çalışsın, rızkı ve kalp halini yalnızca Allah belirler.' Râzî: 'Sûfî geleneğinde Kâbız-Bâsıt çifti, seyr ü sülûkun (manevî yolculuğun) iki temel hâlini ifade eder: kabz (sıkıntı/arınma) ve bast (ferahlık/genişleme).'"}
+  ],
+  hadisler:[
+    {metin:"Allah bazen kulunun rızkını sever, bazen de darlık verir — her ikisi de O'nun hikmetiyle olur.", kaynak:"Müslim, Zekât 69; Ahmed, Müsned 3/340", derece:"Sahih"},
+    {metin:"Rızık Allah'ın takdiriyle verilir; ne acele ederek artırılır ne de sabırla eksilir.", kaynak:"İbn Hibbân, Sahîh 2/495; Hâkim, Müstedrek", derece:"Hasen"}
+  ],
+  geylani:"Kabz halinde şikâyet etme; o hal, seni içi boş kabadan dolu kaba dönüştürme sürecidir."
+},
+{
+  no:22, arapca:"ٱلْبَاسِط", latin:"el-Bâsıt", anlam:"Açan, genişleten — rızıkları, kalpleri ve rahmetini yayan", grup:"Cemâl",
+  kok:"B-S-T kökü. 'Bast' açmak, sermek, yaymak, genişletmek. El açmak da bu köktendir — 'bastü'l-yed' (eli uzatmak, cömertlik). Bâsıt, Kâbız'ın zıddı ve tamamlayıcısıdır. Manevî boyutu: Ferahlık, sevinç ve hidayet de bir bast hâlidir.",
+  ayetler:[
+    {arapca:"ٱللَّهُ يَقْبِضُ وَيَبْصُۜطُ", meal:"Allah daraltır ve genişletir.", kaynak:"Bakara 2:245",
+     tefsir:"İbn Kesîr: 'Bast, Allah'ın lütuf kapısını kuluna açmasıdır. Kâbız ve Bâsıt birlikte insanın tevekküle muhtaç olduğunu öğretir: Ne daraltmadan kaçabilirsin ne de genişletmeyi zorla getirebilirsin.' Kurtubî: 'Bâsıt isminin en güzel tecellisi, dua sonrasında kalbe gelen huzur ve ferahlıktır. Bu, Allah'ın kalbe eli uzatmasıdır.'"},
+    {arapca:"وَيَقْبِضُ وَيَبْسُطُ وَإِلَيْهِ تُرْجَعُونَ", meal:"Daraltır ve genişletir; O'na döndürüleceksiniz.", kaynak:"Bakara 2:245",
+     tefsir:"Taberî: 'Ölüm dönüşünün âyetin sonuna eklenmesi önemlidir; ne daralmadan ne de genişlemeden hiç birinin kalıcı olmadığını, asıl konağın Allah'a dönüş olduğunu hatırlatır.' Râzî: 'Bâsıt ismini meditasyon (tefekkür) olarak kullanan sûfîler, kalp genişliğinin kaynağını Allah'a bağlamayı öğrenirler.'"}
+  ],
+  hadisler:[
+    {metin:"Allah, infak edene bereketini açar; malını tutan kişinin rızkını sıkıştırır.", kaynak:"Buhârî, Zekât 3; Müslim, Zekât 57", derece:"Sahih"},
+    {metin:"Allah'ın eli doludur; gece gündüz vermekle eksilmez.", kaynak:"Buhârî, Tevhid 22; Müslim, Zekât 37", derece:"Sahih"}
+  ],
+  geylani:"Bast hâlindeyken şükür et ve ver; bu hâl yalnızca sana değil, seninle karşılaşan herkese de açılabilir."
+},
+{
+  no:23, arapca:"ٱلْخَافِض", latin:"el-Hâfız / el-Hâfid", anlam:"Alçaltan — zalimleri, mütekebbirleri ve kâfirleri aşağıya indiren", grup:"Celâl",
+  kok:"H-F-D kökü. 'Hafd' aşağıya indirmek, alçaltmak. Zıddı 'Râfi'' (yükselten) dir. Kıyamette bir grup alçaltılır (hâfide): İnkârcılar ve zalimler. Bu isim 99 esma listelerinde bazı kaynaklarda yer alırken bazılarında Hâfız (koruyan) ile karıştırılmaktadır; İbn Hacer her ikisini ayrı ayrı ele almıştır.",
+  ayetler:[
+    {arapca:"إِذَا وَقَعَتِ ٱلْوَاقِعَةُ ۝ لَيْسَ لِوَقْعَتِهَا كَاذِبَةٌ ۝ خَافِضَةٌ رَّافِعَةٌ", meal:"Vâkıa (kıyamet) gerçekleştiğinde, o olayın gerçekleşmesini yalanlayacak kimse yoktur; alçaltandır, yükseltendir.", kaynak:"Vâkıa 56:1-3",
+     tefsir:"İbn Kesîr: 'Kıyamet, bir grubu alçaltır (kâfirler ve zalimler), bir grubu yükseltir (mü'minler ve sâlihler). Bu iki sıfat Allah'ın mutlak adaletinin en büyük tezahürüdür.' Kurtubî: 'Hâfıza ve Râfia bir arada zikredilmesi, adaletin denge ilkesini gösterir: Bu dünyada yükselen zalim orada alçalır; alçaltılan mazlum orada yükselir.'"},
+    {arapca:"وَتُعِزُّ مَن تَشَآءُ وَتُذِلُّ مَن تَشَآءُ", meal:"Dilediğini aziz edersin, dilediğini zelil edersin.", kaynak:"Âl-i İmrân 3:26",
+     tefsir:"Taberî: 'İzzet ve zillet (yükseltme ve alçaltma) tamamen Allah'ın iradesindedir. Bunun dünyevi siyasi bir ifadesi olduğu gibi manevî ve ahirete yönelik boyutu da vardır.' Râzî: 'Bu âyet Hâfız/Hâfid ismini fiil olarak açıklar: Alçaltma da Allah'ın tasarrufudur; dünyadaki güçten ahiretteki azaba kadar her boyutu kapsar.'"}
+  ],
+  hadisler:[
+    {metin:"Allah zalimi mühlet verir; ama yakaladığında artık kurtulamaz.", kaynak:"Buhârî, Tefsir 11/4; Müslim, Birr 61", derece:"Sahih"},
+    {metin:"Kıyamette boyun eğdirilenlerin başında kibirliler gelir.", kaynak:"Tirmizî, Kıyamet 47; Ahmed, Müsned 2/179", derece:"Hasen"}
+  ],
+  geylani:"Hâfid ismini bil; dünyada yüksek görünen her zalim, bu ismin hükmüyle yere kapanacaktır."
+},
+{
+  no:24, arapca:"ٱلرَّافِع", latin:"er-Râfi'", anlam:"Yükselten — mü'minleri, dereceleri ve hakikati yücelten", grup:"Cemâl",
+  kok:"R-F-A kökü. 'Ref' yukarı kaldırmak, yükseltmek. Hem maddî (bir şeyi kaldırmak) hem manevî (derece yükseltmek) anlamı vardır. Zıddı Hâfız/Hâfid'dir. Allah; sâlihlerin derecesini, Peygamberlerin şanını ve mü'minlerin ruhunu yükseltir.",
+  ayetler:[
+    {arapca:"يَرْفَعِ ٱللَّهُ ٱلَّذِينَ ءَامَنُوا۟ مِنكُمْ وَٱلَّذِينَ أُوتُوا۟ ٱلْعِلْمَ دَرَجَـٰتٍ", meal:"Allah içinizden iman edenleri ve ilim verilenleri derecelerle yükseltir.", kaynak:"Mücâdele 58:11",
+     tefsir:"İbn Kesîr: 'Râfi' isminin pratik tecellisi bu âyettedir: İki grup yükseltilir — iman edenler ve ilim sahibi olanlar. İkisinin birlikte zikredilmesi, ilmin imansız olmayacağını gösterir.' Kurtubî: 'Derece kelimesi çoğul kullanılmıştır; tek bir yükseliş değil, katmanlı ve sürekli bir yükseliş söz konusudur. Her amel, her ilim, her tevbe yeni bir derece açar.'"},
+    {arapca:"وَرَفَعْنَا لَكَ ذِكْرَكَ", meal:"Senin şanını (zikrini) yükselttik.", kaynak:"İnşirâh 94:4",
+     tefsir:"Taberî: 'Bu âyet Hz. Peygamber'e hitap eder; Râfi' isminin en özel tecellisi, Allah'ın Peygamber'in ismini ebediyen yükseltmesidir — ezan ve şehadette adının Allah'ın adıyla birlikte anılması.' Râzî: 'Şanı yükseltmek; yalnızca dünya şöhreti değil, Allah katındaki değerin ve tarihsel izin yücelmesidir.'"}
+  ],
+  hadisler:[
+    {metin:"Kim Allah için alçalırsa, Allah onu yükseltir.", kaynak:"Müslim, Birr 69; İbn Mâce, Zühd 16", derece:"Sahih"},
+    {metin:"İlim öğrenmek her Müslümana farzdır.", kaynak:"İbn Mâce, Mukaddime 17; Beyhakî, Şuab", derece:"Sahih"}
+  ],
+  geylani:"Yükselmeyi istiyorsan alçal; Râfi' yalnızca eğilenleri yükseltir, dik duranları değil."
+},
+{
+  no:25, arapca:"ٱلْمُعِزّ", latin:"el-Muizz", anlam:"İzzet veren — dilediğini aziz eden, şereflendiren", grup:"Cemâl",
+  kok:"A-Z-Z kökü. 'İzz' güç, şeref, saygınlık. Muizz, 'if'âl' kalıbı: birine izzet (şeref-güç) bahşeden. Allah; mü'minleri, peygamberleri ve dilediği kullarını izzete kavuşturur. Bu izzet ne para ne güçle kazanılır; yalnızca Allah verir.",
+  ayetler:[
+    {arapca:"قُلِ ٱللَّهُمَّ مَـٰلِكَ ٱلْمُلْكِ تُؤْتِى ٱلْمُلْكَ مَن تَشَآءُ وَتَنزِعُ ٱلْمُلْكَ مِمَّن تَشَآءُ وَتُعِزُّ مَن تَشَآءُ وَتُذِلُّ مَن تَشَآءُ", meal:"De ki: 'Ey mülkün sahibi Allah'ım! Dilediğine mülk verirsin, dilediğinden mülkü çeker alırsın; dilediğini aziz edersin, dilediğini zelil edersin.'", kaynak:"Âl-i İmrân 3:26",
+     tefsir:"İbn Kesîr: 'Bu âyet Allah'ın mutlak egemenliğini dört fiil üzerinden anlatır. Muizz isminin özü burada: izzet verme ve alma yetkisi yalnızca Allah'tadır.' Kurtubî: 'Bu âyetin başındaki 'De ki' emri, insanın bunu içselleştirmesi ve dilinden düşürmemesi gerektiğine işaret eder. Zira insanlar sürekli izzeti insanlardan arar — oysa kaynak bellidir.'"},
+    {arapca:"مَن كَانَ يُرِيدُ ٱلْعِزَّةَ فَلِلَّهِ ٱلْعِزَّةُ جَمِيعًا", meal:"Kim izzet istiyorsa bilsin ki, izzet tümüyle Allah'a aittir.", kaynak:"Fâtır 35:10",
+     tefsir:"Taberî: 'Bu âyet, izzeti Allah dışında başka yerde arayanları uyarır. Müşrikler putlarından, münâfıklar kâfirlerden izzet beklerdi; âyet her ikisini de reddeder.' Râzî: 'İzzet, bir kaptan diğerine aktarılır gibi değil; kaynaktan içilir. Kaynak Allah'tır; O'na doğrudan yönelen bulur.'"}
+  ],
+  hadisler:[
+    {metin:"Kim Allah için alçakgönüllü olursa, Allah onu yükseltir; kim büyüklük taslarsa, Allah onu alçaltır.", kaynak:"Müslim, Birr 69; Tirmizî, Birr 82", derece:"Sahih"},
+    {metin:"Gerçek izzet mü'minlerin, münafığın ise zilletidir.", kaynak:"Müslim, Münâfikîn 63 bağlamı; Ahmed Müsned 3/89", derece:"Hasen"}
+  ],
+  geylani:"İzzet için kapı kapı dolaşan; sonunda Muizz'in kapısını bulduğunda anlar ki, geçen yıllar arayışla geçmiştir — kapı hep açıktı."
+},
+{
+  no:26, arapca:"ٱلْمُذِلّ", latin:"el-Müzill", anlam:"Zelil kılan — zalimleri, mütekebbirleri ve kâfirleri alçaltan", grup:"Celâl",
+  kok:"Z-L-L kökü. 'Zillet' alçaklık, küçüklük. Müzill if'âl kalıbı: birine zillet (alçalma) yaşatan. Allah; zâlimleri, müstekbirleri (büyüklük taslayan) ve münkir olanları dünyada veya âhirette zelil kılar. Muizz ile çift olan bu isim, Allah'ın adaletin gereği olarak hem yükselteceğini hem de alçaltacağını ilan eder.",
+  ayetler:[
+    {arapca:"وَتُعِزُّ مَن تَشَآءُ وَتُذِلُّ مَن تَشَآءُ", meal:"Dilediğini aziz edersin, dilediğini zelil edersin.", kaynak:"Âl-i İmrân 3:26",
+     tefsir:"Kurtubî: 'İzzet ve zillet Allah'ın elindedir; hiçbir güç bu iki tasarrufu O'ndan alamaz. Müzill ismini bilen insan, zâlimlere yaranmaktan kurtulur çünkü onların izzetinin de Allah'ın iznine bağlı olduğunu anlar.' Taberî: 'Bu âyet hem teselli hem uyarıdır: Mü'mine teselli — zulüm görenin eninde sonunda kalkacağı; zâlime uyarı — şu anki yüksekliğin geçici olduğu.'"},
+    {arapca:"إِنَّ ٱلَّذِينَ يُحَآدُّونَ ٱللَّهَ وَرَسُولَهُۥٓ أُو۟لَـٰٓئِكَ فِى ٱلْأَذَلِّينَ", meal:"Allah'a ve Resulüne karşı çıkanlar, işte onlar zelillerin içindedir.", kaynak:"Mücâdele 58:20",
+     tefsir:"İbn Kesîr: 'Allah'a muhalefet edenin en büyük zillet olarak sonuçlandığını bildiren bu âyet, Müzill isminin ahiretteki tecellisini anlatır.' Râzî: 'Zillet iki türlüdür: (1) Kendi iradesini Allah'a teslim ederek kazanılan kulluktaki zillet — bu gerçek izzettir; (2) Allah'a karşı çıkarak kazanılan kibrin sonundaki zillet — bu gerçek alçalıştır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah zalimi mühlet verir; yakaladığında kurtuluş yoktur.", kaynak:"Buhârî, Tefsir, Hûd; Müslim, Birr 61", derece:"Sahih"},
+    {metin:"Kıyamette mütekebbirler (kibirliler) küçük karıncalar gibi haşredilir, her taraftan zillet onları kaplar.", kaynak:"Tirmizî, Kıyamet 47; Ahmed, Müsned 2/179", derece:"Hasen"}
+  ],
+  geylani:"Müzill ismi, zâlimin güldüğü her yerde sessizce iş başındadır. Sabret; O'nun saati geldiğinde erteleme olmaz."
+},
+{
+  no:27, arapca:"ٱلسَّمِيع", latin:"es-Semî'", anlam:"Her şeyi işiten — gizli fısıltıyı, kalbın sesini, her duayı eksiksiz duyan", grup:"Kemâl",
+  kok:"S-M-A kökü. 'Sem'' işitmek. Semî' fa'îl kalıbı: çok iyi ve eksiksiz işiten. Allah'ın işitmesi; kulak organına değil, zâtına dayalı ezelî bir sıfattır. En gizli sesi, en uzak köşedeki duayı, kalbin içindeki iniltiyi bile duyar.",
+  ayetler:[
+    {arapca:"قَدْ سَمِعَ ٱللَّهُ قَوْلَ ٱلَّتِى تُجَـٰدِلُكَ فِى زَوْجِهَا", meal:"Allah, kocası hakkında seninle tartışan kadının sözünü işitti.", kaynak:"Mücâdele 58:1",
+     tefsir:"İbn Kesîr: 'Bu âyet Semî' isminin en çarpıcı somutlaştırmasıdır. Hz. Âişe derdi: Allah Peygamber'inin yanındaki kadının sesini bile işitmişti. Ben odanın diğer köşesindeydim ve duyamıyordum. Allah her şeyi duyar.' Kurtubî: 'Sûrenin bu açılışı, Allah'ın en özel bir konuşmayı bile duyduğunu anlatır. Yalnızken ya da fısıldarken de O işitir.'"},
+    {arapca:"إِنَّنِى مَعَكُمَآ أَسْمَعُ وَأَرَىٰ", meal:"Ben sizinle birlikteyim; işitiyorum ve görüyorum.", kaynak:"Tâhâ 20:46",
+     tefsir:"Taberî: 'Hz. Mûsâ ve Hârûn Firavun'a gitmeden korktular. Allah bu âyetle onları güçlendirdi: Ben sizinle birlikteyim, Semî'im, gören ve işitenim. Bu, peygamberlere verilen en büyük güvencelerden biridir.' Râzî: 'Semî' ve Basîr isimlerinin birlikte gelmesi sıktır; işitmek ve görmek Allah'ın kuşatıcı bilgisinin iki boyutudur.'"}
+  ],
+  hadisler:[
+    {metin:"Bir ev halkı tartışır, Allah hepsini işitir; mü'minin sözü altın gibi kayıt altına alınır.", kaynak:"Buhârî, Edeb 27; Müslim, Birr 75", derece:"Sahih"},
+    {metin:"Biriniz dua ederken sesini yükseltmesin; Allah sağır değildir, en yakın yerdedir.", kaynak:"Buhârî, Cihat 131; Müslim, Zikir 44", derece:"Sahih"}
+  ],
+  geylani:"Semî' ismini bilen insan, gizli günah için bile utanır. O zaman gerçek hayâ (utanma) başlamış demektir."
+},
+{
+  no:28, arapca:"ٱلْبَصِير", latin:"el-Basîr", anlam:"Her şeyi gören — gizliyi, açığı, en ince ayrıntıyı eksiksiz gören", grup:"Kemâl",
+  kok:"B-S-R kökü. 'Basar' görme gücü, basiret (iç görüş) aynı kökten. Basîr fa'îl kalıbı: çok iyi gören. Allah'ın görmesi; gözle değil, zâtına özgü ezelî sıfattır. Karanlıkta, okyanusun dibinde, kalbin içinde — her yeri görür.",
+  ayetler:[
+    {arapca:"وَٱللَّهُ بَصِيرٌۢ بِمَا تَعْمَلُونَ", meal:"Allah, yaptıklarınızı hakkıyla görmektedir.", kaynak:"Bakara 2:265",
+     tefsir:"İbn Kesîr: 'Sadaka ve iyilik bağlamında gelen bu âyet; samimi niyetle yapılan ameli göreceğini, riyâ (gösteriş) ile yapılanı da göreceğini bildirir. Basîr ismi hem müjde hem uyarıdır.' Kurtubî: 'İnsanın göremediği niyeti Allah görür. Bu nedenle ihlâs (samimiyet) amel kadar, hatta daha fazla önemlidir.'"},
+    {arapca:"إِنَّهُۥ هُوَ ٱلسَّمِيعُ ٱلْبَصِيرُ", meal:"Şüphesiz O, Semî' ve Basîr'dir.", kaynak:"İsrâ 17:1",
+     tefsir:"Taberî: 'Miracı anlatan bu âyette Semî' ve Basîr isimlerinin gelmesi şu anlama gelir: O gece yaşanan her şeyi; Peygamber'in gördüklerini, duyduklarını, Allah eksiksiz biliyordu.' Râzî: 'Semî' ve Basîr isimleri sıklıkla birlikte gelir; bilginin iki temel kanalını temsil ederler. Allah bu iki kanalın ötesinde ve üzerindedir.'"}
+  ],
+  hadisler:[
+    {metin:"İhsân (en güzel ibadeti) Allah'ı görür gibi yapman demektir; sen O'nu görmesen de O seni görür.", kaynak:"Buhârî, İman 37; Müslim, İman 1 (Cibril hadisi)", derece:"Sahih"},
+    {metin:"Allah'tan utanmak için gözlerin haramdan korunması şarttır.", kaynak:"Tirmizî, Kıyamet 24; Ahmed, Müsned 1/387", derece:"Hasen"}
+  ],
+  geylani:"Basîr olan Allah'a gözlerin haramdan sakınırsa, kalbe bir nur gelir ki o nur dünyayı aydınlatır."
+},
+{
+  no:29, arapca:"ٱلْحَكَم", latin:"el-Hakem", anlam:"Hüküm veren — kâinatın tek ve nihaî hâkimi", grup:"Celâl",
+  kok:"H-K-M kökü. 'Hükm' yargı, karar, yönetim. Hakem, fa'al kalıbı: taraflar arasında hüküm veren, karar hakkı yalnız kendisinde olan. Hakîm (hikmet sahibi) ile aynı kökten fakat farklı kalıp: Hakem yargılama yetkisini, Hakîm ise bilgeliği öne çıkarır.",
+  ayetler:[
+    {arapca:"أَفَغَيْرَ ٱللَّهِ أَبْتَغِى حَكَمًا وَهُوَ ٱلَّذِىٓ أَنزَلَ إِلَيْكُمُ ٱلْكِتَـٰبَ مُفَصَّلًا", meal:"Allah'tan başka hâkim mi arayayım? Oysa O, Kitab'ı size ayrıntılı biçimde indiren O'dur.", kaynak:"En'âm 6:114",
+     tefsir:"İbn Kesîr: 'Bu âyet hâkimiyetin yalnız Allah'a ait olduğunu en net biçimde ilan eder. Başka bir hakem aramak; ya cehalet ya da inkârdır.' Kurtubî: 'Kitabın ayrıntılı olması ile hâkimiyetin Allah'a ait olması birlikte zikredilir; çünkü hükmü verecek olan hem kanunu hem hikmeti bilmelidir — ikisi de yalnız Allah'tadır.'"},
+    {arapca:"إِنِ ٱلْحُكْمُ إِلَّا لِلَّهِ", meal:"Hüküm yalnızca Allah'a aittir.", kaynak:"En'âm 6:57",
+     tefsir:"Taberî: 'Bu cümle Kur'ân'da üç yerde aynen tekrarlanır. Tekrar, bu ilkenin tartışmasız bir esas olduğunu gösterir: Ne beşer, ne put, ne doğa — hüküm yalnız Allah'ındır.' Râzî: 'Hakem isminin siyasi boyutu (yasa koyma) olduğu kadar kozmik boyutu da vardır: Kâinatın çalışma düzenini belirleyen hüküm de Allah'ındır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah Hakem'dir; insanların Hakem diye isim koyması uygun değildir.", kaynak:"Buhârî, Edeb 109; Müslim, Edeb 15", derece:"Sahih"},
+    {metin:"Hüküm Allah'ındır; kıyamette O hükmeder ve kimseye haksızlık yapılmaz.", kaynak:"Müslim, Cennet 76; Tirmizî, Kıyamet 2", derece:"Sahih"}
+  ],
+  geylani:"Hakem'den başkasının önünde dava açma; O'nun mahkemesi asla yanılmaz ve asla gecikme yapmaz."
+},
+{
+  no:30, arapca:"ٱلْعَدْل", latin:"el-Adl", anlam:"Mutlak adalet — zerre kadar haksızlık yapmayan tam adalet sahibi", grup:"Cemâl",
+  kok:"A-D-L kökü. 'Adalet' denge, düzeltme, eşitleme. Adl isim olarak: dengeyi sağlayan, her şeyi hak ettiği yere koyan. İbn Fâris: 'Adl, iki tarafın dengelenmesidir.' Allah'ın adaleti; yaratılışta, şeriatta ve kıyamette tam olarak tecelli eder.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ لَا يَظْلِمُ مِثْقَالَ ذَرَّةٍ", meal:"Şüphesiz Allah, zerre ağırlığı kadar zulüm yapmaz.", kaynak:"Nisâ 4:40",
+     tefsir:"İbn Kesîr: 'Zerre; gözle görülemeyen en küçük şeydir. Allah'ın adaleti bu ölçekte çalışır; hiçbir şey kaybolmaz, hiçbir hak çiğnenmez.' Kurtubî: 'Adl isminin en önemli tecellisi âhirette görülecektir: Dünyada adaletin gecikmesi O'nun adaletinin olmadığını değil, hikmetli bir mühlet verdiğini gösterir.'"},
+    {arapca:"وَنَضَعُ ٱلْمَوَٰزِينَ ٱلْقِسْطَ لِيَوْمِ ٱلْقِيَـٰمَةِ", meal:"Kıyamet günü için adalet terazilerini koyarız.", kaynak:"Enbiyâ 21:47",
+     tefsir:"Taberî: 'Terazi; adaletin somut sembolüdür. Kıyamette tartı hem iyi hem kötü ameller için işler; hiçbir şey terazinin dışında kalmaz.' Râzî: 'Adalet terazisi; insanın hesap kaygısını doğru bir zemine oturtur. Allah'ın adaletini bilen kul ne umutsuz ne de sorumsuz olur.'"}
+  ],
+  hadisler:[
+    {metin:"Kıyamette boynuzsuz koyun, boynuzlu koyundan hakkını alır; sonra 'toprak ol' denilir.", kaynak:"Müslim, Birr 60; Tirmizî, Kıyamet 2", derece:"Sahih"},
+    {metin:"Adil önder kıyamette Allah'ın sağında nurdan minber üzerinde olur.", kaynak:"Müslim, İmaret 18; Nesâî, Adab 1", derece:"Sahih"}
+  ],
+  geylani:"Adl ismini bilen, hiçbir haksızlığın hesapsız kalmayacağını anlar. Bu anlayış onu hem adil hem de sabırlı yapar."
+},
+{
+  no:31, arapca:"ٱللَّطِيف", latin:"el-Latîf", anlam:"İnce ve nazik — en gizli şeylere ulaşan, kullarına ince lütuflarla yaklaşan", grup:"Cemâl",
+  kok:"L-T-F kökü. 'Lutf' incelik, naziklik, hafiflik. İki anlam: (1) İnce ve gizli olan her şeye nüfuz eden (bilgi boyutu); (2) Kullarına ince ve nazik bir şekilde yaklaşan (lütuf boyutu). İbn Fâris: 'Latîf, hem küçük şeyleri bilen hem de nazikçe davranan demektir.'",
+  ayetler:[
+    {arapca:"ٱللَّهُ لَطِيفٌۢ بِعِبَادِهِۦ يَرْزُقُ مَن يَشَآءُ", meal:"Allah kullarına Latîf'tir; dilediğine rızık verir.", kaynak:"Şûrâ 42:19",
+     tefsir:"İbn Kesîr: 'Latîf isminin kullarla ilişkisi bu âyette rızık üzerinden anlatılır. Allah en gizli ihtiyacı bilir ve en ince yollarla karşılar. İnsan hiç fark etmeden nice kapılar açılır.' Kurtubî: 'Latîf ile rızık arasındaki bağ şudur: Rızık bazen öngörülmedik yollardan gelir; bu Allah'ın latîfliğinin işaretidir.'"},
+    {arapca:"يَـٰبُنَىَّ إِنَّهَآ إِن تَكُ مِثْقَالَ حَبَّةٍ مِّنْ خَرْدَلٍ فَتَكُن فِى صَخْرَةٍ أَوْ فِى ٱلسَّمَـٰوَٰتِ أَوْ فِى ٱلْأَرْضِ يَأْتِ بِهَا ٱللَّهُ ۚ إِنَّ ٱللَّهَ لَطِيفٌ خَبِيرٌ", meal:"Yavrucuğum! Bir hardal tanesi ağırlığında bile olsa, kayanın içinde, gökte ya da yerde olsa Allah onu getirir. Allah Latîf'tir, Habîr'dir.", kaynak:"Lokmân 31:16",
+     tefsir:"Taberî: 'Lokman'ın oğluna nasihatındaki bu âyet, Latîf isminin bilgi boyutunu vurgular: Hardal tanesi kadar gizli bir şeyi bile Allah bilir ve hesaba katar.' Râzî: 'Latîf ve Habîr isimlerinin birlikte gelmesi; Allah'ın hem ince yerlere ulaştığını (Latîf) hem de orada ne olduğunu bildiğini (Habîr) anlatır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah kuluna öyle yollar açar ki kul hiç beklemiyordur; bu Allah'ın latîfliğidir.", kaynak:"Talâk 65:3 bağlamı; Tirmizî, Tefsir, Talak", derece:"Sahih (âyet)"},
+    {metin:"Kim Allah'a tevekkül ederse Allah ona yeter; rızkını ummadık yerden getirir.", kaynak:"İbn Mâce, Zühd 2; Ahmed, Müsned 1/303", derece:"Hasen"}
+  ],
+  geylani:"Latîf ismi, zorluğun ortasında bile bir incelik taşır. Kapılar kapanmış görünse de Latîf'in parmağıyla açılan görünmez bir kapı her zaman vardır."
+},
+{
+  no:32, arapca:"ٱلْخَبِير", latin:"el-Habîr", anlam:"Her şeyin iç yüzünden haberdar — gizli gerçekleri bilen", grup:"Kemâl",
+  kok:"H-B-R kökü. 'Haber' bilgi, deneyim. Habîr: yalnızca dışını değil, içini; yalnızca olanı değil, olacağını; yalnızca görüneni değil, gizleni bilen. Alîm'den farkı: Alîm bilginin genişliğini, Habîr ise derinliğini ve iç yüzünü vurgular.",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلَّذِى يَتَوَفَّىٰكُم بِٱلَّيْلِ وَيَعْلَمُ مَا جَرَحْتُم بِٱلنَّهَارِ ... وَهُوَ ٱللَّطِيفُ ٱلْخَبِيرُ", meal:"O, sizi geceleyin uyku ile öldürendir; gündüz işlediklerinizi bilir ... O Latîf'tir, Habîr'dir.", kaynak:"En'âm 6:60",
+     tefsir:"İbn Kesîr: 'Uyku ve ölüm benzetmesiyle bağlanan bu âyet, gece yapılan her şeyi ve gündüz işlenen her ameli Allah'ın bildiğini söyler. Habîr ismi bu bağlamda; dışarıya yansıyan değil içten gelen niyeti de bilmek demektir.' Kurtubî: 'Latîf ve Habîr birlikte; ince ulaşan ve her şeyin içyüzünü bilen. İkisi birlikte O'nun her şeyi tam bildiğinin delilidir.'"},
+    {arapca:"إِنَّ ٱللَّهَ عَلِيمٌ خَبِيرٌ", meal:"Şüphesiz Allah her şeyi bilen ve her şeyden haberdar olandır.", kaynak:"Hucurât 49:13",
+     tefsir:"Taberî: 'Bu âyet insanların en şerefli olanının takvâ sahibi olduğunu söyledikten sonra Alîm ve Habîr ismiyle kapanır. Takvânın içteki boyutunu ancak Habîr olan Allah bilir.' Râzî: 'Alîm bilginin genişliğini, Habîr ise derinliğini ifade eder. Her ikisi Allah'ta en üst derecede bulunur.'"}
+  ],
+  hadisler:[
+    {metin:"Ameller niyetlere göredir; herkes niyetine göre karşılık görür.", kaynak:"Buhârî, Bed'ü'l-vahy 1; Müslim, İmaret 155", derece:"Sahih"},
+    {metin:"Allah kalplere bakar; içteki niyeti ve gizli ameli görür.", kaynak:"Müslim, Birr 33; İbn Mâce, Zühd 9", derece:"Sahih"}
+  ],
+  geylani:"Habîr'den hiçbir şey gizli kalmaz. Dışın temiz, için kirli olsa bile O bilir. Bu yüzden ihlâs (içten samimiyet) en büyük ibadettir."
+},
+{
+  no:33, arapca:"ٱلْحَلِيم", latin:"el-Halîm", anlam:"Yumuşak huylu — cezayı hak eden günahkâra bile hemen azap etmeyip sabırla bekleyen", grup:"Cemâl",
+  kok:"H-L-M kökü. 'Hilm' olgunluk, vakar, sakinlik. Halîm fa'îl kalıbı: sürekli ve derin yumuşak huyluluk. İnsan hilm sahibi olabilir ama öfkeyle sınanır; Allah'ın hilmi ise eksiksiz ve ezeli olup hiçbir günahın onu tüketemeyeceği bir sabır içerir.",
+  ayetler:[
+    {arapca:"وَٱعْلَمُوٓا۟ أَنَّ ٱللَّهَ غَفُورٌ حَلِيمٌ", meal:"Bilin ki Allah Gafûr'dur (bağışlayıcı), Halîm'dir.", kaynak:"Bakara 2:235",
+     tefsir:"İbn Kesîr: 'Gafûr ve Halîm isimleri sıklıkla birlikte gelir; çünkü hilm (yumuşaklık) bağışlamanın kapısını açar. Allah günahı hemen cezalandırmaması, bilâhare bağışlamasının zeminini hazırlamasıdır.' Kurtubî: 'Halîm ismi, günahkâra son nefese kadar tövbe kapısının açık olduğunun güvencesidir. Allah acele etmez; kul bu süreyi değerlendirirse kurtuluş bulur.'"},
+    {arapca:"وَلَوْ يُؤَاخِذُ ٱللَّهُ ٱلنَّاسَ بِمَا كَسَبُوا۟ مَا تَرَكَ عَلَىٰ ظَهْرِهَا مِن دَآبَّةٍ", meal:"Eğer Allah insanları kazandıklarıyla hemen cezalandırsaydı yeryüzünde tek bir canlı bırakmazdı.", kaynak:"Fâtır 35:45",
+     tefsir:"Taberî: 'Bu âyet Halîm isminin ne kadar kapsamlı olduğunu gösterir: Allah hemen cezalandırsaydı kimse hayatta kalmazdı. Yeryüzündeki hayat, Allah'ın hilminin en büyük delilidir.' Râzî: 'Hilm ile mühlet vermek arasındaki bağ: Allah günah işleyene anında azap etmez; bu hem lütuf hem sınavdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah, azabı acele etmez; ama mühlet verdiği kuldan da hesap sormadan geçmez.", kaynak:"Buhârî, Rikâk 11; Müslim, Birr 61", derece:"Sahih"},
+    {metin:"Allah'ın hilmine (yumuşaklığına) hiçbir şey benzemez; O'nun merhametinin genişliğine hiçbir şey ulaşamaz.", kaynak:"Müslim, Tevbe 17; Ahmed, Müsned 1/389", derece:"Sahih"}
+  ],
+  geylani:"Halîm olan Allah, seni günah içinde gördüğünde hemen yok etmez; bu mühlet, O'nun seni beklediğinin işaretidir. Bu beklemeyi boşa harcama."
+},
+{
+  no:34, arapca:"ٱلْعَظِيم", latin:"el-Azîm", anlam:"Pek büyük — hiçbir aklın tam kavrayamayacağı sonsuz büyüklük sahibi", grup:"Celâl",
+  kok:"A-Z-M kökü. 'Azamet' büyüklük, ululuk. Azîm fa'îl kalıbı: sonsuz derecede büyük. İnsan azîm olabilir ama sınırlı; Allah'ın azameti ise sonsuz ve kavranamaz. Azîz (güçlü) ile farkı: Azîz gücü, Azîm büyüklüğü ön plana çıkarır.",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ", meal:"O, Aliyy'dir (yüce), Azîm'dir (büyük).", kaynak:"Bakara 2:255 (Âyetü'l-Kürsî)",
+     tefsir:"İbn Kesîr: 'Âyetü'l-Kürsî Aliyy ve Azîm isimleriyle kapanır. Bu iki isim Allah'ın yüceliğinin iki boyutunu anlatır: Aliyy mekânsal ve sıfatsal yüceliği, Azîm ise büyüklüğün akıl almaz boyutunu ifade eder.' Kurtubî: 'Azîm ismi tesbihde kullanılır: Sübhânallâhil-Azîm. Bu ifadeyle kul, Allah'ın büyüklüğünü dile getirirken onun sınırsızlığını da itiraf eder.'"},
+    {arapca:"وَلَقَدْ ءَاتَيْنَـٰكَ سَبْعًا مِّنَ ٱلْمَثَانِى وَٱلْقُرْءَانَ ٱلْعَظِيمَ", meal:"Sana tekrarlanan yedileri (Fâtiha'yı) ve Azîm Kur'ân'ı verdik.", kaynak:"Hicr 15:87",
+     tefsir:"Taberî: 'Kur'ân'ın Azîm diye nitelenmesi, Allah'ın Azîm isminin bu Kitab'a yansıdığını gösterir. Azîm olan Allah'tan gelen Kelam da azîmdir.' Râzî: 'Büyüklüğü kavramak mümkün değildir; yalnızca iz düşümü görülebilir. Kur'ân bu iz düşümünün insan diline yansımasıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Sübhânallâhil-Azîm — dile hafif, terazide ağır, Rahman'a sevimli.", kaynak:"Buhârî, Daavât 65; Müslim, Zikir 31", derece:"Sahih"},
+    {metin:"Rükûda 'Sübhâne Rabbiyel-Azîm' de.", kaynak:"Müslim, Salât 207; Ebû Dâvûd, Salât 148", derece:"Sahih"}
+  ],
+  geylani:"Azîm olan Allah'ın karşısında duran kul kendini gerçekten küçük hisseder. Bu küçüklük hissi, büyüklüğe giden en doğru yoldur."
+},
+{
+  no:35, arapca:"ٱلْغَفُور", latin:"el-Gafûr", anlam:"Çok bağışlayan — günahları örten ve affeden", grup:"Cemâl",
+  kok:"G-F-R kökü. Gaffâr ile aynı kök fakat farklı kalıp. Gaffâr çokluk ve tekrarı (her seferinde bağışlayan); Gafûr ise bağışlamanın genişliğini ve derinliğini vurgular. İkisi birbirini tamamlar. Kur'ân'da Gafûr, Gaffâr'dan daha sık geçer.",
+  ayetler:[
+    {arapca:"وَإِنَّ رَبَّكَ لَذُو مَغْفِرَةٍ لِّلنَّاسِ عَلَىٰ ظُلْمِهِمْ", meal:"Şüphesiz Rabbin, zulümlerine rağmen insanlara karşı mağfiret sahibidir.", kaynak:"Ra'd 13:6",
+     tefsir:"Kurtubî: 'Alâ zulmihim — zulümleri üzerindeyken bile. Bu ifade mağfiretin şartlara bağlı olmadığını göstermez; tövbeye kapının açık olduğunu anlatır.' İbn Kesîr: 'Gafûr isminin bu bağlamda gelmesi şunu söyler: İnsan ne kadar hatalı olursa olsun, Allah'ın bağışlamasının ölçütü insan hatasının büyüklüğü değil, kendi lutfunun genişliğidir.'"},
+    {arapca:"إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا", meal:"Şüphesiz Allah, günahların tümünü bağışlar.", kaynak:"Zümer 39:53",
+     tefsir:"Taberî: 'Cemîan — tümünü. Bu mutlak ifade, tövbe eden her günahkâr için geçerlidir. Hiçbir günahın bu kapsamın dışında olmadığını söyler.' Râzî: 'Şirk bile tövbeyle bağışlanır mı? Müfessirler bu âyetin tövbeyle bağlı olduğunu söyler. Şirk üzere ölüm ayrı bir meseledir; bu âyet tövbe kapısının her günahı kapsadığını anlatır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah her gece: 'Benden af isteyen var mı, affedeyim; rızık isteyen var mı, vereyim' diye seslenir.", kaynak:"Buhârî, Teheccüd 14; Müslim, Müsâfirîn 168", derece:"Sahih"},
+    {metin:"Günahın büyüklüğünden değil, Allah'ın mağfiretinin genişliğinden hareketle tövbe et.", kaynak:"Tirmizî, Daavât 98; İbn Mâce, Zühd 30", derece:"Sahih"}
+  ],
+  geylani:"Gafûr'un kapısına giden, günahlarının ağırlığını değil Allah'ın affının genişliğini tartmalıdır."
+},
+{
+  no:36, arapca:"ٱلشَّكُور", latin:"eş-Şekûr", anlam:"Az amele çok karşılık veren — şükre şükürle karşılık veren", grup:"Cemâl",
+  kok:"Ş-K-R kökü. 'Şükür' minnettarlık, karşılık verme. Şekûr fa'ûl kalıbı: çok şükreden veya çok şükür eden. Allah için bu isim; kulun küçük ameline büyük karşılık veren, hiçbir iyiliği boşa saymayan demektir.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ غَفُورٌ شَكُورٌ", meal:"Şüphesiz Allah Gafûr'dur, Şekûr'dur.", kaynak:"Fâtır 35:30",
+     tefsir:"İbn Kesîr: 'Gafûr ve Şekûr birlikte; biri hatayı siler, diğeri iyiliği misliyle karşılar. Bu iki isim birlikte Allah'ın kuluna karşı tavrını en güzel özetler.' Kurtubî: 'Şekûr isminin kula verdiği motivasyon muazzamdır: Küçük bir iyilik bile karşılıksız kalmayacaktır; hem bağışlanacak hem de ödüllendirilecektir.'"},
+    {arapca:"مَّن ذَا ٱلَّذِى يُقْرِضُ ٱللَّهَ قَرْضًا حَسَنًا فَيُضَـٰعِفَهُۥ لَهُۥٓ أَضْعَافًا كَثِيرَةً", meal:"Kim Allah'a güzel bir borç verir (verir)se, Allah onun karşılığını kat kat artırır.", kaynak:"Bakara 2:245",
+     tefsir:"Taberî: 'Allah'a ödünç vermek — hayır yapmak — karşılığının kat kat verileceğinin vaadini içerir. Bu Şekûr isminin pratik boyutudur.' Râzî: 'Kat kat artırmak; sadece sayısal değil niteliksel artışı da kapsar. Allah'ın Şekûr oluşu, verilen şeyin hem miktarını hem kalitesini yükseltir.'"}
+  ],
+  hadisler:[
+    {metin:"Bir iyilik on katından yediyüz katına kadar, Allah dilediğince daha fazlasıyla karşılanır.", kaynak:"Buhârî, İman 42; Müslim, İman 205", derece:"Sahih"},
+    {metin:"Kim Allah için bir ağaç dikerse, her yaprakta bir hasene yazılır.", kaynak:"Ahmed, Müsned 5/415; Taberânî, Kebîr", derece:"Hasen"}
+  ],
+  geylani:"Şekûr olan Allah, verdiğin küçük bir adım için sana yüz kapı açabilir. Amel küçük olsun büyük olsun; O'nun kefesine koy."
+},
+{
+  no:37, arapca:"ٱلْعَلِىّ", latin:"el-Aliyy", anlam:"En yüce — her şeyin üstünde olan, hiçbir şeyin erişemeyeceği", grup:"Celâl",
+  kok:"A-L-V (yâ ile) kökü. 'Ulüvv' yükseklik, yücelik. Aliyy fa'îl kalıbı: son derece yüce. Allah'ın yüceliği iki boyutlu: (1) Zâtsal yücelik — yaratılmışların üstünde, (2) Sıfatsal yücelik — hiçbir eksiklik taşımayan. Azîm ile sıklıkla birlikte gelir.",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ", meal:"O, Aliyy'dir ve Azîm'dir.", kaynak:"Bakara 2:255 (Âyetü'l-Kürsî)",
+     tefsir:"İbn Kesîr: 'Âyetü'l-Kürsî bu iki isimle biter. Aliyy, Allah'ın her şeyden yüce olduğunu; Azîm ise bu yüceliğin sonsuz büyüklükte olduğunu söyler.' Kurtubî: 'Secde esnasında Rabbiyel-A'lâ (en yüce Rabbim) denmesi bu ismin pratiğe yansımasıdır; en aşağıda olan insan, en yukarıda olan Allah'a secde eder.'"},
+    {arapca:"وَهُوَ ٱلْعَلِىُّ ٱلْكَبِيرُ", meal:"O Aliyy'dir, Kebîr'dir.", kaynak:"Ra'd 13:9",
+     tefsir:"Taberî: 'Aliyy ve Kebîr birlikte; yükseklik ve büyüklük. Bu iki isim birlikte Allah'ın yaratılmışların tamamen dışında ve üstünde olduğunu anlatır.' Râzî: 'Aliyy isminin iki boyutu: (1) Mekânsal ve ontolojik yücelik; (2) Sıfatlarının mükemmelliği. Her ikisi yönünden hiçbir şey O'na yaklaşamaz.'"}
+  ],
+  hadisler:[
+    {metin:"Secdede 'Sübhâne Rabbiyel-A'lâ' de.", kaynak:"Ebû Dâvûd, Salât 148; Tirmizî, Salât 193", derece:"Sahih"},
+    {metin:"Allah'ın Arş'ı suyun üstündedir; semaların üstündedir; her şeyin üstündedir.", kaynak:"Buhârî, Tevhid 22; Müslim, Zikir 28", derece:"Sahih"}
+  ],
+  geylani:"Aliyy olan Allah'ın önünde yerlere kapanan insan, aslında en yüksek makama ulaşır. Alçakgönüllülük, yüceliğin kapısıdır."
+},
+{
+  no:38, arapca:"ٱلْكَبِير", latin:"el-Kebîr", anlam:"Pek büyük — büyüklükte sınır olmayan, her şeyden büyük", grup:"Celâl",
+  kok:"K-B-R kökü. 'Kibr' büyüklük. Kebîr fa'îl kalıbı: büyüklüğü zâtına özgü. Mütekebbir ile farkı: Mütekebbir büyüklüğünü izhar eden; Kebîr ise fiilî olarak büyük olan. Azîm ve Aliyy ile anlam yakınlığı vardır; Kebîr, büyüklüğün sıfatsal boyutunu öne çıkarır.",
+  ayetler:[
+    {arapca:"ذَٰلِكَ بِأَنَّ ٱللَّهَ هُوَ ٱلْحَقُّ وَأَنَّ مَا يَدْعُونَ مِن دُونِهِۦ هُوَ ٱلْبَـٰطِلُ وَأَنَّ ٱللَّهَ هُوَ ٱلْعَلِىُّ ٱلْكَبِيرُ", meal:"Bu; Allah'ın Hakk, O'ndan başka çağrılanların bâtıl, Allah'ın Aliyy ve Kebîr olduğunu kanıtlar.", kaynak:"Hacc 22:62",
+     tefsir:"İbn Kesîr: 'Tevhid delilinin özü bu âyette üç sıfat üzerinden verilir: Hakk (gerçek), Aliyy (yüce), Kebîr (büyük). Bu üçü birlikte bütün putları ve sahte tanrıları çürütür.' Kurtubî: 'Kebîr isminin bu bağlamda gelmesi putlara ve insanlara yönelik bir kıyaslama içerir: Ne kadar büyük olursa olsun bir insan, Allah'ın büyüklüğüyle kıyaslanamaz.'"},
+    {arapca:"وَهُوَ ٱلْعَلِىُّ ٱلْكَبِيرُ", meal:"O, Aliyy'dir ve Kebîr'dir.", kaynak:"Ra'd 13:9",
+     tefsir:"Taberî: 'Aliyy ve Kebîr isimlerinin Ra'd sûresinde gaybı bilmekle ilgili âyetin ardından gelmesi anlam bütünlüğü taşır: Gizliyi bilen, her şeyden yüce ve büyük olandır.' Râzî: 'Kebîr ismi Azîm'den farkı: Azîm büyüklüğün muazzam (ihtişamlı) boyutunu, Kebîr ise büyüklüğün kapsam ve genişliğini vurgular.'"}
+  ],
+  hadisler:[
+    {metin:"Allâhü ekber (Allah en büyüktür) — namazın açılış tekbiridir; her büyüklük iddiası bu tekbirle çöker.", kaynak:"Ebû Dâvûd, Salât 61; Tirmizî, Salât 61", derece:"Sahih"},
+    {metin:"Allah'ın büyüklüğünü tefekkür etmek, nafile ibadetten daha hayırlıdır.", kaynak:"Beyhakî, Şuabü'l-İman 1/136; Münzirî, et-Terğîb", derece:"Hasen"}
+  ],
+  geylani:"Kebîr'in büyüklüğü yanında her şey küçülür; bunu hisseden kul, dünya büyüklerinden korkmaz hale gelir."
+},
+{
+  no:39, arapca:"ٱلْحَفِيظ", latin:"el-Hafîz", anlam:"Koruyan ve saklayan — her şeyi muhafaza eden, amelleri eksiksiz kaydeden", grup:"Kemâl",
+  kok:"H-F-Z kökü. 'Hıfz' koruma, ezberleme, saklama. Hafîz fa'îl kalıbı: çok koruyan. İki boyut: (1) Koruyan — kâinatı, Kur'ân'ı, kulları; (2) Kaydeden — amelleri, sözleri, niyetleri. Hafeze melekleri (koruyucu melekler) de bu kökten gelir.",
+  ayetler:[
+    {arapca:"إِنَّ رَبِّى عَلَىٰ كُلِّ شَىْءٍ حَفِيظٌ", meal:"Şüphesiz Rabbim her şeyi koruyucudur.", kaynak:"Hûd 11:57",
+     tefsir:"İbn Kesîr: 'Hz. Hûd, kavmine bunu söylerken aslında şunu demektedir: Ben elimden geleni yaptım; bundan sonra sizi ne koruyacak ne de neler kaybedeceğiniz Allah'a aittir.' Kurtubî: 'Bu âyet Hafîz isminin iki boyutunu birden kapsar: Allah hem kulun salih amellerini saklayıp hesabını tutar, hem de kulunu tehlikelerden korur.'"},
+    {arapca:"وَرَبُّكَ عَلَىٰ كُلِّ شَىْءٍ حَفِيظٌ", meal:"Rabbin her şeyi koruyan ve gözetendir.", kaynak:"Sebe' 34:21",
+     tefsir:"Taberî: 'Bu âyet cinlerin ve meleklerin gaybı bilmediğini anlatan bir bağlamda geçer. Allah, bunların bilmediği şeyleri de bilir ve korur.' Râzî: 'Hafîz isminin amelleri kaydetme boyutu, kıyamet hesabının temelini oluşturur. Zerre kadar bile kayıp olmaz.'"}
+  ],
+  hadisler:[
+    {metin:"Yatarken Âyetü'l-Kürsî oku; sabaha kadar seni koruyan bir melek görevlendirilir.", kaynak:"Buhârî, Vekâlet 10; Müslim, Müsâfirîn 257", derece:"Sahih"},
+    {metin:"Allah'ı (emirlerini) koru, Allah seni korur; Allah'ı koru, O'nu önünde bulursun.", kaynak:"Tirmizî, Kıyamet 59; Ahmed, Müsned 1/307", derece:"Sahih"}
+  ],
+  geylani:"Hafîz olan Allah'ın korumasına sığınan kul, düşmanını bile O'na havale eder. Gerçek emniyet, zırh ve duvarda değil Hafîz'in hıfzındadır."
+},
+{
+  no:40, arapca:"ٱلْمُقِيت", latin:"el-Mukît", anlam:"Her şeye kuvvet ve gıda veren — bedenlerin ve ruhların rızkını sağlayan", grup:"Kemâl",
+  kok:"K-V-T / K-Y-T kökü. 'Kût' gıda, geçimlik, enerji kaynağı. Mukît if'âl kalıbı: gıda ve güç verenin kendisi. Rezzâk'tan farkı: Rezzâk rızkı veren; Mukît ise bu rızkın bedende ve ruhta güce dönüşmesini sağlayan.",
+  ayetler:[
+    {arapca:"وَكَانَ ٱللَّهُ عَلَىٰ كُلِّ شَىْءٍ مُّقِيتًا", meal:"Allah her şey üzerinde Mukît'tir.", kaynak:"Nisâ 4:85",
+     tefsir:"İbn Kesîr: 'Bu âyet şefaatin ardından gelir; şefaat edenin iyi veya kötü payı olduğunu belirtir. Allah her şeye gücü yeten ve herkese rızkını veren olarak bunu takip eder ve hesap verir.' Kurtubî: 'Mukît için üç anlam aktarılır: (1) Rızık veren, (2) Gücünü gösteren (şahit), (3) Muhafaza eden. İbn Abbâs birinci anlamı tercih eder.'"},
+    {arapca:"وَمَا مِن دَآبَّةٍ فِى ٱلْأَرْضِ إِلَّا عَلَى ٱللَّهِ رِزْقُهَا", meal:"Yeryüzünde hiçbir canlı yoktur ki rızkı Allah üzerine olmasın.", kaynak:"Hûd 11:6",
+     tefsir:"Taberî: 'Her canlı — en küçük böcekten en büyük balinaya kadar — rızkını Allah'tan alır. Mukît isminin kapsayıcılığı burada görülür.' Râzî: 'Rızkı veren Allah'tır; araç ve sebepler yalnızca O'nun belirlediği kanallardır.'"}
+  ],
+  hadisler:[
+    {metin:"Kişinin bakmakla yükümlü olduğuna yeterince nafaka vermesi, günahkâr sayılmaması için yeterlidir.", kaynak:"Müslim, Zekât 40; Ebû Dâvûd, Zekât 45", derece:"Sahih"},
+    {metin:"Helâl kazanç, farz ibadetlerin ardından gelen bir farzdır.", kaynak:"Beyhakî, Şuabü'l-İman 2/87; Taberânî, Evsat", derece:"Hasen"}
+  ],
+  geylani:"Mukît'in rızkını yiyen, başkasına muhtaç gibi el açmamalı; zira gerçek rızık sahibi kapısında durmaktadır."
+},
+{
+  no:41, arapca:"ٱلْحَسِيب", latin:"el-Hasîb", anlam:"Hesap gören ve yeten — her şeyin hesabını tutan ve kuluna yeterli olan", grup:"Kemâl",
+  kok:"H-S-B kökü. 'Hisab' sayma, hesap. Hasîb fa'îl kalıbı, iki anlam: (1) Hesap gören — kıyamette herkesin hesabını tutan; (2) Yeterli olan — kuluna yetecek derecede kâfi. İbn Fâris: 'Hasb, hem saymak hem de bir şeyin yeterli olması anlamına gelir.'",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ كَانَ عَلَىٰ كُلِّ شَىْءٍ حَسِيبًا", meal:"Şüphesiz Allah her şeyin hesabını tutandır.", kaynak:"Nisâ 4:86",
+     tefsir:"İbn Kesîr: 'Selam vermeyle ilgili âyetin ardından Hasîb isminin gelmesi; en küçük sosyal ilişkinin bile hesaba dahil olduğunu gösterir.' Kurtubî: 'Hasîb ismi iki yönlü bir motivasyon sağlar: Hem iyilik yapmaya teşvik eder (hesabı tutulacak), hem de kötülükten alıkoyar (hesabı tutulacak).'"},
+    {arapca:"وَكَفَىٰ بِٱللَّهِ حَسِيبًا", meal:"Hesap görücü olarak Allah yeter.", kaynak:"Nisâ 4:6",
+     tefsir:"Taberî: 'Yetimlerin mallarını hesap etme konusundaki bu âyette Hasîb ismi kullanılır; Allah zaten biliyor, sen gizleyemezsin demektir.' Râzî: 'Hasîb isminin yeterlilik boyutu: Allah'a güvenen kula, Allah yeter. Başkasından hesap ve yardım istemek şart değildir.'"}
+  ],
+  hadisler:[
+    {metin:"Kendi nefsini hesaba çeken kıyamette rahatlıkla hesap verir; hesabını dünyada yapmayan kıyamette zorlanır.", kaynak:"Tirmizî, Kıyamet 25; Ahmed, Müsned 4/18", derece:"Hasen"},
+    {metin:"Kıyamette ilk sorulacak şey namazdır; namaz düzelirse her şey düzelir.", kaynak:"Nesâî, Salât 1; Tirmizî, Salât 188", derece:"Sahih"}
+  ],
+  geylani:"Hasîb'in önünde hesap vereceksin; o hesabı bugün kendin yap, yarın daha kolayına gelsin."
+},
+{
+  no:42, arapca:"ٱلْجَلِيل", latin:"el-Celîl", anlam:"Ululuk sahibi — sıfatlarında haşmet ve celâl taşıyan", grup:"Celâl",
+  kok:"C-L-L kökü. 'Celâl' ululuk, haşmet. Celîl fa'îl kalıbı: büyük ve ulu olan. Cemîl (güzel) ile aynı kalıptan fakat farklı kök; biri güzelliği, diğeri heybeti anlatır. Zü'l-Celâl ismiyle bağlantılıdır. Celâl, Allah'ın korkutucu ve heybetli boyutunu; cemâl ise lütuf ve güzellik boyutunu temsil eder.",
+  ayetler:[
+    {arapca:"وَيَبْقَىٰ وَجْهُ رَبِّكَ ذُو ٱلْجَلَـٰلِ وَٱلْإِكْرَامِ", meal:"Celâl ve ikrâm sahibi Rabbinin yüzü bâki kalacaktır.", kaynak:"Rahmân 55:27",
+     tefsir:"İbn Kesîr: 'Her şey fâni olduğu söylendikten sonra yalnızca Allah'ın Zât'ının kalacağı ilan edilir. Celâl ve ikrâm birlikte; hem haşmet hem de şeref. Bu iki isim Allah'ın tek başına kalan gerçek varlığının iki boyutudur.' Kurtubî: 'Celîl ve Cemîl isimleri Allah'ın iki farklı yönünü yansıtır: Biri korkuyla, diğeri sevgiyle yaklaşmayı gerektirir. Her ikisi dengeli olmalıdır.'"},
+    {arapca:"تَبَـٰرَكَ ٱسْمُ رَبِّكَ ذِى ٱلْجَلَـٰلِ وَٱلْإِكْرَامِ", meal:"Celâl ve ikrâm sahibi Rabbinin ismi ne mübarektir!", kaynak:"Rahmân 55:78",
+     tefsir:"Taberî: 'Rahmân sûresi bu isimle açılır ve biter; Celâl ve İkrâm'ın Allah'ın iki temel tecelli biçimi olduğunu vurgular.' Râzî: 'Yâ Ze'l-Celâli ve'l-İkrâm duası, hem Allah'ın haşmetine hem de cömertliğine birlikte sığınmaktır.'"}
+  ],
+  hadisler:[
+    {metin:"'Yâ Ze'l-Celâli vel-İkrâm' diyerek dua edin; bu isme sarılın.", kaynak:"Tirmizî, Daavât 65; Nesâî, Sehv 95", derece:"Sahih"},
+    {metin:"Allah'ı anmak, O'nun celâlini hatırlamaktır; bu hatırlama kalbi yumuşatır.", kaynak:"Zümer 39:23 bağlamı; Buhârî, Fedâilü'l-Kur'ân 1", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Celîl olan Allah'ın karşısında heybetle titreyen kalp, başka hiçbir şeyden korkmaz. Celâl korkusu, dünya korkularının panzehiridir."
+},
+{
+  no:43, arapca:"ٱلْكَرِيم", latin:"el-Kerîm", anlam:"En cömert — karşılık beklemeksizin bol bol veren, en şerefli", grup:"Cemâl",
+  kok:"K-R-M kökü. 'Kerem' cömertlik ve şeref. Kerîm fa'îl kalıbı: cömertliği zâtına özgü, şeref sahibi. Allah için iki anlam: (1) Sonsuz cömertlik — karşılıksız ve bol veren; (2) Şeref — tüm kıymetlerin kaynağı. İbn Fâris: 'Kerem, zorunluluk değil gönüllü lütufla vermektir.'",
+  ayetler:[
+    {arapca:"يَـٰٓأَيُّهَا ٱلْإِنسَـٰنُ مَا غَرَّكَ بِرَبِّكَ ٱلْكَرِيمِ", meal:"Ey insan! Seni Kerîm Rabbine karşı aldatan nedir?", kaynak:"İnfitâr 82:6",
+     tefsir:"İbn Kesîr: 'Bu âyet insanın aldanışını sorgular. Allah'ın Kerîm oluşu, insana o kadar çok nimet vermiştir ki insan nankörlüğünü fark etmemiştir. Aldatma bu cömertliğin yanlış yorumlanmasından kaynaklanır.' Kurtubî: 'Kerîm ismiyle soru sormak çok dikkat çekicidir: Kötülüğe cesaretlendiren şey, Allah'ın iyiliğinin sonsuzluğuna güvenmektir. Allah'ın cömertliği, günah için zemin değil şükür için vesiledir.'"},
+    {arapca:"وَرَبُّكَ ٱلْغَنِىُّ ذُو ٱلرَّحْمَةِ", meal:"Rabbin, rahmet sahibi Ganiyy'dir.", kaynak:"En'âm 6:133",
+     tefsir:"Taberî: 'Ganiyy (ihtiyaçsız) ve rahmet ile Kerîm'in anlamı örtüşür: Muhtaç olmadığı halde verir; bu gerçek keremdir.' Râzî: 'İnsan cömert olabilir ama elde etmek veya beğenilmek için. Allah'ın kereminde ise hiçbir çıkar ve beklenti yoktur.'"}
+  ],
+  hadisler:[
+    {metin:"Allah Kerîm'dir; el açıp dua eden kulun elini boş çevirmekten haya eder.", kaynak:"Ebû Dâvûd, Salât 358; Tirmizî, Daavât 119", derece:"Hasen-Sahih"},
+    {metin:"Kim ihtiyacını Allah'a arz ederse, Allah ona lâyık şekilde karşılık verir.", kaynak:"Tirmizî, Daavât 109; İbn Mâce, Duâ 13", derece:"Hasen"}
+  ],
+  geylani:"Kerîm'in kapısında dilenci olunmaz; O'nun önünde oturan sultan gibi ağırlanır. El açmak yeterlidir."
+},
+{
+  no:44, arapca:"ٱلرَّقِيب", latin:"er-Rakîb", anlam:"Gözetleyen — her an, her yerde kullarını denetim altında tutan", grup:"Kemâl",
+  kok:"R-K-B kökü. 'Rekabe' boyun, gözleme kulesi. Rakîb fa'îl kalıbı: sürekli gözleyen. İki boyut: (1) Bilgi — her şeyi kaydeden; (2) Yönetim — her şeyin üzerinde hâkimiyet kuran. Hafîz ile anlam yakınlığı vardır; Rakîb gözetimi, Hafîz ise korumayı öne çıkarır.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ كَانَ عَلَيْكُمْ رَقِيبًا", meal:"Şüphesiz Allah sizi gözetendir.", kaynak:"Nisâ 4:1",
+     tefsir:"İbn Kesîr: 'Akrabalık haklarını anlatan bu âyet Rakîb ismiyle biter. En gizli aile meselelerini bile Allah görür ve kaydeder. Bu bilgi, insanı kendi yakınlarına karşı bile dürüst olmaya zorlar.' Kurtubî: 'Rakîb ismi ihsânın temelidir: Allah'ı görür gibi ibadet etmek, O'nun her an bizimle olduğunu bilmekten geçer.'"},
+    {arapca:"وَكَانَ ٱللَّهُ عَلَىٰ كُلِّ شَىْءٍ رَّقِيبًا", meal:"Allah her şeyi gözetleyendir.", kaynak:"Ahzâb 33:52",
+     tefsir:"Taberî: 'Her şey — en küçük eylemden en büyüğüne kadar — Allah'ın gözetimi altındadır. Bu bilgi sürekliliği vurgular: geçmişte değil, şu anda ve gelecekte de gözetliyor.' Râzî: 'Rakîb ismi ile ihsân hadisi arasındaki bağ: İhsânın özü, Allah'ın gözetimini sürekli hissetmektir.'"}
+  ],
+  hadisler:[
+    {metin:"İhsân: Allah'ı görür gibi ibadet etmendir; sen O'nu görmesen de O seni görür.", kaynak:"Buhârî, İman 37; Müslim, İman 1", derece:"Sahih"},
+    {metin:"Gizliyle açık aynı kişi olun; Allah'tan başkasının ağzına bakma.", kaynak:"Tirmizî, Zühd 60; Ahmed, Müsned 5/153", derece:"Hasen"}
+  ],
+  geylani:"Rakîb'in gözü her an üzerindedir. Bunu hisseden kul, yalnız kaldığında insanlardan gizlense bile Allah'tan gizlenemeyeceğini bilir."
+},
+{
+  no:45, arapca:"ٱلْمُجِيب", latin:"el-Mücîb", anlam:"Dualara cevap veren — her çağrıya, her istemeye karşılık veren", grup:"Cemâl",
+  kok:"C-V-B kökü. 'Cevap' vermek. Mücîb if'âl kalıbı: cevap veren, kabul eden. Allah'a özel olan bu isim; dua edeni asla duymazdan gelmeyeceğini, her çağrıya mutlaka bir şekilde karşılık verileceğini bildirir.",
+  ayetler:[
+    {arapca:"وَإِذَا سَأَلَكَ عِبَادِى عَنِّى فَإِنِّى قَرِيبٌ ۖ أُجِيبُ دَعْوَةَ ٱلدَّاعِ إِذَا دَعَانِ", meal:"Kullarım sana Beni sorarlarsa, Ben yakınım; dua edenin duasını kabul ederim.", kaynak:"Bakara 2:186",
+     tefsir:"İbn Kesîr: 'Bu âyet Ramazan ayı orucu âyetleri arasına yerleştirilmiştir; çünkü oruç ve duanın iç içe olduğunu vurgular. Allah yakın ve Mücîb'dir; dua etmek yeterlidir.' Kurtubî: 'İcâbet şartları: Dua edince, samimi olan. Allah'ın icabeti her zaman duanın aynen gerçekleşmesi olmayabilir; bazen daha iyisini verir, bazen belâyı defeder, bazen âhirete saklar.'"},
+    {arapca:"إِنَّ رَبِّى قَرِيبٌ مُّجِيبٌ", meal:"Rabbim yakındır ve duaları kabul edendir.", kaynak:"Hûd 11:61",
+     tefsir:"Taberî: 'Hz. Sâlih'in bu sözü, peygamberlik iddiasının temeli olarak kullanılmıştır: Rabbim benim duama icabet etti; bu icabet O'nun gerçek Rab olduğunun delilidir.' Râzî: 'Yakın ve Mücîb isimleri birlikte: Uzak olsaydı cevap veremezdi; Mücîb olmasaydı yakınlığı fayda vermezdi. İkisi birlikte icâbetin kemalini (mükemmelliğini) anlatır.'"}
+  ],
+  hadisler:[
+    {metin:"Dua, ibadetin özüdür.", kaynak:"Tirmizî, Daavât 1; İbn Mâce, Duâ 1", derece:"Sahih"},
+    {metin:"Üç duanın reddi yoktur: Mazlumun duası, oruçlunun duası, yolcunun duası.", kaynak:"Tirmizî, Daavât 48; İbn Mâce, Duâ 11", derece:"Hasen"}
+  ],
+  geylani:"Mücîb'in kapısını çalmak için özel bir hal şartı yoktur. Her halde, her vakitte, her dilden O'na ulaşılır."
+},
+{
+  no:46, arapca:"ٱلْوَٰسِع", latin:"el-Vâsi'", anlam:"Geniş ihsan sahibi — ilmi, rahmeti ve kudreti sonsuz geniş olan", grup:"Cemâl",
+  kok:"V-S-A kökü. 'Vüs'at' genişlik, bolluk. Vâsi' fa'il kalıbı: genişliği sonsuz. Allah'ın Vâsi' oluşu; hem ilminin, hem rahmetinin hem de kudretinin hiçbir sınır tanımadığı anlamına gelir. Fâtiha'daki 'sırat-ı müstakîm' duasına verilen ilahî güvence olarak da okunabilir.",
+  ayetler:[
+    {arapca:"وَلِلَّهِ ٱلْمَشْرِقُ وَٱلْمَغْرِبُ ۚ فَأَيْنَمَا تُوَلُّوا۟ فَثَمَّ وَجْهُ ٱللَّهِ ۚ إِنَّ ٱللَّهَ وَٰسِعٌ عَلِيمٌ", meal:"Doğu da batı da Allah'ındır; nereye dönerseniz Allah'ın vechi oradadır. Allah Vâsi'dir, Alîm'dir.", kaynak:"Bakara 2:115",
+     tefsir:"İbn Kesîr: 'Bu âyet yön meselesini çözerken Allah'ın Vâsi' oluşunu vurgular: Yön sınırlandırılamaz; Allah'ın varlığı ve rahmeti her yönü kapsar.' Kurtubî: 'Vâsi' ile Alîm birlikte; kapsamlı olan aynı zamanda bilen. Allah'ın genişliği kör değil; her şeyi de bilir.'"},
+    {arapca:"وَٱللَّهُ وَٰسِعٌ حَكِيمٌ", meal:"Allah Vâsi'dir, Hakîm'dir.", kaynak:"Bakara 2:247",
+     tefsir:"Taberî: 'Allah'ın rahmetinin ve lütfunun genişliği sınır tanımaz; ancak bu genişlik hikmetle yönetilir — kimseye rastgele verilmez.' Râzî: 'Vâsi' ismi kulun ümidini besler: Ne kadar uzak olursan ol, Allah'ın rahmetinin dışında değilsindir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'ın rahmeti her şeyi kuşatmıştır.", kaynak:"A'raf 7:156 bağlamı; Buhârî, Tevhid 28; Müslim, Tevbe 17", derece:"Sahih"},
+    {metin:"Allah'ın rahmeti gazabından öne geçmiştir.", kaynak:"Buhârî, Tevhid 15; Müslim, Tevbe 14", derece:"Sahih"}
+  ],
+  geylani:"Vâsi' olan Allah'ın rahmetinin dışında kalabileceğini düşünen insan, O'nu tanımamış demektir."
+},
+{
+  no:47, arapca:"ٱلْحَكِيم", latin:"el-Hakîm", anlam:"Hikmet sahibi — her şeyi en uygun yerinde ve en doğru biçimde yapan", grup:"Kemâl",
+  kok:"H-K-M kökü. 'Hikmet' doğru bilgi ile doğru eylemi birleştirme. Hakîm fa'îl kalıbı: hikmet sahibi, hükmü yerli yerinde olan. Hakem'den farkı: Hakem yargılama yetkisini; Hakîm bilgeliği öne çıkarır. Kur'ân'da en çok geçen isimlerden biridir — özellikle Azîz ile birlikte.",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلْعَزِيزُ ٱلْحَكِيمُ", meal:"O, Azîz ve Hakîm'dir.", kaynak:"İbrahim 14:4",
+     tefsir:"İbn Kesîr: 'Azîz ve Hakîm isimlerinin birlikte gelmesi çok anlamlıdır: Güç, hikmetsiz kullanılırsa zulme dönüşür. Allah'ın gücü (Azîz) daima hikmetle (Hakîm) dengelenir; bu yüzden ilahî tasarrufta hiçbir anlamsızlık yoktur.' Kurtubî: 'Peygamberlerin diliyle yapılan hatalar, ilahî hikmete göre anlam kazanır. Yakup'un oğlunu kaybetmesi, Yusuf'un zindana düşmesi — her biri Hakîm'in planının parçasıydı.'"},
+    {arapca:"إِنَّ ٱللَّهَ كَانَ عَلِيمًا حَكِيمًا", meal:"Şüphesiz Allah Alîm ve Hakîm'dir.", kaynak:"Nisâ 4:11",
+     tefsir:"Taberî: 'Miras hukuku hükümleri bu âyetle sonlandırılır. Allah'ın Alîm ve Hakîm olduğu hatırlatılır: Bu kanunları koyarken hem her şeyi bilmekte hem de en doğru hükmü vermektedir.' Râzî: 'Hikmet, ilim olmadan olmaz; ilim, hikmet olmadan pratik kazanamaz. Allah'ta her ikisi de en üst derecede mevcuttur.'"}
+  ],
+  hadisler:[
+    {metin:"Allah bir kuluna hayır dilerse onu dinde anlayış sahibi kılar.", kaynak:"Buhârî, İlim 13; Müslim, Zekât 98", derece:"Sahih"},
+    {metin:"Hikmet müminin yitik malıdır; nerede bulursa alır.", kaynak:"Tirmizî, İlim 19; İbn Mâce, Zühd 15", derece:"Zayıf (anlam doğrudur)"}
+  ],
+  geylani:"Hakîm'in her hükmünün arkasında gizli bir sebep vardır. Anlamadığın şeyleri inkâr etme; Hakîm olan senden daha ilerisini görür."
+},
+{
+  no:48, arapca:"ٱلْوَدُود", latin:"el-Vedûd", anlam:"Seven ve sevilen — kullarını seven ve sevilmeye en lâyık olan", grup:"Cemâl",
+  kok:"V-D-D kökü. 'Vüdde' derin ve köklü sevgi. Vedûd fa'ûl kalıbı: hem seven hem de sevilen. Hubb (sevgi) ve meveddet (derin bağ) farklıdır; meveddet daha kalıcı ve köklü bir sevgiyi anlatır. Bu isim; Allah'ın kullarına olan sevgisini ve kulun Allah'a olan bağlılığını aynı anda içerir.",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلْغَفُورُ ٱلْوَدُودُ", meal:"O, Gafûr'dur ve Vedûd'dur.", kaynak:"Burûc 85:14",
+     tefsir:"İbn Kesîr: 'Gafûr ve Vedûd birlikte; bağışlayan ve seven. Bu iki ismin peş peşe gelmesi: Günah, sevginin bitmesine yol açmaz. Allah kulunu bağışlarken sevmeyi de bırakmaz.' Kurtubî: 'Vedûd isminin bu sûrede gelmesi dikkat çekicidir: Müminler yakılıp öldürüldükten sonra bu isim geliyor. Zulüm yaşansa bile Allah'ın sevgisi günahkârlar dahil devam eder — hem de en çetin sınavda.'"},
+    {arapca:"إِنَّ ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ سَيَجْعَلُ لَهُمُ ٱلرَّحْمَـٰنُ وُدًّا", meal:"İman edip salih amel işleyenlere Rahman onlar için sevgi (vudd) yaratacaktır.", kaynak:"Meryem 19:96",
+     tefsir:"Taberî: 'Allah; iman edip iyi amel işleyenler için hem kendi katında hem de insanların kalbinde sevgi yaratır. Vedûd ismi bu sevgi yaratmanın kaynağıdır.' Râzî: 'Vudd; ruh sevilmesidir. Beden güzelliği veya servet geçicidir; ruh güzelliğini Allah verir ve bu sevgi kalıcıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah bir kulu severse Cebrail'e sever onu diye bildirir; Cebrail de sever; sonra yerdekiler de onu sever.", kaynak:"Buhârî, Edeb 41; Müslim, Birr 157", derece:"Sahih"},
+    {metin:"Allah'ın sevgisini kazanmak istiyorsan, zühd ile dünyadan el çek ve insanların sevgisini istiyorsan, insanların elindekine göz dikme.", kaynak:"İbn Mâce, Zühd 1; Taberânî, Evsat", derece:"Hasen"}
+  ],
+  geylani:"Vedûd'un sevgisini kazanan, dünya ve ahirette yalnız kalmaz. O sevginin işareti: Başkaları da onu sevmeye başlar."
+},
+{
+  no:49, arapca:"ٱلْمَجِيد", latin:"el-Mecîd", anlam:"Şan ve şeref sahibi — yüce şeref ile büyük cömertliği bir arada taşıyan", grup:"Celâl",
+  kok:"M-C-D kökü. 'Mecd' şeref, yücelik ve cömertliğin birleşimi. Mecîd fa'îl kalıbı. Mâcid'den farkı: Mecîd sıfat; Mâcid ise daha çok fiilî özellik — şanlı olan. Kur'ân'da Salât-ı İbrahîmiye (salavat duası) içinde geçer.",
+  ayetler:[
+    {arapca:"إِنَّهُۥ حَمِيدٌ مَّجِيدٌ", meal:"O, Hamîd ve Mecîd'dir.", kaynak:"Hûd 11:73",
+     tefsir:"İbn Kesîr: 'Hz. İbrahim'in hanımına müjde verilirken Hamîd ve Mecîd isimleri kullanılır. Müjde veren Allah'ın bu iki ismiyle tanıtılması, verilen müjdenin de o şanlı cömertlikle uyumlu olduğunu gösterir.' Kurtubî: 'Hamîd övgüye lâyık olanı; Mecîd ise şanı yüce ve cömert olanı anlatır. İkisi birlikte; hem layık hem bol veren.'"},
+    {arapca:"بَلْ هُوَ قُرْءَانٌ مَّجِيدٌ", meal:"Hayır, O şanlı bir Kur'ân'dır.", kaynak:"Burûc 85:21",
+     tefsir:"Taberî: 'Kur'ân'ın Mecîd diye nitelenmesi; Allah'ın şan ve cömertliğinin bu Kitab'a yansımasıdır. Mecîd Allah'ın sıfatı, Mecîd Kur'ân'ın sıfatı — ikisi aynı kaynaktan beslenir.' Râzî: 'Mecîd Kur'ân; ne zamanla solar ne değeriyle azalır. Allah'ın şanı gibi ebedidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme salli alâ Muhammedin ve alâ âli Muhammed... inneke Hamîdün Mecîd.", kaynak:"Buhârî, Daavât 33; Müslim, Salât 65", derece:"Sahih"},
+    {metin:"Allah'ın şanı tüm şanların üzerindedir; O'nun izni olmadan hiçbir şeref gerçek değildir.", kaynak:"Münâfikûn 63:8 bağlamı; Müslim, Münâfikûn 1", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Mecîd'in şanından nasip almak istiyorsan, O'nun dinine hizmet et. Dine hizmet edenden O'nun şanının bir nuru üzerine düşer."
+},
+{
+  no:50, arapca:"ٱلْبَاعِث", latin:"el-Bâis", anlam:"Dirilten ve gönderen — ölüleri dirilten, peygamberleri ve melekleri görevlendiren", grup:"Kemâl",
+  kok:"B-A-S kökü. 'Ba's' diriltme, gönderme, uyandırma. Bâis fa'il kalıbı: dirilten ve gönderen. İki kullanım: (1) Peygamberleri insanlara gönderen; (2) Kıyamette ölüleri kabirden dirilten. Her iki anlamı da Allah hakkında kullanılır.",
+  ayetler:[
+    {arapca:"وَيَوْمَ يَبْعَثُهُمُ ٱللَّهُ جَمِيعًا فَيُنَبِّئُهُم بِمَا عَمِلُوا۟", meal:"Allah onların hepsini dirilttiği gün yaptıklarını onlara haber verir.", kaynak:"Mücâdele 58:6",
+     tefsir:"İbn Kesîr: 'Ba's ve hesap birlikte; diriltme yalnızca fiziksel değil, hesap için bir araya getirmedir. Bâis ismi bu hesabın gerçekleşeceğinin güvencesidir.' Kurtubî: 'Ba's inkârı, İslam'ın temel esaslarından birini inkâr etmektir. Bâis ismi bu önemli konunun ilahî dayanağıdır.'"},
+    {arapca:"ثُمَّ بَعَثْنَا مِنۢ بَعْدِهِم مُّوسَىٰ وَهَـٰرُونَ إِلَىٰ فِرْعَوْنَ", meal:"Ardından Mûsâ ve Hârûn'u Firavun'a gönderdik.", kaynak:"Yûnus 10:75",
+     tefsir:"Taberî: 'Peygamberlerin gönderilmesi ba's kelimesiyle ifade edilir. Bâis ismi; Allah'ın tarih boyunca vahiy zincirine devam ettiğini anlatır.' Râzî: 'Peygamber göndermek ve ölüleri diriltmek aynı güç tarafından gerçekleşir: Bâis. Vahyi inkar eden ba's'ı da inkâr etmiş olur.'"}
+  ],
+  hadisler:[
+    {metin:"Ben de dahil her peygamber kendi kavmine gönderildi; ben ise kıyamete kadar tüm insanlığa gönderildim.", kaynak:"Buhârî, Teyemmüm 1; Müslim, Mesâcid 5", derece:"Sahih"},
+    {metin:"Kıyamette herkes kabirden, vücuduyla birlikte dirilecektir.", kaynak:"Buhârî, Rikâk 45; Müslim, Cennet 56", derece:"Sahih"}
+  ],
+  geylani:"Bâis'in biri gönderdiğinde git, birini dirilttiğinde kalk. O'nun her hareketi bir başlangıçtır; dirilişi de böyle bil."
+},
+{
+  no:51, arapca:"ٱلشَّهِيد", latin:"eş-Şehîd", anlam:"Her şeye şahit olan — her an, her yerde hazır bulunan ve tanıklık eden", grup:"Kemâl",
+  kok:"Ş-H-D kökü. 'Şehadet' hem şahitlik hem de şehitlik. Şehîd fa'îl kalıbı: her an hazır bulunan tanık. Allah için; görünen-görünmeyen her şeye bizzat şahit olan demektir. Kul için şehit (şahitlik ederek ölen); Allah için ise her şeye bizzat tanık olan.",
+  ayetler:[
+    {arapca:"وَكَفَىٰ بِٱللَّهِ شَهِيدًا", meal:"Şahit olarak Allah yeter.", kaynak:"Nisâ 4:79",
+     tefsir:"İbn Kesîr: 'Allah'ın şahitliği; insanların şahitliğine muhtaç olmayan mutlak bir tanıklıktır. O'nun şahitliği insan itirazlarını gereksiz kılar.' Kurtubî: 'Bu âyet Hz. Peygamber'in tebliğini inkâr edenlere karşı gelir. Allah bizzat şahit olduğu için beşer inkârı bir şey değiştirmez.'"},
+    {arapca:"قُلْ أَىُّ شَىْءٍ أَكْبَرُ شَهَـٰدَةً ۖ قُلِ ٱللَّهُ ۖ شَهِيدٌۢ بَيْنِى وَبَيْنَكُمْ", meal:"De ki: Hangi şey en büyük şahittir? De ki: Allah! Benimle sizin aranızda şahittir.", kaynak:"En'âm 6:19",
+     tefsir:"Taberî: 'Kur'ân'ın en büyük şahidi Allah'tır; O'nun şahitliği tüm inkârları geçersiz kılar.' Râzî: 'Şehîd ismi, günahkârların mahkemede inkâr etme ihtimalini ortadan kaldırır: Her amelin tanığı Allah'tır; kayıtlar tutulmuş, şahit hazırdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'ın şahitliği yeterlidir; başka şahide gerek yoktur.", kaynak:"İbn Kesîr, Tefsîr, En'âm 6:19 bağlamı; Buhârî, Tefsir", derece:"Sahih (âyet)"},
+    {metin:"Amellerin karşılığı verilirken hiçbir şey gizli kalmayacak; her şeyin şahidi hazırdır.", kaynak:"Zelzele 99:7-8 bağlamı; Müslim, Cennet 51", derece:"Sahih"}
+  ],
+  geylani:"Şehîd olan Allah'ın tanıklığını bilen kul, en yalnız anında bile yalnız olmadığını anlar."
+},
+{
+  no:52, arapca:"ٱلْحَقّ", latin:"el-Hakk", anlam:"Gerçek ve mutlak varlık — varlığı zorunlu, her şeyin dayanağı olan", grup:"Zât",
+  kok:"H-K-K kökü. 'Hakk' zorunluluk, doğruluk, gerçeklik. Bu isim hem sıfat hem özel isim gibi kullanılır. Allah'ın Hakk oluşu; O'nun varlığının zorunlu (vâcib) olduğunu, yani var olmak için başka bir şeye muhtaç olmadığını ifade eder. Aynı zamanda söylediği her şeyin gerçek olduğunu bildirir.",
+  ayetler:[
+    {arapca:"فَذَٰلِكُمُ ٱللَّهُ رَبُّكُمُ ٱلْحَقُّ ۖ فَمَاذَا بَعْدَ ٱلْحَقِّ إِلَّا ٱلضَّلَـٰلُ", meal:"İşte bu, gerçek Rabbiniz Allah'tır. Haktan sonra sapıklıktan başka ne var ki?", kaynak:"Yûnus 10:32",
+     tefsir:"İbn Kesîr: 'Kâinatın yaratılması ve yönetilmesi delil gösterildikten sonra bu âyet gelir: Tüm bu deliller Hakk olan Allah'ı gösterir; O'ndan başkasına yönelmek sapıklıktır.' Kurtubî: 'Hakk isminin en derin anlamı: Varlığı kendinden olan. Her şey başkasına muhtaçken Allah hiçbir şeye muhtaç değildir — bu zorunlu varlıktır.'"},
+    {arapca:"ذَٰلِكَ بِأَنَّ ٱللَّهَ هُوَ ٱلْحَقُّ وَأَنَّهُۥ يُحْىِ ٱلْمَوْتَىٰ", meal:"Bu; Allah'ın Hakk olduğunu ve ölüleri O'nun dirilteceğini göstermektedir.", kaynak:"Hacc 22:6",
+     tefsir:"Taberî: 'Hakk ismi ba's (diriliş) ile birlikte gelir; çünkü Hakk olan Allah'ın vaadi de Hakk'tır. Diriliş vaadi gerçektir, çünkü vaad eden Hakk'tır.' Râzî: 'Hakk ismini anlamak, hem Allah'ın varlığını hem de O'nun söylediklerinin doğruluğunu kabul etmeyi gerektirir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme leke'l-hamd, ente'l-Hakk... — Allah'ım hamd Sanadır, Sen Hakk'sın.", kaynak:"Buhârî, Teheccüd 1; Müslim, Müsâfirîn 199", derece:"Sahih"},
+    {metin:"Hakkı söyle; her ne kadar acı gelse de.", kaynak:"Tirmizî, Fiten 74; Ahmed, Müsned 5/252", derece:"Hasen"}
+  ],
+  geylani:"Hakk ismi, zikredenin diline doğruluk nuru geçirir. Hakk'ı çok anan, yanlış söylemekten utanmaya başlar."
+},
+{
+  no:53, arapca:"ٱلْوَكِيل", latin:"el-Vekîl", anlam:"Güvenilen vekil — kendisine havale edilen her işi en iyi bilen ve yönetilen", grup:"Cemâl",
+  kok:"V-K-L kökü. 'Tevkîl' bırakmak, güvenip havale etmek. Vekîl fa'îl kalıbı: kendisine güvenilip bırakılan. Tevekkül (Allah'a güvenip bırakmak) bu kökten gelir. Allah için; kendisine havale edilen her şeyi en iyi bilen, yöneten ve sonuçlandırandır.",
+  ayetler:[
+    {arapca:"وَتَوَكَّلْ عَلَى ٱللَّهِ ۚ وَكَفَىٰ بِٱللَّهِ وَكِيلًا", meal:"Allah'a tevekkül et; vekil olarak Allah yeter.", kaynak:"Ahzâb 33:3",
+     tefsir:"İbn Kesîr: 'Vekîl ismi tevekkülün temelini oluşturur: Güvenilecek tek gerçek vekil Allah'tır. İnsan vekil olabilir ama sınırlıdır; Allah'ın vekilliği sınırsızdır.' Kurtubî: 'Kefâ (yeter) ifadesi mutlaktır; yani Allah'ın vekilliği tüm ihtiyaçları karşılar, hiçbir eksiklik yoktur.'"},
+    {arapca:"حَسْبُنَا ٱللَّهُ وَنِعْمَ ٱلْوَكِيلُ", meal:"Allah bize yeter; O ne güzel vekildir!", kaynak:"Âl-i İmrân 3:173",
+     tefsir:"Taberî: 'Bu cümle, Uhud sonrası tehdit edilen sahabilerin Hz. Peygamber ile birlikte söylediği sözdür. Allah'a güven, düşman korku ve kalabalığını geçersiz kılar.' Râzî: 'Hasbünallah — Allah yeter ifadesi; ihtiyaçların tümünü Allah'a havale etmenin formülüdür. Hz. İbrahim ateşe atılırken de bu cümleyi söylemiştir.'"}
+  ],
+  hadisler:[
+    {metin:"Kim 'Hasbiyallâh lâ ilâhe illâ hüve aleyhi tevekkeltü' derse Allah ona dünyanın ve ahiretin güzelliklerini yeter.", kaynak:"Ebû Dâvûd, Salât 261; Tirmizî, Daavât 62", derece:"Hasen"},
+    {metin:"Gerçek tevekkül; esbaba (sebeplere) sarılıp ardından Allah'a bırakmaktır.", kaynak:"Tirmizî, Kıyamet 60 bağlamı; Ahmed, Müsned 1/307", derece:"Hasen"}
+  ],
+  geylani:"Vekîl'e havale eden, sonucu merak etmez; zira Vekîl'in bilgisi ve gücü sonsuzken neden endişelensin ki?"
+},
+{
+  no:54, arapca:"ٱلْقَوِىّ", latin:"el-Kaviyy", anlam:"Güçlü — hiçbir şeyin zayıflatamayacağı sonsuz güç sahibi", grup:"Celâl",
+  kok:"K-V-V kökü. 'Kuvvet' güç, enerji. Kaviyy fa'îl kalıbı: son derece güçlü. Allah'ın gücü; azalmayan, yorulmayan, tükenmez. Metîn ile anlam yakınlığı vardır; Kaviyy güçlülüğü, Metîn ise bu gücün sarsılmazlığını vurgular.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ قَوِىٌّ شَدِيدُ ٱلْعِقَابِ", meal:"Şüphesiz Allah güçlüdür, azabı çetindir.", kaynak:"Enfâl 8:52",
+     tefsir:"İbn Kesîr: 'Kaviyy ve Şedîdü'l-İkab birlikte; güç hem ödülde hem azapta geçerlidir. Allah'ın gücü yalnızca iyilere yardımda değil, kötülere azapta da görünür.' Kurtubî: 'Kaviyy ismi, dünya güçlerine karşı en büyük tesellilerden biridir: Güçlü görünen zalimler, Kaviyy'in gücü yanında sönük kalır.'"},
+    {arapca:"إِنَّ ٱللَّهَ هُوَ ٱلرَّزَّاقُ ذُو ٱلْقُوَّةِ ٱلْمَتِينُ", meal:"Şüphesiz rızkı veren güç ve kuvvet sahibi Allah'tır.", kaynak:"Zâriyât 51:58",
+     tefsir:"Taberî: 'Rezzâk, Kaviyy ve Metîn üç isim birlikte; Allah hem rızkı hem gücü hem de bu gücün sürekliliğini bir arada taşır.' Râzî: 'Güçlü olan verebilir; güçsüz olan istese de veremez. Allah'ın Kaviyy oluşu, Rezzâk isminin güvencesidir.'"}
+  ],
+  hadisler:[
+    {metin:"Güçlü mümin, zayıf müminden Allah'a daha sevimlidir; her ikisinde de hayır vardır.", kaynak:"Müslim, Kader 34; İbn Mâce, Mukaddime 10", derece:"Sahih"},
+    {metin:"Allah güçlüdür ve güçlüleri sever; zayıflığı tercih etmeyi ve tembelliği sevmez.", kaynak:"Ahmed, Müsned 1/307; Beyhakî, Şuab 3/232", derece:"Hasen"}
+  ],
+  geylani:"Kaviyy'e dayanarak hareket et; O güçlüyken sen zayıf düşsen bile O'nun gücü yeter."
+},
+{
+  no:55, arapca:"ٱلْمَتِين", latin:"el-Metîn", anlam:"Sarsılmaz — gücü hiç eksilmeyen ve asla zayıflamayan", grup:"Celâl",
+  kok:"M-T-N kökü. 'Metin' sert, sağlam, dayanıklı. Metîn fa'îl kalıbı: gücünde eksilik, yorgunluk ve sarsıntı olmayan. Kaviyy ile birlikte; Kaviyy gücü, Metîn bu gücün sürekliliğini ve sağlamlığını vurgular.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ هُوَ ٱلرَّزَّاقُ ذُو ٱلْقُوَّةِ ٱلْمَتِينُ", meal:"Rızık veren, güç ve kuvvet sahibi Allah'tır.", kaynak:"Zâriyât 51:58",
+     tefsir:"İbn Kesîr: 'Metîn ismi; Allah'ın gücünün hiçbir şey tarafından azaltılamayacağını söyler. O ne yorulur ne zayıflar ne de herhangi bir şey O'ndan güç çalabilir.' Kurtubî: 'Bu üç isim: Rezzâk, Kaviyy, Metîn — birlikte tevekkülün en güçlü dayanağını oluşturur: Hem veren, hem güçlü, hem de bu güç hiç bitmez.'"},
+    {arapca:"وَلَا يَئُودُهُۥ حِفْظُهُمَا", meal:"İkisini (gökleri ve yeri) korumak O'na ağır gelmez.", kaynak:"Bakara 2:255 (Âyetü'l-Kürsî)",
+     tefsir:"Taberî: 'Âyetü'l-Kürsî'nin bu ifadesi Metîn ismini özetler: Sonsuz kâinatı sürdürmek O'na hiç ağır gelmez, yorulmaz. Bu güç hem tam hem de sarsılmazdır.' Râzî: 'İnsanın en büyük eserini sürdürmek yorar ve tüketir. Allah ise en büyük yaratılmışı sürdürürken hiç etkilenmez — Metîn isminin sırrı budur.'"}
+  ],
+  hadisler:[
+    {metin:"Allah uyuklamaz ve uyumaz; O'nun gücü hiç eksilmez.", kaynak:"Müslim, İman 293; Nesâî, Sehv 95", derece:"Sahih"},
+    {metin:"Allah gece ve gündüz yorulmaksızın yaratmaya, rızık vermeye devam eder.", kaynak:"Buhârî, Tevhid 22; Müslim, Zikir 37", derece:"Sahih"}
+  ],
+  geylani:"Metîn'e dayanan kul, uzun yolda yorulsa bile destek alır. O'nun gücü bitmediği için senin yolun da bitmez."
+},
+{
+  no:56, arapca:"ٱلْوَلِىّ", latin:"el-Veliyy", anlam:"Dost ve yardımcı — müminlerin dostu, koruyucusu ve yardımcısı", grup:"Cemâl",
+  kok:"V-L-V kökü. 'Vilâyet' dostluk, koruma, yönetim. Veliyy fa'îl kalıbı: dost, yardımcı, koruyucu. Allah için; müminleri seven, destekleyen ve koruyan. Kul için ise Allah'a yakın olan (Allah'ın velisi). Bu isim hem Allah'ın insanlara yönelik tarafını hem de kulun Allah'a yönelik tarafını kapsar.",
+  ayetler:[
+    {arapca:"ٱللَّهُ وَلِىُّ ٱلَّذِينَ ءَامَنُوا۟ يُخْرِجُهُم مِّنَ ٱلظُّلُمَـٰتِ إِلَى ٱلنُّورِ", meal:"Allah, inananların velisidir; onları karanlıklardan nura çıkarır.", kaynak:"Bakara 2:257",
+     tefsir:"İbn Kesîr: 'Veliyy isminin en güzel pratiği bu âyette; Allah müminlerin velisi olarak onları cehaletten ilme, günahtan takvaya, karanlıktan aydınlığa çıkarır.' Kurtubî: 'Zulümât (karanlıklar) çoğul; nur ise tekil. Sapkınlık yolları çoktur; doğru yol tektir. Veliyy olan Allah, bu tek yola çıkarır.'"},
+    {arapca:"أَلَآ إِنَّ أَوْلِيَآءَ ٱللَّهِ لَا خَوْفٌ عَلَيْهِمْ وَلَا هُمْ يَحْزَنُونَ", meal:"Dikkat edin! Allah'ın velileri için ne korku ne üzüntü vardır.", kaynak:"Yûnus 10:62",
+     tefsir:"Taberî: 'Velîlerin sıfatı: Âyetin devamında iman ve takva ile açıklanır. Allah'ın velisi olmak; özel bir mertebeye ulaşmak değil, iman ve takvayı sürdürmektir.' Râzî: 'Korku ve üzüntünün kalkması; dünya sıkıntılarının yok olacağı anlamında değil, kalbin Allah'a bağlanmasıyla bu duyguların etkisini yitireceği anlamındadır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah buyurdu: Kim Benim velime düşmanlık ederse Benimle savaşmış olur.", kaynak:"Buhârî, Rikâk 38", derece:"Sahih"},
+    {metin:"Velîler; birbirini görünce Allah hatıra gelir.", kaynak:"İbn Mâce, Zühd 44; Taberânî, Kebîr", derece:"Hasen"}
+  ],
+  geylani:"Veliyy olan Allah'ı dost edinen, tüm düşmanlardan emin olur; zira O'nun dostu, düşmanlarından güçlüdür."
+},
+{
+  no:57, arapca:"ٱلْحَمِيد", latin:"el-Hamîd", anlam:"Övülmeye lâyık — zâtında tüm övgülerin odaklandığı", grup:"Cemâl",
+  kok:"H-M-D kökü. 'Hamd' övgü, şükür. Hamîd fa'îl kalıbı: övgüye lâyık. Mahmûd (övülen) ile farkı: Mahmûd başkalarının övdüğü; Hamîd ise zâtında övgüyü hak eden. İnsanlar övse de övmese de O Hamîd'dir. Muhammed ve Ahmed isimleri de aynı kökten gelir.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ لَغَنِىٌّ حَمِيدٌ", meal:"Şüphesiz Allah Ganiyy ve Hamîd'dir.", kaynak:"Lokmân 31:26",
+     tefsir:"İbn Kesîr: 'Ganiyy (hiçbir şeye muhtaç olmayan) ve Hamîd (övgüye lâyık) birlikte; muhtaç olmadığı halde verir ve bu verme O'nu övgüye lâyık kılar. İnsanın şükrü O'na bir şey katmaz; şükrü terk etmesi de bir şey eksiltmez — O zaten Hamîd'dir.' Kurtubî: 'Fâtiha'nın El-Hamdülillah ile başlaması, tüm ibadetin özünün hamd olduğunu gösterir. Bu hamd, Hamîd olan Allah'a yöneliktir.'"},
+    {arapca:"وَإِن تَكْفُرُوا۟ فَإِنَّ ٱللَّهَ غَنِىٌّ حَمِيدٌ", meal:"Nankörlük ederseniz bilin ki Allah Ganiyy ve Hamîd'dir.", kaynak:"İbrahim 14:8",
+     tefsir:"Taberî: 'Nankörlük Allah'a zarar vermez; O'nun Hamîd'liği insanların şükrüne bağlı değildir.' Râzî: 'Bu âyet hem uyarı hem de teselli içerir: İnsan şükretmeli; ancak şükrü bıraksa bile Allah'ın övgüye lâyıklığı değişmez.'"}
+  ],
+  hadisler:[
+    {metin:"El-hamdülillah, mizanda ağır gelir.", kaynak:"Müslim, Tahâret 1; Tirmizî, Daavât 60", derece:"Sahih"},
+    {metin:"Allah'tan ister ve hamd ederek başla; hamdın olmadığı dua eksiktir.", kaynak:"Ebû Dâvûd, Salât 178; Tirmizî, Daavât 65", derece:"Hasen"}
+  ],
+  geylani:"Hamîd'e hamd eden, övgünün kaynağını bulmuş demektir. Başkasını övmek için harcanan her kelime, asıl kaynağı unutmaktır."
+},
+{
+  no:58, arapca:"ٱلْمُحْصِى", latin:"el-Muhsî", anlam:"Her şeyi sayıp bilen — hiçbir ayrıntıyı gözden kaçırmayan kayıt tutucu", grup:"Kemâl",
+  kok:"H-S-V kökü. 'İhsâ' saymak, istatistik. Muhsî if'âl kalıbı: her şeyi sayıp kaydeden. Hafîz koruyan; Muhsî ise sayıp kaydeden. Kıyamette hiçbir şeyin eksik olmadığı hesabın dayanağı bu isimdir.",
+  ayetler:[
+    {arapca:"وَأَحْصَىٰ كُلَّ شَىْءٍ عَدَدًا", meal:"Her şeyi sayı olarak saydı (kayıt altına aldı).", kaynak:"Cin 72:28",
+     tefsir:"İbn Kesîr: 'Her şey — bir insan ömründeki her nefes, her kelime, her adım — Allah'ın katında sayılıp kayıt altına alınmıştır. Bu, Muhsî isminin en kapsamlı ifadesidir.' Kurtubî: 'Sayı kavramı nihayete işaret eder: Her şey sayılabilir sınırlar içindedir; yalnızca Allah'ın sıfatları sınırsızdır.'"},
+    {arapca:"وَكُلَّ شَىْءٍ أَحْصَيْنَـٰهُ فِىٓ إِمَامٍ مُّبِينٍ", meal:"Her şeyi apaçık bir imâmda (Levh-i Mahfûz'da) saydık.", kaynak:"Yâsîn 36:12",
+     tefsir:"Taberî: 'İmâm-ı mübîn; her şeyin yazıldığı ana kayıt defteri. Muhsî ismi bu kayıt tutma eyleminin fâilidir.' Râzî: 'Sayılıp kaydedilmek; hesabın en tarafsız ve en eksiksiz biçimde görüleceğinin delilidir. Ne çok verilir ne az.'"}
+  ],
+  hadisler:[
+    {metin:"Kıyamette kul beş şeyden sorulur: Ömrünü nerede geçirdi, gençliğini nerede harcadı, malını nereden kazandı-nerede harcadı, ilmiyle ne yaptı.", kaynak:"Tirmizî, Kıyamet 1; Ahmed, Müsned 5/231", derece:"Sahih"},
+    {metin:"Zerre kadar iyilik yapan onu görür, zerre kadar kötülük yapan onu görür.", kaynak:"Zelzele 99:7-8 bağlamı; Müslim, Cennet 51", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Muhsî'nin defterinde küçük günah diye bir şey yoktur; her şey yazılıdır. Bu yüzden küçük günahı küçümseme."
+},
+{
+  no:59, arapca:"ٱلْمُبْدِئ", latin:"el-Mübdi'", anlam:"İlk yaratan — her şeyi örneksiz olarak ilk defa var eden", grup:"Kemâl",
+  kok:"B-D-E kökü. 'İbdâ' yoktan ve örneksiz yaratma. Mübdi' if'âl kalıbı: ilk ve örneksiz yaratan. Bâri' ile anlam yakınlığı: Bâri' ayırt ederek var eden; Mübdi' ise başlatma ve ilk kez var etme boyutunu vurgular.",
+  ayetler:[
+    {arapca:"إِنَّهُۥ هُوَ يُبْدِئُ وَيُعِيدُ", meal:"Şüphesiz O başlatır (ibda eder) ve iade eder.", kaynak:"Burûc 85:13",
+     tefsir:"İbn Kesîr: 'Mübdi' ve Muîd isimlerinin birlikte gelmesi, yaratmanın iki aşamasını anlatır: İlk yaratma ve yeniden yaratma. Bunları yapabilen, aynı zamanda yakmak ve bağışlamak gibi zıt işleri de yapabilir.' Kurtubî: 'İlk yaratmayı kabul eden yeniden dirilişi inkâr edemez: Yoktan var eden, var olandan da var eder; ikincisi daha kolaydır.'"},
+    {arapca:"أَوَلَمْ يَرَوْا۟ كَيْفَ يُبْدِئُ ٱللَّهُ ٱلْخَلْقَ ثُمَّ يُعِيدُهُ", meal:"Allah'ın yaratmayı nasıl başlattığını, sonra nasıl iade ettiğini görmüyorlar mı?", kaynak:"Ankebût 29:19",
+     tefsir:"Taberî: 'Bu âyet; diriliş inkârcılarına delil gösterir: Çevrenizdeki her bahar yeniden yaratmanın örneğidir.' Râzî: 'Mübdi' ismi; yaratmanın kaynağının hiçbir dışsal gereklilik veya malzeme olmaksızın gerçekleştiğini bildirir. Saf irade ve kudrettir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah, yaratmadan önce de vardı; Arş su üzerindeydi.", kaynak:"Buhârî, Bed'ül-halk 1; Müslim, Zikir 28", derece:"Sahih"},
+    {metin:"Allah her şeyi takdir etmişti; semâlar ve arz yaratılmadan elli bin yıl önce.", kaynak:"Müslim, Kader 16; Tirmizî, Kader 17", derece:"Sahih"}
+  ],
+  geylani:"Mübdi' olan Allah, seni de örneksiz ve benzersiz yarattı. Başkası gibi olmaya çalışmak, O'nun sanatını küçümsemektir."
+},
+{
+  no:60, arapca:"ٱلْمُعِيد", latin:"el-Muîd", anlam:"Yeniden yaratan — ölümden sonra her şeyi başlangıcına döndüren", grup:"Kemâl",
+  kok:"A-V-D kökü. 'İâde' geri döndürme, tekrarlama. Muîd if'âl kalıbı: yeniden var eden, iade eden. Diriliş (ba's) bu ismin en büyük tecellisidir. Mübdi' ile çift: Başlatan ve yeniden yaratan.",
+  ayetler:[
+    {arapca:"وَهُوَ ٱلَّذِى يَبْدَؤُا۟ ٱلْخَلْقَ ثُمَّ يُعِيدُهُۥ وَهُوَ أَهْوَنُ عَلَيْهِ", meal:"O, yaratmayı başlatır sonra iade eder; bu O'na daha kolaydır.", kaynak:"Rûm 30:27",
+     tefsir:"İbn Kesîr: 'Ehven aleyhi (O'na daha kolay) ifadesi: Allah için kolay-zor farkı yoktur; bu insanın anlayışına hitap eder. İlk yaratmayı kabul eden, tekrar yaratmayı da kabul etmelidir.' Kurtubî: 'Muîd ismi kıyamet inancının ilahî dayanağıdır. Allah yoktan var etmiştir; var olandan yeniden var etmesi çok daha belirgindir.'"},
+    {arapca:"إِنَّ ٱلَّذِى فَرَضَ عَلَيْكَ ٱلْقُرْءَانَ لَرَآدُّكَ إِلَىٰ مَعَادٍ", meal:"Kur'ân'ı sana farz kılan, seni dönüş yerine (âhirete) kesinlikle döndürecektir.", kaynak:"Kasas 28:85",
+     tefsir:"Taberî: 'Meâd (dönüş yeri) âhireti ifade eder. Allah'ın Muîd oluşu; her şeyin O'na geri döneceğinin ilanıdır.' Râzî: 'Her şeyin Allah'a dönüşü; fiziksel diriliş kadar ruhî bir dönüşü de kapsar. Muîd, bu dönüşün sahibidir.'"}
+  ],
+  hadisler:[
+    {metin:"Kabirde çürüyen kemikleri Allah toplar ve yeniden diriltir.", kaynak:"Buhârî, Tefsir, Yâsîn; Müslim, Cennet 56", derece:"Sahih"},
+    {metin:"Herkes öldüğü hal üzere diriltilir.", kaynak:"Müslim, Cennet 56; İbn Mâce, Zühd 31", derece:"Sahih"}
+  ],
+  geylani:"Muîd'in huzuruna gideceksin. Orada ilk yaratılışının sahibi ile karşılaşacaksın. O'na nasıl gittiğin, dünyada nasıl yaşadığına bağlıdır."
+},
+{
+  no:61, arapca:"ٱلْمُحْيِى", latin:"el-Muhyî", anlam:"Hayat veren — ölü toprağı, ruhları ve kalpleri dirilten", grup:"Kemâl",
+  kok:"H-Y-V kökü. 'Hayat' yaşam. Muhyî if'âl kalıbı: hayat veren. İki boyut: (1) Fiziksel hayat — canlılara can veren; (2) Manevî hayat — kalplere iman ve hidayet vererek dirilten. Mümît ile çifttir.",
+  ayetler:[
+    {arapca:"وَٱللَّهُ يُحْيِى وَيُمِيتُ", meal:"Allah diriltir ve öldürür.", kaynak:"Âl-i İmrân 3:156",
+     tefsir:"İbn Kesîr: 'Muhyî ve Mümît isimleri birlikte; hayat ve ölüm yalnız Allah'ın elindedir. Savaşta ölenler Allah'ın izninde öldü; geri kalanlar da O'nun izniyle yaşıyor.' Kurtubî: 'Hayat vermek yalnızca fiziksel değildir; Kur'ân'da iman da hayat olarak nitelenir. Muhyî ismi her iki boyutu kapsar.'"},
+    {arapca:"يُحْيِى ٱلْأَرْضَ بَعْدَ مَوْتِهَا", meal:"Ölümünün ardından yeri O diriltir.", kaynak:"Rûm 30:50",
+     tefsir:"Taberî: 'Toprağın baharda dirilmesi; ba'sın (diriliş) en somut örneğidir. Muhyî ismi bunu her yıl gözler önüne serer.' Râzî: 'Fiziksel diriliş görenler manevî dirilişi inkâr edemez. Muhyî ismi hem tabiat hem de ruh için geçerlidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'ım, beni ihyâ et (dirilt) — ilim ile, ibadetle, sağlıkla.", kaynak:"Tirmizî, Daavât 80; Ahmed, Müsned 1/247", derece:"Hasen"},
+    {metin:"Kur'ân'ı oku; o kalpleri diriltir.", kaynak:"Buhârî, Fedâilü'l-Kur'ân 1; Müslim, Müsâfirîn 245", derece:"Sahih"}
+  ],
+  geylani:"Muhyî, ölü kalpleri de diriltir. Bu için terk etme; O her an seni diriltebilir."
+},
+{
+  no:62, arapca:"ٱلْمُمِيت", latin:"el-Mümît", anlam:"Ölüm veren — her canlıya ölümü yaratan ve ulaştıran", grup:"Celâl",
+  kok:"M-V-T kökü. 'Mevt' ölüm. Mümît if'âl kalıbı: ölüm veren. Ölüm, bir yok oluş değil; Allah'ın bir eylemidir ve yalnızca O'ndan gelir. Muhyî ile çifttir; ikisi Allah'ın mutlak hayat ve ölüm tasarrufunu birlikte anlatır.",
+  ayetler:[
+    {arapca:"ٱلَّذِى خَلَقَ ٱلْمَوْتَ وَٱلْحَيَوٰةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا", meal:"Hanginizin daha güzel amel işleyeceğini denemek için ölümü ve hayatı yaratan O'dur.", kaynak:"Mülk 67:2",
+     tefsir:"İbn Kesîr: 'Ölüm bile bir yaratmadır; Mümît ismi bunu söyler. Ölüm; sınav arenasının kapanmasıdır. Ahsenü amelen (en güzel amel) ifadesi; en çok değil en ihlaslı ve en doğru ameli kasteder.' Kurtubî: 'Ölümün hayattan önce zikredilmesi dikkat çekicidir; zira ölüm hatırlanınca amel düzelir.'"},
+    {arapca:"كُلُّ نَفْسٍ ذَآئِقَةُ ٱلْمَوْتِ", meal:"Her nefis ölümü tadacaktır.", kaynak:"Âl-i İmrân 3:185",
+     tefsir:"Taberî: 'Tattırmak (zevk ettirmek) ifadesi; ölümün bir deneyim olduğunu söyler. Her canlı bu deneyimi yaşayacaktır.' Râzî: 'Ölümü tattıran Mümît ismidir. Bu ismi bilen; ölümü inkâr etmek yerine hazırlık yapar.'"}
+  ],
+  hadisler:[
+    {metin:"Ölümü çok hatırlayın; o her zevki yok eder.", kaynak:"Tirmizî, Zühd 4; İbn Mâce, Zühd 31", derece:"Sahih"},
+    {metin:"Akıllı kimse ölümü düşünen ve ardından hazırlık yapandır.", kaynak:"Tirmizî, Kıyamet 25; İbn Mâce, Zühd 31", derece:"Hasen"}
+  ],
+  geylani:"Mümît'i unutma; hayat sana ucuz görünmesin. Her nefes, bir sonraki yokluğa yaklaşmaktır."
+},
+{
+  no:63, arapca:"ٱلْحَىّ", latin:"el-Hayy", anlam:"Diri olan — ölümsüz ve ezeli hayat sahibi", grup:"Zât",
+  kok:"H-Y-V kökü. 'Hayat' yaşam. Hayy fa'îl kalıbı: gerçek ve eksiksiz hayat sahibi. Allah'ın hayatı; başlangıcı olmayan, sonu olmayan, sebebi olmayan, hiçbir şeye muhtaç olmayan hayattır. Kayyûm ile çifttir ve ism-i a'zam olarak bilinir.",
+  ayetler:[
+    {arapca:"ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ", meal:"Allah — O'ndan başka ilah yoktur; Hayy ve Kayyûm'dur.", kaynak:"Bakara 2:255 (Âyetü'l-Kürsî)",
+     tefsir:"İbn Kesîr: 'Hayy ve Kayyûm isimleri ism-i a'zamın (en büyük ismin) içinde olduğu rivayet edilir. Hayy, yaşayan; Kayyûm, her şeyi ayakta tutan. İkisi birlikte Allah'ın varlığının en temel iki boyutunu anlatır.' Kurtubî: 'Hayy isminin farkı: İnsanın hayatı arız olmuştur (sonradan gelmiştir); Allah'ın hayatı ise zâtına özgüdür ve ezeli-ebedidir.'"},
+    {arapca:"وَتَوَكَّلْ عَلَى ٱلْحَىِّ ٱلَّذِى لَا يَمُوتُ", meal:"Ölmeyen Hayy'a tevekkül et.", kaynak:"Furkân 25:58",
+     tefsir:"Taberî: 'Tevekkülün doğru adresi: Ölmeyen Hayy. İnsana tevekkül edilmez çünkü insan ölür; servete tevekkül edilmez çünkü geçicidir. Yalnızca Hayy'a tevekkül edilir.' Râzî: 'Lâ yemût (ölmez) ifadesi Hayy ismini pekiştirir: Gerçek hayat, ölümü olmayan hayattır.'"}
+  ],
+  hadisler:[
+    {metin:"Yâ Hayyu Yâ Kayyûm, bi-rahmetike esteğîs — Ey Hayy ve Kayyûm, rahmetinle yardım isterim.", kaynak:"Tirmizî, Daavât 80; Hâkim, Müstedrek", derece:"Sahih"},
+    {metin:"İsm-i a'zam Bakara 2:255, Âl-i İmrân 3:2 ve Tâhâ 20:111'dedir; hepsi Hayy ve Kayyûm içerir.", kaynak:"Tirmizî, Daavât 65; İbn Mâce, Duâ 9", derece:"Hasen"}
+  ],
+  geylani:"Hayy olan Allah'a bağlanan kul, onun hayatından pay alır. Bu pay; düşen kalkmasında, kaybolan bulmasında görünür."
+},
+{
+  no:64, arapca:"ٱلْقَيُّوم", latin:"el-Kayyûm", anlam:"Her şeyi ayakta tutan — varlığı kendi başına duran ve her şeyi O'nda tutan", grup:"Zât",
+  kok:"K-V-M kökü. 'Kıyam' ayakta durma. Kayyûm fey'ûl kalıbı, mübalağa: her şeyi ayakta tutan, varlığı kendinden olan. İki anlam: (1) Kendi varlığını sürdürmek için hiçbir şeye muhtaç olmayan; (2) Her şeyin varlığının O'nun iradesiyle devam eden. İsm-i a'zamın parçası.",
+  ayetler:[
+    {arapca:"ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌ وَلَا نَوْمٌ", meal:"Allah — O'ndan başka ilah yoktur; Hayy ve Kayyûm'dur. Onu uyku da uyuklama da tutmaz.", kaynak:"Bakara 2:255",
+     tefsir:"İbn Kesîr: 'Kayyûm isminin delili: Uyuklama ve uyku olmaması. Kayyûm, her şeyi ayakta tutan; uyku anlık bilinç kaybıdır ve bunu yaşayan hiçbir şeyi ayakta tutamaz. Allah uyumaz, bu nedenle kâinat ayaktadır.' Kurtubî: 'Kayyûm'un biri kaldırması; kâinatın çökmesi demektir. Bu isim Allah'ın evrensel tasarrufunun devamlılığını anlatır.'"},
+    {arapca:"وَعَنَتِ ٱلْوُجُوهُ لِلْحَىِّ ٱلْقَيُّومِ", meal:"Yüzler, Hayy ve Kayyûm'un önünde boyun eğer.", kaynak:"Tâhâ 20:111",
+     tefsir:"Taberî: 'Kıyamette tüm yüzlerin Hayy ve Kayyûm'a boyun eğmesi; bu iki ismin egemenliğinin nihaî tecellisidir.' Râzî: 'Kayyûm ismi kâinatın varlığını Allah'a bağlar: O dilemedikçe hiçbir şey var olamaz, var olan hiçbir şey devam edemez.'"}
+  ],
+  hadisler:[
+    {metin:"Yâ Hayyu Yâ Kayyûm — bu ism-i a'zamı içerir; bu isimle yapılan dua reddedilmez.", kaynak:"Tirmizî, Daavât 80; Hâkim, Müstedrek 1/504", derece:"Sahih"},
+    {metin:"Kayyûm olan Allah, gökleri ve yeri daima taşımaktadır.", kaynak:"Âyetü'l-Kürsî tefsiri; Buhârî, Tevhid 22; Müslim, İman 293", derece:"Sahih"}
+  ],
+  geylani:"Kayyûm'a bağlanan kul, ayakta durur; O'ndan kopan ise yere düşer. Düşüşlerin sebebi bağın zayıflamasıdır."
+},
+{
+  no:65, arapca:"ٱلْوَاجِد", latin:"el-Vâcid", anlam:"İstediğini bulan — hiçbir eksikliği olmayan, her şeye sahip", grup:"Kemâl",
+  kok:"V-C-D kökü. 'Vücûd' var olmak, bulmak. Vâcid fa'il kalıbı: bulan, sahip olan. Allah için; ihtiyaç duyduğu her şeyi bulmak değil (zira hiçbir şeye muhtaç değildir) — dilediği her şeye sahip olan, eksiği olmayan anlamındadır.",
+  ayetler:[
+    {arapca:"وَوَجَدَكَ عَآئِلًا فَأَغْنَىٰ", meal:"Seni fakir buldu ve zenginleştirdi.", kaynak:"Duhâ 93:8",
+     tefsir:"İbn Kesîr: 'Vâcid isminin fiili (vecede — buldu) burada Allah'ın Hz. Peygamber'i bulması ve ona verdiği nimetler için kullanılır. Allah, eksikliği görür ve tamamlar; bu Vâcid isminin cömertlik boyutudur.' Kurtubî: 'Duhâ sûresindeki bu âyetler silsilesi: Yetim bulduk-barındırdık; yolunu şaşırmış bulduk-doğru yola ilettik; fakir bulduk-zenginleştirdik. Her biri Vâcid'in aktif tavrını gösterir.'"},
+    {arapca:"وَإِن يَمْسَسْكَ ٱللَّهُ بِضُرٍّ فَلَا كَاشِفَ لَهُۥٓ إِلَّا هُوَ", meal:"Eğer Allah sana bir zarar dokundurursa, onu O'ndan başkası açamaz.", kaynak:"En'âm 6:17",
+     tefsir:"Taberî: 'Vâcid ismi; ihtiyacın giderilmesinin yalnızca Allah tarafından yapılabileceğini gösterir. Başka hiçbir varlık, Allah'ın sahip olduğu imkâna sahip değildir.' Râzî: 'Allah hiçbir şeye muhtaç olmadığı için dilediğini bulur ve verir. Kula gelince; ihtiyacını O'na arz ederse Vâcid onu karşılar.'"}
+  ],
+  hadisler:[
+    {metin:"Allah hiçbir şeye muhtaç değildir; her şey O'na muhtaçtır.", kaynak:"İhlâs 112:2 bağlamı; Buhârî, Tefsir, İhlâs", derece:"Sahih (âyet)"},
+    {metin:"Kim Allah'tan ister, Allah ona verir; O'ndan başkasından dilenir, Allah o işi o kişiye bırakır.", kaynak:"Tirmizî, Daavât 109; İbn Mâce, Duâ 13", derece:"Hasen"}
+  ],
+  geylani:"Vâcid'in katında her şey mevcuttur. Başkasına muhtaç gibi el açmak, Vâcid'i tanımamaktır."
+},
+{
+  no:66, arapca:"ٱلْمَاجِد", latin:"el-Mâcid", anlam:"Şanlı ve cömert — şerefin ve keremın üst noktasında olan", grup:"Celâl",
+  kok:"M-C-D kökü. Mecîd ile aynı kök, farklı kalıp. Mâcid fa'il: fiilî olarak şanlı ve cömert davranan. Mecîd sıfat; Mâcid ise fiil ve sıfatın birleşimi gibi. Her ikisi de Allah'ın yüce şeref ve cömertliğini anlatır.",
+  ayetler:[
+    {arapca:"إِنَّهُۥ حَمِيدٌ مَّجِيدٌ", meal:"Şüphesiz O Hamîd ve Mecîd'dir.", kaynak:"Hûd 11:73",
+     tefsir:"İbn Kesîr: 'Mâcid ve Mecîd aynı kökten; ikisi de şanlı ve cömert anlamında. Allah'ın bu özelliği; müminlere müjde verilirken hatırlatılır — müjdeyi veren de verilenler de bu şanın kapsamındadır.' Kurtubî: 'Kerem ve mecd birlikte; cömertlik şanla birleşince gerçek büyüklük doğar.'"},
+    {arapca:"وَٱللَّهُ وَٰسِعٌ عَلِيمٌ", meal:"Allah geniş (Vâsi') ve bilendir.", kaynak:"Bakara 2:115",
+     tefsir:"Taberî: 'Mâcid isminin Vâsi' ismiyle bağlantısı: Genişlik ve kerem birlikte — hem imkânı geniş hem de cömert.' Râzî: 'Mâcid; sadece sahip olmak değil, sahip olduğunu vermek. Allah sahip olduğu her şeyi cömertçe paylaşır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah cömerttir ve cömertliği sever.", kaynak:"Buhârî, Edeb 39; Müslim, Birr 144", derece:"Sahih"},
+    {metin:"'Yâ Mâcid, yâ Kerîm' diye dua edin; bu isimler kıyamette büyük kapılar açar.", kaynak:"Taberânî, Kebîr; Münzirî, Terğîb", derece:"Hasen"}
+  ],
+  geylani:"Mâcid'in cömertliğinden pay almak istiyorsan, O'nun cömertliğini taklid et — ver, paylaş, cömert ol."
+},
+{
+  no:67, arapca:"ٱلْوَاحِد", latin:"el-Vâhid", anlam:"Bir olan — eşi, benzeri ve ortağı olmayan tek varlık", grup:"Zât",
+  kok:"V-H-D kökü. 'Vahdet' birlik. Vâhid fa'il kalıbı: sayıca bir olan. Ehad ile farkı: Vâhid sayısal birliği; Ehad ise niteliksel ve zâtî tekliği vurgular. İkisi birlikte; Allah'ın hem sayısal hem de özsel anlamda bir ve tek olduğunu anlatır.",
+  ayetler:[
+    {arapca:"وَإِلَـٰهُكُمْ إِلَـٰهٌ وَٰحِدٌ ۖ لَّآ إِلَـٰهَ إِلَّا هُوَ", meal:"İlahınız, bir tek ilahtır; O'ndan başka ilah yoktur.", kaynak:"Bakara 2:163",
+     tefsir:"İbn Kesîr: 'Bu âyet tevhidin özüdür. Vâhid ismi: Sayıca bir olan, ikinci ve ortağı bulunmayan. Bu temel ilke; İslam'ın tüm inanç yapısını üzerine inşa ettiği temeldir.' Kurtubî: 'Vâhid ismini her gün tekrar etmek; putçuluğun tüm biçimlerine karşı en güçlü panzehirdir.'"},
+    {arapca:"قُلْ هُوَ ٱللَّهُ أَحَدٌ", meal:"De ki: O Allah, bir tektir.", kaynak:"İhlâs 112:1",
+     tefsir:"Taberî: 'Ehad burada kullanılır; Vâhid değil. Ehad, bölünme ve çoğalma kabul etmeyen mutlak tekliği anlatır. Ancak Vâhid de bu anlama dahildir.' Râzî: 'Vâhid ve Ehad isimleri birlikte; birincisi sayısal ikincisi niteliksel birliği anlatır. İkisi birlikte Allah'ın tüm tevhid boyutlarını kapsar.'"}
+  ],
+  hadisler:[
+    {metin:"En büyük günah Allah'a ortak koşmaktır.", kaynak:"Buhârî, Edeb 6; Müslim, İman 141", derece:"Sahih"},
+    {metin:"Tevhidi tam anlayan, diğer her şeyin küçük kaldığını görür.", kaynak:"Buhârî, Tevhid 1; Müslim, İman 1 bağlamı", derece:"Sahih"}
+  ],
+  geylani:"Vâhid'i bilmek; kalpteki tüm ortakları söküp atmaktır. Bu söküm ne kadar derin olursa, o kadar gerçek tevhid başlar."
+},
+{
+  no:68, arapca:"ٱلْأَحَد", latin:"el-Ehad", anlam:"Mutlak tek — bölünme ve çoğalma kabul etmeyen mutlak birlik sahibi", grup:"Zât",
+  kok:"V-H-D kökü. Vâhid ile aynı kök; Ehad ise bu birliğin mutlak ve niteliksel boyutunu anlatır. İbn Fâris: 'Ehad ve Vâhid; ilki mutlak tekliği, ikincisi sayısal birliği anlatır.' İhlâs sûresinde Ehad kullanılmıştır; çünkü buradaki anlam sayısal değil, zâtî ve niteliksel birliği ifade etmektedir.",
+  ayetler:[
+    {arapca:"قُلْ هُوَ ٱللَّهُ أَحَدٌ", meal:"De ki: O Allah, bir tektir.", kaynak:"İhlâs 112:1",
+     tefsir:"İbn Kesîr: 'İhlâs sûresinin tamamı Ehad isminin açıklamasıdır: Ne doğuran ne doğurulan ne dengi olan. Bu üç ret; birliğin üç boyutunu ortadan kaldırır.' Kurtubî: 'Ehad; Vâhid'den daha özel. Vâhid sayıca bir olabilir; Ehad ise parçaya bölünmeyen, birleşmemiş olan, salt tek demektir. Bu Allah'a özgüdür.'"},
+    {arapca:"أَمِ ٱتَّخَذَ مِمَّا يَخْلُقُ بَنَاتٍ وَأَصْفَىٰكُم بِٱلْبَنِينَ", meal:"Yoksa yarattıklarından kızlar edinip sizi oğullarla mı seçti?", kaynak:"Zuhruf 43:16",
+     tefsir:"Taberî: 'Bu âyet; Allah'a çocuk nisbet etmenin tutarsızlığını ortaya koyar. Ehad olan Allah, hiçbir ortağa, çocuğa, eşe ihtiyaç duymaz.' Râzî: 'Ehad ismi; her türlü terkibi (birleşmeyi) ve bölünmeyi reddeder. Bu reddediş; İslam'ın Hz. Îsâ hakkındaki teslise (teslisin reddine) verdiği en temel cevaptır.'"}
+  ],
+  hadisler:[
+    {metin:"İhlâs sûresi Kur'ân'ın üçte birine denktir.", kaynak:"Buhârî, Fedâilü'l-Kur'ân 13; Müslim, Müsâfirîn 261", derece:"Sahih"},
+    {metin:"Her gün 'Kul hüvallahu Ehad' oku; gece-gündüz korunursun.", kaynak:"Ebû Dâvûd, Edeb 102; Tirmizî, Daavât 23", derece:"Hasen"}
+  ],
+  geylani:"Ehad'ı tanıyan kalp, başka hiçbir şeyi gerçek anlamda büyük tutamaz. Tevhidin zirve noktası bu isimdir."
+},
+{
+  no:69, arapca:"ٱلصَّمَد", latin:"es-Samed", anlam:"Her şeyin kendisine sığındığı — kendisi hiçbir şeye muhtaç olmayan", grup:"Zât",
+  kok:"S-M-D kökü. Nadir bir kök. 'Samed' katı, sağlam, içi dolu, efendi demektir. İbn Abbâs'ın en meşhur açıklaması: 'Herkesin ihtiyacını O'na getirdiği, O'nun ise hiçbir şeye muhtaç olmadığı.' Bu tanım hem Allah'ın yeterliliğini hem de yaratılmışların ona bağımlılığını aynı anda ifade eder.",
+  ayetler:[
+    {arapca:"ٱللَّهُ ٱلصَّمَدُ", meal:"Allah Samed'dir.", kaynak:"İhlâs 112:2",
+     tefsir:"İbn Kesîr: 'Samed; kâinatın tamamının ihtiyaçları için başvurduğu, O'nun ise hiçbir şeye muhtaç olmadığı. Bu isim; Allah'ın her şeye yeterliliğini en kısa formülle anlatır.' Kurtubî: 'Samed'in iki boyutu: (1) İçi dolu olan — hiçbir boşluğu, eksikliği olmayan; (2) Efendi, lider — herkesin başvurduğu. Her iki anlam Allah'a lâyıktır.'"},
+    {arapca:"يَـٰٓأَيُّهَا ٱلنَّاسُ أَنتُمُ ٱلْفُقَرَآءُ إِلَى ٱللَّهِ", meal:"Ey insanlar! Siz Allah'a muhtaçsınız.", kaynak:"Fâtır 35:15",
+     tefsir:"Taberî: 'Samed isminin zıt kutbu insanın fakirliği (muhtaçlığı) dır. İnsanlar Allah'a muhtaç; Allah ise hiçbir şeye muhtaç değil. Bu iki gerçek tevhidin pratik boyutunu oluşturur.' Râzî: 'Samed ismi İhlâs sûresinde Ehad'ın ardından gelir; önce tekliği, ardından her şeyin kendisine muhtaç olduğu tek varlığı anlatır.'"}
+  ],
+  hadisler:[
+    {metin:"İhlâs sûresi Kur'ân'ın üçte birine denktir.", kaynak:"Buhârî, Fedâilü'l-Kur'ân 13; Müslim, Müsâfirîn 261", derece:"Sahih"},
+    {metin:"Samed olan Allah'a dua et; O kimseyi boş çevirmez.", kaynak:"Taberânî, Kebîr; İbn Mâce, Duâ 3 bağlamı", derece:"Hasen"}
+  ],
+  geylani:"Samed'e sığınan hiçbir şeye muhtaç kalmaz; zira her ihtiyaç O'ndan giderilir. O'ndan başkasına sığınmak ise boş kapı çalmaktır."
+},
+{
+  no:70, arapca:"ٱلْقَادِر", latin:"el-Kâdir", anlam:"Güç yetiren — dilediğini yapmaya gücü yeten", grup:"Celâl",
+  kok:"K-D-R kökü. 'Kudret' güç, iktidar. Kâdir fa'il kalıbı: gücü olan. Kadir ile Kadîr ve Muktedir aynı kökten; Kâdir temel gücü, Kadîr daha yoğun gücü, Muktedir ise iktidarı fiilen kullananı anlatır.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", meal:"Şüphesiz Allah her şeye kâdirdir.", kaynak:"Bakara 2:20",
+     tefsir:"İbn Kesîr: 'Bu âyet Kur'ân'ın en sık tekrarlanan cümlelerinden biridir. Her şeye kâdir olma; hiçbir sınır, engel ve güçsüzlük tanımayan kudreti anlatır.' Kurtubî: 'Kâdir ismi imtihanlar anında en büyük teselli kaynağıdır: O her şeye kâdirdir; senin içinde bulunduğun durumdan da çıkış vardır.'"},
+    {arapca:"وَكَانَ ٱللَّهُ عَلَىٰ كُلِّ شَىْءٍ مُّقْتَدِرًا", meal:"Allah her şeye muktedirdir.", kaynak:"Kehf 18:45",
+     tefsir:"Taberî: 'Dünyevî güç ve servetin geçiciliği anlatıldıktan sonra Muktedir ismi gelir. Allah'ın kudreti; dünyanın tüm geçici güçlerinin üstündedir.' Râzî: 'Kâdir ve Muktedir isimleri arasındaki fark: Kâdir gücün varlığını; Muktedir bu gücün etkin kullanımını vurgular.'"}
+  ],
+  hadisler:[
+    {metin:"Allah her şeye kâdirdir; O'nun için imkânsız yoktur.", kaynak:"Yâsîn 36:82 bağlamı; Buhârî, Tevhid 1; Müslim, İman 281", derece:"Sahih"},
+    {metin:"Allah dilediğini yapar; hiçbir şey O'nu engelleyemez.", kaynak:"Buhârî, Bed'ül-halk 1; Müslim, Kader 16", derece:"Sahih"}
+  ],
+  geylani:"Kâdir'i tanıyan, 'imkânsız' diyemez. Her imkânsız, O'nun kudretinin önünde mümkün olur."
+},
+{
+  no:71, arapca:"ٱلْمُقْتَدِر", latin:"el-Muktedir", anlam:"Hâkim güç sahibi — gücünü her an fiilen kullanan", grup:"Celâl",
+  kok:"K-D-R kökü. Kâdir ile aynı kök, if'tial (iftial) kalıbı: gücünü kazanıp kullanan. Allah için; gücü sonradan kazanılmış değil, zâtına özgü. Muktedir Kâdir'den daha güçlü bir vurgu yapar: Hem gücü var, hem kullanıyor.",
+  ayetler:[
+    {arapca:"فِى مَقْعَدِ صِدْقٍ عِندَ مَلِيكٍ مُّقْتَدِرٍ", meal:"Hak meclisinde, Muktedir olan bir Melik'in yanında.", kaynak:"Kamer 54:55",
+     tefsir:"İbn Kesîr: 'Cennet ehlinin makamı Muktedir Melik'in yanında. Bu; Allah'ın sonsuz gücünün cennetle bütünleştiğini anlatır. Muktedir burada cennetin garantisinin Allah'ın gücüyle desteklendiğini söyler.' Kurtubî: 'Mücrim (suçlular) ve muttaki (korunanlar) karşılaştırılır. Muttakilerin yanında Muktedir Melik var; en güçlü ve en hâkim olan.'"},
+    {arapca:"وَكَانَ ٱللَّهُ عَلَىٰ كُلِّ شَىْءٍ مُّقْتَدِرًا", meal:"Allah her şeye muktedirdir.", kaynak:"Kehf 18:45",
+     tefsir:"Taberî: 'Kehf sûresindeki bu ifade; dünyevî güçlerin çöküşü bağlamında gelir. Mal, servet ve çocuk geçici; Allah'ın gücü kalıcı ve üstündür.' Râzî: 'Muktedir ismi, Allah'ın kudretinin teorik değil pratikte etkin olduğunu anlatır. Her an, her yerde, her şeyde O'nun muktedirliği işler.'"}
+  ],
+  hadisler:[
+    {metin:"Allah dilediğini yapar ve kimse engelleyemez.", kaynak:"Buhârî, Tevhid 1; Müslim, Kader 1", derece:"Sahih"},
+    {metin:"Kader, Allah'ın gücünün önceden belirlenmiş ifadesidir.", kaynak:"Müslim, Kader 16; Tirmizî, Kader 17", derece:"Sahih"}
+  ],
+  geylani:"Muktedir'e dayan; O gücünü tutmaz, kullanır. Senin için de kullanmasını iste."
+},
+{
+  no:72, arapca:"ٱلْمُقَدِّم", latin:"el-Mukaddim", anlam:"Öne geçiren — dilediğini öne alan, ilerleyen ve önceliklendiren", grup:"Kemâl",
+  kok:"K-D-M kökü. 'Takadum' öne geçme. Mukaddim tef'il kalıbı: öne geçiren. Zıddı Muahhir (geriye bırakan). Allah; kullarından dilediğini öne çıkarır — iman, makam, rızık veya zafer bakımından.",
+  ayetler:[
+    {arapca:"لَا مُعَقِّبَ لِحُكْمِهِۦ وَهُوَ سَرِيعُ ٱلْحِسَابِ", meal:"O'nun hükmünü geri çevirecek yoktur; O hesabı çabuk görendir.", kaynak:"Ra'd 13:41",
+     tefsir:"İbn Kesîr: 'Mukaddim ismi bu âyetle bağlantılıdır: Allah öne geçirdiğini kimse geri alamaz; geri bıraktığını kimse öne geçiremez.' Kurtubî: 'Öne geçirme ve geri bırakma; hem dünyevî konumlarda hem ebedi hesapta geçerlidir. Allah'ın bu iki tasarrufu birlikte kaderin özünü oluşturur.'"},
+    {arapca:"يَرْفَعِ ٱللَّهُ ٱلَّذِينَ ءَامَنُوا۟ مِنكُمْ وَٱلَّذِينَ أُوتُوا۟ ٱلْعِلْمَ دَرَجَـٰتٍ", meal:"Allah inananları ve ilim verilenleri derecelerle yükseltir.", kaynak:"Mücâdele 58:11",
+     tefsir:"Taberî: 'Yükseltmek Mukaddim isminin bir tecellisidir: Allah'ın öne geçirdiği; iman ve ilim sahiplerine öncelik tanıması.' Râzî: 'Mukaddim ismi, önceliğin beşer değil ilahî kaynaktan geldiğini öğretir. Kim öne geçirildiğini O belirler.'"}
+  ],
+  hadisler:[
+    {metin:"Kim Allah için mütevazı olursa Allah onu öne geçirir.", kaynak:"Müslim, Birr 69; İbn Mâce, Zühd 16", derece:"Sahih"},
+    {metin:"İman ve takva, kişiyi Allah katında öne geçirir.", kaynak:"Hucurât 49:13 bağlamı; Buhârî, Tefsir, Hucurât", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Mukaddim'in öncelik verdiği kimse, dünyada geride görünse bile ahirette ön safları tutar."
+},
+{
+  no:73, arapca:"ٱلْمُؤَخِّر", latin:"el-Muahhir", anlam:"Geri bırakan — dilediğini erteleyip sonraya alan", grup:"Kemâl",
+  kok:"E-H-R kökü. 'Te'hir' erteleme, geri bırakma. Muahhir tef'il kalıbı: geri bırakan. Mukaddim'in zıddı. Allah; dilediğini zamanda, mekânda, makamda ya da cezada geri bırakır. Zalimlere mühlet vermesi bu ismin en bilinen tecellisidir.",
+  ayetler:[
+    {arapca:"إِنَّمَا يُؤَخِّرُهُمْ لِيَوْمٍ تَشْخَصُ فِيهِ ٱلْأَبْصَـٰرُ", meal:"Onları yalnızca gözlerin donacağı güne erteler.", kaynak:"İbrâhîm 14:42",
+     tefsir:"İbn Kesîr: 'Zalimlere mühlet; Muahhir isminin en dikkat çekici tecellisi. Kıyamet günü gözlerin donacağı o güne kadar ertelenirler. Bu erteleme; hem peygamberleri terk eden topluluklar için hem de her türlü zalim için geçerlidir.' Kurtubî: 'Te'hir (erteleme) zulüm değil hikmettir: Tövbe için fırsat tanımak veya cezayı en uygun anda vermek.'"},
+    {arapca:"وَلَن يُؤَخِّرَ ٱللَّهُ نَفْسًا إِذَا جَآءَ أَجَلُهَا", meal:"Eceli geldiğinde Allah hiçbir nefsi geri bırakmaz.", kaynak:"Münâfikûn 63:11",
+     tefsir:"Taberî: 'Ecel geldiğinde Muahhir devreye girmez; artık zaman dolmuştur. Muahhir yalnızca ecel gelmeden önce çalışır — bu da geri bırakmanın sınırını gösterir.' Râzî: 'Ecelin kesinliği ve Muahhir isminin sınırlılığı birlikte; ne kadar güçlü olursa olsun kimse ecelini erteleyemez.'"}
+  ],
+  hadisler:[
+    {metin:"Allah zalimi mühlet verir, yakaladığında kurtaramaz.", kaynak:"Buhârî, Tefsir, Hûd; Müslim, Birr 61", derece:"Sahih"},
+    {metin:"Sıla-i rahim (akrabalık bağı) ömrü uzatır (Muahhir'in takdiriyle).", kaynak:"Buhârî, Edeb 12; Müslim, Birr 20", derece:"Sahih"}
+  ],
+  geylani:"Muahhir'in mühletini boşa harcama; her erteleme bir fırsat, son fırsat olabilir."
+},
+{
+  no:74, arapca:"ٱلْأَوَّل", latin:"el-Evvel", anlam:"İlk olan — her şeyden önce var olan, başlangıcı olmayan", grup:"Zât",
+  kok:"E-V-L kökü. 'Evvellik' önce olmak. Evvel fa'il kalıbı: en önce olan. Allah'ın Evvel oluşu; zamansal değil ontolojik önceliktir. Hiçbir şey O'ndan önce yoktu; her şey O'ndan sonra var oldu. Âhir ile çifttir.",
+  ayetler:[
+    {arapca:"هُوَ ٱلْأَوَّلُ وَٱلْـَٔاخِرُ وَٱلظَّـٰهِرُ وَٱلْبَاطِنُ", meal:"O, Evvel'dir, Âhir'dir, Zâhir'dir, Bâtın'dır.", kaynak:"Hadîd 57:3",
+     tefsir:"İbn Kesîr: 'Bu dört isim Allah'ın varlığının dört boyutunu kapsar: Öncesi yok (Evvel), sonu yok (Âhir), her yerde delilleri görünür (Zâhir), zâtı kavranamaz (Bâtın). Dört boyutu birlikte düşünmek Allah'ı en kapsamlı tanımaktır.' Kurtubî: 'Peygamber uyku duasında bu dört ismi birlikte kullanırdı; dört boyutla birlikte Allah'a sığınmak en eksiksiz sığınıştır.'"},
+    {arapca:"وَإِن يُرِيدُوا۟ أَن يَخْدَعُوكَ فَإِنَّ حَسْبَكَ ٱللَّهُ", meal:"Seni aldatmak isterlerse Allah sana yeter.", kaynak:"Enfâl 8:62",
+     tefsir:"Taberî: 'Evvel olan Allah'a güven; O'ndan önce bir şey olmadığı gibi O'nun bilgisinden önce de bir şey olmaz.' Râzî: 'Evvel ismi; Allah'ın bilgisinin her olaydan önce olduğunu gösterir. Hiçbir şey O'nu şaşırtamaz; zira O her şeyden evvel bilmektedir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme Ente'l-Evvel feleyse kableke şey' — Allah'ım Sen Evvel'sin, Senden önce hiçbir şey yoktur.", kaynak:"Müslim, Zikir 61; Tirmizî, Daavât 19", derece:"Sahih"},
+    {metin:"Allah var iken hiçbir şey yoktu; O'ndan başkası sonradan geldi.", kaynak:"Buhârî, Bed'ül-halk 1; Müslim, Zikir 28", derece:"Sahih"}
+  ],
+  geylani:"Evvel olan Allah'ı bilmek; geçmişe takılmayı bırakmaktır. O geçmişten de öndeydi; şimdide de, gelecekte de."
+},
+{
+  no:75, arapca:"ٱلْـَٔاخِر", latin:"el-Âhir", anlam:"Son olan — her şeyden sonra da var olan, sonu olmayan", grup:"Zât",
+  kok:"E-H-R kökü. 'Uhuvvet' geriye kalmak, sonda olmak. Âhir fa'il kalıbı: sonda kalan. Her şey yok olduğunda bile O var olmaya devam eden. Evvel'in tamamlayıcısı.",
+  ayetler:[
+    {arapca:"هُوَ ٱلْأَوَّلُ وَٱلْـَٔاخِرُ وَٱلظَّـٰهِرُ وَٱلْبَاطِنُ", meal:"O Evvel, Âhir, Zâhir ve Bâtın'dır.", kaynak:"Hadîd 57:3",
+     tefsir:"İbn Kesîr: 'Âhir ismi; her şey geçip gittiğinde, kıyamet koptuğunda, cennet ve cehennem kurulduğunda dahi O var olmaya devam edeceğini söyler. Bu sonsuzluk; yaratılmışlarınkinden tamamen farklıdır.' Kurtubî: 'Evvel ve Âhir birlikte; başsız ve sonsuz. İnsan için başlangıç ve son olduğu düşünülen her şey, Allah için geçerli değildir.'"},
+    {arapca:"كُلُّ شَىْءٍ هَالِكٌ إِلَّا وَجْهَهُۥ", meal:"O'nun yüzü (zâtı) hariç her şey yok olacaktır.", kaynak:"Kasas 28:88",
+     tefsir:"Taberî: 'Âhir isminin en derin ifadesi bu âyettedir: Her şey yok olur; O kalır. Bu ebedîlik yaratılmışlarla paylaşılmaz.' Râzî: 'Bakâ (ebedilik) Allah'a özgüdür; yaratılmışların sürekliliği ise Allah'ın izni ve iradesiyledir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme Ente'l-Âhir feleyse ba'deke şey' — Allah'ım Sen Âhir'sin, Senden sonra hiçbir şey yoktur.", kaynak:"Müslim, Zikir 61; Tirmizî, Daavât 19", derece:"Sahih"},
+    {metin:"Her şey fânîdir; yalnızca O bâkîdir.", kaynak:"Rahmân 55:26-27 bağlamı; Buhârî, Tefsir, Rahmân", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Âhir'e doğru yolculuk ediyorsun. Bu yolculuğun nereye çıkacağını bilen Âhir'in yanında kal; O seni başa çıkarır."
+},
+{
+  no:76, arapca:"ٱلظَّاهِر", latin:"ez-Zâhir", anlam:"Açık olan — varlığının delilleri her yerde görünen", grup:"Zât",
+  kok:"Z-H-R kökü. 'Zuhur' belirme, açığa çıkma. Zâhir fa'il kalıbı. Allah bizzat görünmez; fakat kâinattaki her şey O'nun varlığına apaçık delildir. Bâtın'ın karşıtıdır.",
+  ayetler:[
+    {arapca:"هُوَ ٱلْأَوَّلُ وَٱلْـَٔاخِرُ وَٱلظَّاهِرُ وَٱلْبَاطِنُ وَهُوَ بِكُلِّ شَىْءٍ عَلِيمٌ", meal:"O Evvel, Âhir, Zâhir ve Bâtın'dır; her şeyi bilendir.", kaynak:"Hadîd 57:3",
+     tefsir:"İbn Kesîr: 'Zâhir; delilleri ve ayetleri her yerde apaçık görünen demektir. Güneş, gece-gündüz döngüsü, tohumdan çıkan ağaç — her biri O'nun varlığını ilan eder. Dört isim birlikte Allah'ın varlığının dört boyutunu kapatır: Öncesi yok (Evvel), sonu yok (Âhir), delilleri her yerde (Zâhir), zâtı kavranamaz (Bâtın).' Kurtubî: 'Zâhir ismi en güçlü tevhid delilini içerir: Allah görünmez ama eserleri görünür. Bunu gören akıl O'nu inkâr edemez.'"},
+    {arapca:"سَنُرِيهِمْ ءَايَـٰتِنَا فِى ٱلْـَٔافَاقِ وَفِىٓ أَنفُسِهِمْ حَتَّىٰ يَتَبَيَّنَ لَهُمْ أَنَّهُ ٱلْحَقُّ", meal:"Ufuklarda ve kendi nefislerinde ayetlerimizi onlara göstereceğiz.", kaynak:"Fussilet 41:53",
+     tefsir:"Taberî: 'Dış âlem (ufuklar) ve iç dünya (nefis) — ikisi birlikte Zâhir isminin iki aynasıdır. Her yerde O'nun izleri görünür.' Râzî: 'Ufuklardaki ayetler kozmik deliller; nefisteki ayetler ise insan bünyesindeki mucizeler. Her ikisi de Zâhir isminin geniş tecellisidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme Ente'z-Zâhiru feleyse fevkake şey — Allah'ım Sen Zâhir'sin, Senden üstte hiçbir şey yoktur.", kaynak:"Müslim, Zikir 61; Tirmizî, Da'avât 19", derece:"Sahih"},
+    {metin:"Yeryüzünde, gökyüzünde her şey Allah'ın varlığına şahittir.", kaynak:"Zâriyât 51:20-21 bağlamı; Buhârî, Bed'ü'l-halk 1", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Zâhir olan Allah her yerde delil bırakmıştır. Görmek için gözlere değil, bakış açısına ihtiyaç vardır."
+},
+{
+  no:77, arapca:"ٱلْبَاطِن", latin:"el-Bâtın", anlam:"Gizli olan — zâtı hiçbir aklın tam kavrayamadığı", grup:"Zât",
+  kok:"B-T-N kökü. 'Batın' iç, gizli taraf. Bâtın fa'il kalıbı. Zâhir ile birlikte çift; delilleri görünür ama zâtı kavranamaz. Allah her şeye şah damarından yakın olmakla birlikte zâtını hiçbir yaratılmış kuşatamaz.",
+  ayetler:[
+    {arapca:"وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ وَٱللَّهُ بِمَا تَعْمَلُونَ بَصِيرٌ", meal:"Nerede olursanız O sizinle beraberdir; Allah yaptıklarınızı görür.", kaynak:"Hadîd 57:4",
+     tefsir:"İbn Kesîr: 'Bâtın ismiyle bu âyet birlikte okunmalı: Allah her yerde beraberdir; ama bu beraberlik mekânsal değil, ilim ve tasarrufu yoluyla. Zâtı bâtındır ama bilgisi ve kudreti her yerde hâzır.' Kurtubî: 'Bâtın; uzak demek değil, aksine en derin yakınlıktır. Şah damarından yakın olan (Kâf 50:16) ama zâtı aklın ötesinde olan.'"},
+    {arapca:"وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ ٱلْوَرِيدِ", meal:"Biz ona şah damarından daha yakınız.", kaynak:"Kâf 50:16",
+     tefsir:"Taberî: 'Bâtın olmak; uzak olmak değil, tersine her şeyin içine işlemiş olmak demektir. Şah damarından yakın olan, fakat zâtı beşer kavrayışının ötesinde olan.' Râzî: 'Bu ikili paradoks Allah'ın üstün gerçekliğini anlatır: Hem en yakın hem de kavranamayan. Bunları birleştirmek ancak O'na mahsustur.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme Ente'l-Bâtınu feleyse dûneke şey — Allah'ım Sen Bâtın'sın, Senden altta hiçbir şey yoktur.", kaynak:"Müslim, Zikir 61; Tirmizî, Da'avât 19", derece:"Sahih"},
+    {metin:"Allah kalplerin içini bilir; en gizli düşünceler O'na apaçıktır.", kaynak:"Kâf 50:16 bağlamı; Buhârî, Tefsir, Kâf", derece:"Sahih"}
+  ],
+  geylani:"Bâtın olan Allah, kalbin en derin köşesinde seni bilir. Bu bilgi hem ürpertsin hem teselli etsin."
+},
+{
+  no:78, arapca:"ٱلْوَالِى", latin:"el-Vâlî", anlam:"Hâkim ve yöneten — kâinatı idare eden mutlak otorite", grup:"Celâl",
+  kok:"V-L-V kökü. Veliyy ile aynı kök; Vâlî yönetim ve idare boyutunu öne çıkarır. 'Vali' (idareci) bu kökten Türkçe'ye geçmiştir. Allah yalnızca dost (Veliyy) değil; her şeyi fiilen yöneten mutlak hâkimdir.",
+  ayetler:[
+    {arapca:"أَمِ ٱتَّخَذُوا۟ مِن دُونِهِۦٓ أَوْلِيَآءَ فَٱللَّهُ هُوَ ٱلْوَلِىُّ وَهُوَ يُحْىِ ٱلْمَوْتَىٰ", meal:"Allah'tan başka veliler mi edindiler? Allah velîdir; O ölüleri diriltir.", kaynak:"Şûrâ 42:9",
+     tefsir:"İbn Kesîr: 'Vâlî ismi; hem yönetimi hem dostluğu birleştirir. Her şeyi yöneten ve müminlerin velisi olan Allah'tan başka gerçek veli aranamaz.' Kurtubî: 'Vâlî; yönetimde sınırsız otoriteyi vurgular. Hiçbir güç O'nun yönetimine itiraz edemez; kâinat O'nun idaresiyle işler.'"},
+    {arapca:"وَهُوَ يَتَوَلَّى ٱلصَّـٰلِحِينَ", meal:"O sâlihlerin velisidir.", kaynak:"A'râf 7:196",
+     tefsir:"Taberî: 'Salihlerin velâyetini üstlenmek; onları yönetmek, korumak, yardım etmek demektir. Vâlî olarak Allah, dost olduğu kullar için aktif olarak devreye girer.' Râzî: 'Vâlî ismi; Allah'ın pasif izleyici değil, aktif yönetici olduğunu söyler. Kâinat kendi başına değil O'nun idaresiyle işler.'"}
+  ],
+  hadisler:[
+    {metin:"Kim Allah'a tevekkül ederse Allah onun işlerini yönetir; kim başkasına güvenirse Allah onu ona bırakır.", kaynak:"Tirmizî, Zühd 33; İbn Mâce, Zühd 14", derece:"Hasen"},
+    {metin:"Allah müminlerin velisidir; onları karanlıktan nura çıkarır.", kaynak:"Bakara 2:257 bağlamı; Buhârî, Tefsir, Bakara", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Vâlî'nin yönetimine razı olmak; en yüksek tevekkülün adıdır."
+},
+{
+  no:79, arapca:"ٱلْمُتَعَالِى", latin:"el-Müteâlî", anlam:"Her şeyin üstünde yüce — beşer kavrayışının ulaşamadığı", grup:"Celâl",
+  kok:"A-L-V kökü. Aliyy ile aynı kök; Müteâlî tefaul kalıbı: yüceliğini sürekli izhar eden veya her tasavvurun ötesinde yüce olan. Aliyy statik yüceliği; Müteâlî ise her kavrayışın ötesinde aşkın yüceliği vurgular.",
+  ayetler:[
+    {arapca:"عَـٰلِمُ ٱلْغَيْبِ وَٱلشَّهَـٰدَةِ ٱلْكَبِيرُ ٱلْمُتَعَالِ", meal:"Gaybı ve görüneni bilen, Kebîr ve Müteâlî olan.", kaynak:"Ra'd 13:9",
+     tefsir:"İbn Kesîr: 'Müteâlî ismi Kebîr ile birlikte gelir; büyüklükte sınır yoktur ve bu büyüklük her kavrayışın üstündedir. Gayb ilmini de eklemek: Hem en büyük hem her şeyi bilen hem de idrak edilemeyen.' Kurtubî: 'Müteâlî; Aliyy'den daha güçlü bir yücelik. Aliyy yüce olan; Müteâlî ise her beşerî kavrayışın ötesinde yüce olan.'"},
+    {arapca:"سُبْحَـٰنَهُۥ وَتَعَـٰلَىٰ عَمَّا يَقُولُونَ عُلُوًّا كَبِيرًا", meal:"O, söylediklerinden münezzeh ve çok yücedir.", kaynak:"İsrâ 17:43",
+     tefsir:"Taberî: 'Müteâlî ismi tüm yanlış tasavvurları reddeder. Allah insanların O hakkında söylediği her sınırlı tanımın çok ötesindedir.' Râzî: 'Teâlâ (yüceldi) fiilinin sıklıkla kullanılması; Allah'ın her beşerî kavrayışı aşan yüceliğinin sürekli ilanıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'ı hakkıyla kavramak mümkün değildir; O her tasavvurun üstündedir.", kaynak:"Beyhakî, Esmâ ve Sıfât 2/5; İbn Kayyım, Medâric", derece:"Hasen"},
+    {metin:"Sübhânallâhil-Azîm — bu tesbih Allah'ın kavranamaz yüceliğini dile getirir.", kaynak:"Buhârî, Da'avât 65; Müslim, Zikir 31", derece:"Sahih"}
+  ],
+  geylani:"Müteâlî'yi kavradım diyene inanma; O'nu ancak kavrayamadığını anlayan tanır."
+},
+{
+  no:80, arapca:"ٱلْبَرّ", latin:"el-Berr", anlam:"İyilik kaynağı — kullarına sonsuz iyilik ve lütuf veren", grup:"Cemâl",
+  kok:"B-R-R kökü. 'Birr' iyilik, dürüstlük, vefa. Berr fa'l kalıbı: iyiliği bol ve geniş olan. Rahim ile farkı: Rahim merhameti, Berr ise fiilî iyiliğin genişliğini öne çıkarır.",
+  ayetler:[
+    {arapca:"إِنَّا كُنَّا مِن قَبْلُ نَدْعُوهُ ۖ إِنَّهُۥ هُوَ ٱلْبَرُّ ٱلرَّحِيمُ", meal:"Biz daha önce O'na dua ederdik; O Berr ve Rahim'dir.", kaynak:"Tûr 52:28",
+     tefsir:"İbn Kesîr: 'Cennet ehlinin söylediği bu âyet; dünyadaki duanın kabulünü ve Allah'ın iyiliğinin devamını anlatır. Berr ve Rahim; iyilik ve merhamet — ikisi cennetin iki kapısıdır.' Kurtubî: 'Berr ismi Allah'ın iyiliğinin kapsamını gösterir: Dua edilsin veya edilmesin, şart konulsun veya konulmasın O iyidir. Bu iyilik O'nun zâtından kaynaklanır.'"},
+    {arapca:"وَتَعَاوَنُوا۟ عَلَى ٱلْبِرِّ وَٱلتَّقْوَىٰ وَلَا تَعَاوَنُوا۟ عَلَى ٱلْإِثْمِ وَٱلْعُدْوَٰنِ", meal:"İyilik ve takvada yardımlaşın; günah ve düşmanlıkta yardımlaşmayın.", kaynak:"Mâide 5:2",
+     tefsir:"Taberî: 'Birr (iyilik) hem Allah'ın ismi hem kulların eylemidir. Allah Berr'dir; kullar da birbirine birr ile davranmalıdır — bu ismin en pratik yansımasıdır.' Râzî: 'Berr ismini bilen kul, iyiliğin kaynağının Allah olduğunu anlar ve kendi iyiliğini O'ndan alınan bir pay olarak görür.'"}
+  ],
+  hadisler:[
+    {metin:"Birr (iyilik) güzel ahlâktır; ism (günah) ise içini sıkan ve insanların bilmesini istemediğin şeydir.", kaynak:"Müslim, Birr 14; Tirmizî, Zühd 52", derece:"Sahih"},
+    {metin:"Allah iyilik yapmayı sever ve iyilik yapanı sever.", kaynak:"Buhârî, Edeb 39; Müslim, Birr 144", derece:"Sahih"}
+  ],
+  geylani:"Berr olan Allah'tan iyilik gelir; O'nu aradan çıkarıp başkasından iyilik beklemek, pınarı bırakıp çamurdan su içmektir."
+},
+{
+  no:81, arapca:"ٱلتَّوَّاب", latin:"et-Tevvâb", anlam:"Tövbeleri defalarca kabul eden — kulunu tövbeye yönlendiren ve kabul eden", grup:"Cemâl",
+  kok:"T-V-B kökü. 'Tevbe' dönmek; günahtan Allah'a yönelmek. Tevvâb fa'âl kalıbı: çok çok tövbe kabul eden. Allah önce kulun kalbini tövbeye çevirir, sonra tövbeyi kabul eder — her iki adım da O'ndandır.",
+  ayetler:[
+    {arapca:"إِنَّهُۥ هُوَ ٱلتَّوَّابُ ٱلرَّحِيمُ", meal:"Şüphesiz O Tevvâb ve Rahim'dir.", kaynak:"Bakara 2:37",
+     tefsir:"İbn Kesîr: 'Hz. Âdem'in tövbesinin kabulünün ardından gelen Tevvâb ismi; insanlık tarihinin başından beri tövbenin kapısının açık olduğunu ilan eder. Bu, ümidi en eski teminattır.' Kurtubî: 'Tevvâb mübalağa kalıbı; tekrar tekrar tövbe edene tekrar tekrar kabul eden demektir. Kaç kez düşülürse düşülsün kapı kapanmaz.'"},
+    {arapca:"وَتُوبُوٓا۟ إِلَى ٱللَّهِ جَمِيعًا أَيُّهَ ٱلْمُؤْمِنُونَ لَعَلَّكُمْ تُفْلِحُونَ", meal:"Ey müminler! Hepiniz Allah'a tövbe edin; kurtuluşa eresiniz.", kaynak:"Nûr 24:31",
+     tefsir:"Taberî: 'Toplu tövbe çağrısı; Tevvâb isminin kapısının herkese ve her zaman açık olduğunu gösterir. Hiçbir istisna yoktur.' Râzî: 'Tövbe; yalnızca büyük günahlar için değil, her an her hal için geçerlidir. Tevvâb ismi bu kapıyı sürekli açık tutar.'"}
+  ],
+  hadisler:[
+    {metin:"Allah kulunun tövbesinden, çölde devesini bulanın sevincinden daha çok sevinir.", kaynak:"Buhârî, Da'avât 4; Müslim, Tevbe 7", derece:"Sahih"},
+    {metin:"Güneş batıdan doğmadıkça tövbenin kapısı açıktır.", kaynak:"Müslim, Zikir 43; Tirmizî, Da'avât 98", derece:"Sahih"}
+  ],
+  geylani:"Tevvâb'ın kapısını çalmak için özel bir hal gerekmez; sadece döndüğünde O kapıyı açmış bulursun."
+},
+{
+  no:82, arapca:"ٱلْمُنتَقِم", latin:"el-Müntakim", anlam:"Hakkı alan — zulmün hesabını soran, mazlumun hakkını geri veren", grup:"Celâl",
+  kok:"N-K-M kökü. 'İntikam' hakkı zorla alma. Müntakim if'tiâl kalıbı. Allah için bu isim şahsî öfke değil; bozulan adaletin yeniden tesisidir. Mazlumun hakkını zâlimden alan; bu isim adaletin ilahî teminatıdır.",
+  ayetler:[
+    {arapca:"إِنَّا مِنَ ٱلْمُجْرِمِينَ مُنتَقِمُونَ", meal:"Biz suçlulardan intikam alırız.", kaynak:"Secde 32:22",
+     tefsir:"İbn Kesîr: 'Bu âyet; günahı hafife alanlar için en güçlü uyarıdır. Allah intikam alır — zulüm hesapsız kalmaz. Müntakim ismi adaleti güvence altına alır.' Kurtubî: 'Müntakim ismi mazluma sığınak, zâlime uyarıdır. Dünyada ceza ertelenebilir ama Allah'ın hesap sorması kaçınılmazdır.'"},
+    {arapca:"وَٱللَّهُ عَزِيزٌ ذُو ٱنتِقَامٍ", meal:"Allah güçlüdür, intikam sahibidir.", kaynak:"Âl-i İmrân 3:4",
+     tefsir:"Taberî: 'Azîz ve Müntakim birlikte; güçlü olan intikam alabilir. Allah'ın gücü sonsuz olduğundan intikamı da engelsiz ve kesindir.' Râzî: 'Müntakim ismi adaletin en derin güvencesidir. Hiçbir zulüm son bulmaz; er ya da geç hesap görülür.'"}
+  ],
+  hadisler:[
+    {metin:"Mazlumun bedduasından sakının; Allah ile arasında perde yoktur.", kaynak:"Buhârî, Zekât 41; Müslim, İman 29", derece:"Sahih"},
+    {metin:"Kıyamette her hak sahibi hakkını alır; hatta boynuzsuz koyun, boynuzlu koyundan hakkını alır.", kaynak:"Müslim, Birr 60; Tirmizî, Kıyamet 2", derece:"Sahih"}
+  ],
+  geylani:"Müntakim'i bilen mazlum sabır eder; zira hesap görülecektir. Bu bilgi, öfkeyi sabra dönüştürür."
+},
+{
+  no:83, arapca:"ٱلْعَفُوّ", latin:"el-Afüvv", anlam:"Günahı kökten silen — izi bırakmadan tamamen affeden", grup:"Cemâl",
+  kok:"A-F-V kökü. 'Af' silmek, temizlemek. Afüvv fa'ûl kalıbı: çok çok affeden. Gafûr ile farkı: Gafûr örter, Afüvv ise siler. Bağışlamada iki aşama; örtme sonra silme. Afüvv daha tam ve köklü bir affı anlatır.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ كَانَ عَفُوًّا غَفُورًا", meal:"Allah Afüvv'dür, Gafûr'dur.", kaynak:"Nisâ 4:43",
+     tefsir:"İbn Kesîr: 'Afüvv ve Gafûr birlikte; silme ve örtme. İkisi birlikte tam bağışlamayı anlatır: Günahın izi silinir ve üstü örtülür. Gafûr'a Afüvv eklenmesi bağışlamanın derinliğini gösterir.' Kurtubî: 'Af; günahın sanki hiç olmamış gibi sayılmasıdır. Kul Allah'ın huzuruna lekesiz çıkabilir — bu Afüvv isminin vaadidir.'"},
+    {arapca:"إِنَّ ٱللَّهَ لَعَفُوٌّ غَفُورٌ", meal:"Şüphesiz Allah Afüvv'dür, Gafûr'dur.", kaynak:"Hacc 22:60",
+     tefsir:"Taberî: 'Mazlumiyet bağlamında gelen bu âyet; Allah'ın affının adalet içinde işlediğini gösterir.' Râzî: 'Afüvv ismi Kadir gecesi duasında özellikle kullanılır. O gece tam af için en özel fırsattır.'"}
+  ],
+  hadisler:[
+    {metin:"Kadir gecesinde: 'Allahümme inneke Afüvvun tuhibbu'l-afve fa'fu annî' de.", kaynak:"Tirmizî, Da'avât 89; İbn Mâce, Duâ 5", derece:"Sahih"},
+    {metin:"Allah affetmeyi sever ve affedenlerden hoşlanır.", kaynak:"Tirmizî, Birr 82; Elbânî: sahih", derece:"Sahih"}
+  ],
+  geylani:"Afüvv'ün affı günahın sadece üstünü örtmez, altını da siler. Bu büyük af O'nun sevgisinin büyüklüğündendir."
+},
+{
+  no:84, arapca:"ٱلرَّءُوف", latin:"er-Raûf", anlam:"Şefkatli — derinlikli ve hassas merhametle acıyan", grup:"Cemâl",
+  kok:"R-E-F kökü. 'Re'fet' derin acıma, hassas şefkat. Raûf fa'ûl kalıbı: son derece şefkatli. Rahim'den farkı: Rahim genel merhameti; Raûf ise kalp kırıklığından kaynaklanan ve acıyı bizzat hisseden şefkati anlatır.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ بِٱلنَّاسِ لَرَءُوفٌ رَّحِيمٌ", meal:"Şüphesiz Allah insanlara Raûf ve Rahim'dir.", kaynak:"Bakara 2:143",
+     tefsir:"İbn Kesîr: 'Raûf ismi Allah'ın kullarına derin şefkatini anlatır. Rahim genel merhameti; Raûf ise bu merhametin kalpten gelen, hisseden boyutunu ifade eder. Hz. Peygamber de Raûf ve Rahim diye nitelendirilmiştir (Tevbe 9:128).' Kurtubî: 'Namazı zorlaştırılmaktan korunmak gibi kulların kolaylaştırılması bağlamında Raûf ismi kullanılır; zorlaştıran değil, kolaylaştıran ve acıyan.'"},
+    {arapca:"بِٱلْمُؤْمِنِينَ رَءُوفٌ رَّحِيمٌ", meal:"Mü'minlere Raûf ve Rahim'dir.", kaynak:"Tevbe 9:128",
+     tefsir:"Taberî: 'Hz. Peygamber'e Allah'ın iki isminin verilmesi; O'nun Allah'ın ahlâkıyla ahlâklandığını gösterir. Raûf ismi insanî şefkatin ilahî kalıba girmiş hâlidir.' Râzî: 'Raûf; acı çekeni gördüğünde dayanamayıp yardım eden. Allah'ın bu vasfı, kulun çektiği her acının O'na ulaştığını bildirir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah merhametlidir ve yalnızca merhametlilere merhamet eder.", kaynak:"Buhârî, Edeb 18; Müslim, Tevbe 22", derece:"Sahih"},
+    {metin:"Allah acıyan kalplere acır.", kaynak:"Ebû Dâvûd, Cenâiz 25; Tirmizî, Cenâiz 44", derece:"Sahih"}
+  ],
+  geylani:"Raûf olan Allah'ın nazikliği, kulun en ağır yükünü hafifletir. O'na dayan; O bilir nasıl taşınacağını."
+},
+{
+  no:85, arapca:"مَالِكُ ٱلْمُلْك", latin:"Mâlikü'l-Mülk", anlam:"Mülkün gerçek sahibi — her şeyin mutlak hâkimi", grup:"Celâl",
+  kok:"M-L-K kökü. Mâlik sahipliği; Melik hükümranlığı öne çıkarır. Mâlikü'l-Mülk: mülkün gerçek sahibi. İnsanların sahipliği geçici ve emanet; asıl sahip Allah'tır.",
+  ayetler:[
+    {arapca:"قُلِ ٱللَّهُمَّ مَـٰلِكَ ٱلْمُلْكِ تُؤْتِى ٱلْمُلْكَ مَن تَشَآءُ وَتَنزِعُ ٱلْمُلْكَ مِمَّن تَشَآءُ", meal:"De ki: Ey mülkün sahibi Allah! Dilediğine mülk verirsin, dilediğinden mülkü alırsın.", kaynak:"Âl-i İmrân 3:26",
+     tefsir:"İbn Kesîr: 'Bu âyet tevhidin en kapsamlı ifadelerinden biridir. Mülk Allah'ındır; ne zalim hükümdar kalıcıdır ne de mümin mülksüz kalır.' Kurtubî: 'Mâlikü'l-Mülk ismi mülke bağlananları özgür kılar: Asıl sahip Allah ise, geçici mülk elden gidince yıkılmak için sebep yoktur.'"},
+    {arapca:"تَبَارَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", meal:"Mülk elinde olan ne yücedir; O her şeye kâdirdir.", kaynak:"Mülk 67:1",
+     tefsir:"Taberî: 'Mülk sûresinin açılışı Mâlikü'l-Mülk isminin özüdür. Her şey O'nun elindedir; hiçbir mülk sahibi gerçek anlamda malik değildir.' Râzî: 'Mülk kavramı yalnızca toprak ve servet değildir; zaman, sağlık, akıl ve can da O'nun mülküdür.'"}
+  ],
+  hadisler:[
+    {metin:"Allah kıyamette 'Bugün mülk kimindir?' diye sorar; 'Bir ve Kahhâr olan Allah'ındır' cevabını kendisi verir.", kaynak:"Buhârî, Tefsir, Mü'min; Müslim, Cennet 18", derece:"Sahih"},
+    {metin:"Dünya Allah'ın malıdır; O dilediğine verir.", kaynak:"Buhârî, Cum'a 11; Müslim, Zekât 36 bağlamı", derece:"Sahih"}
+  ],
+  geylani:"Mâlikü'l-Mülk'ü bilen; ne kaybettiğinde yıkılır ne kazandığında şımarır. Mülk O'nundur; gelip gider."
+},
+{
+  no:86, arapca:"ذُو ٱلْجَلَـٰلِ وَٱلْإِكْرَام", latin:"Zü'l-Celâli ve'l-İkrâm", anlam:"Celâl ve İkrâm sahibi — hem heybetli hem de çok ikrâm eden", grup:"Celâl",
+  kok:"C-L-L (celâl: ululuk, heybet) ve K-R-M (ikrâm: şereflendirme, cömertlik) köklerinden bileşik isim. Celâl heybet boyutunu; İkrâm ise lütuf ve cömertlik boyutunu anlatır. İkisi birlikte dengeli bir kulluk hâlini zorunlu kılar: korku ve ümit.",
+  ayetler:[
+    {arapca:"وَيَبْقَىٰ وَجْهُ رَبِّكَ ذُو ٱلْجَلَـٰلِ وَٱلْإِكْرَامِ", meal:"Celâl ve İkrâm sahibi Rabbinin yüzü bâki kalacak.", kaynak:"Rahmân 55:27",
+     tefsir:"İbn Kesîr: 'Her şeyin fânî olduğu söylendikten hemen sonra yalnızca Allah'ın zâtının kalıcı olduğu ilan edilir. Celâl korkuyu; İkrâm ümidi canlı tutar — bu denge ibadetin özüdür.' Kurtubî: 'Hz. Peygamber bu ismi çokça kullanmayı emretmiştir. Rahmân sûresi boyunca sayılan nimetlerin ardından bu isimle bitmesi tesadüf değildir.'"},
+    {arapca:"تَبَارَكَ ٱسْمُ رَبِّكَ ذِى ٱلْجَلَـٰلِ وَٱلْإِكْرَامِ", meal:"Celâl ve İkrâm sahibi Rabbinin ismi ne mübarektir!", kaynak:"Rahmân 55:78",
+     tefsir:"Taberî: 'Rahmân sûresi bu isimle açılır (Rahmân) ve bu isimle kapanır (Zü'l-Celâl). Sûrenin tamamı lütuf ve heybet arasındaki dengeyi işler.' Râzî: 'Yâ Ze'l-Celâli ve'l-İkrâm duası; hem Allah'ın haşmetine hem cömertliğine birlikte sığınmaktır.'"}
+  ],
+  hadisler:[
+    {metin:"'Yâ Ze'l-Celâli ve'l-İkrâm' ile duaya devam edin.", kaynak:"Tirmizî, Da'avât 65; Nesâî, Sehv 95", derece:"Sahih"},
+    {metin:"İsm-i Azam'ın bu ismi içerdiği rivayet edilmiştir; bu isimle yapılan dua reddedilmez.", kaynak:"Hâkim, Müstedrek 1/683; Elbânî: hasen", derece:"Hasen"}
+  ],
+  geylani:"Celâl seni titretsin; İkrâm ise seni sıcak tutsun. Bu iki duygu birlikte mü'minin kalp hâlidir."
+},
+{
+  no:87, arapca:"ٱلْمُقْسِط", latin:"el-Muksit", anlam:"Adaleti eksiksiz uygulayan — tam hakkaniyet sahibi", grup:"Celâl",
+  kok:"K-S-T kökü. 'Kıst' adalet, hak. Muksit if'âl kalıbı: adaleti uygulayan. Dikkat: Kâsıt (aynı kök) haksızlık eden demektir — zıt anlam. Adl ile yakın; Adl adaleti, Muksit ise adaleti fiilen uygulama eylemini öne çıkarır.",
+  ayetler:[
+    {arapca:"إِنَّ ٱللَّهَ يُحِبُّ ٱلْمُقْسِطِينَ", meal:"Allah adaletli olanları sever.", kaynak:"Mâide 5:42",
+     tefsir:"İbn Kesîr: 'Muksit isminin en güzel yansıması; Allah adaletli olanları sevmesidir. O Muksit'tir ve Muksitleri sever.' Kurtubî: 'Adaletli olmak yalnızca hukuki değil; sosyal, aile ve kişisel ilişkilerde de geçerlidir. Allah bu geniş anlamıyla Muksit'tir.'"},
+    {arapca:"وَأَقِيمُوا۟ ٱلْوَزْنَ بِٱلْقِسْطِ وَلَا تُخْسِرُوا۟ ٱلْمِيزَانَ", meal:"Teraziyi adaletle tutun; dengeyi bozmayın.", kaynak:"Rahmân 55:9",
+     tefsir:"Taberî: 'Kıst (adalet) ve Muksit ilişkisi; kulların adaleti, Allah'ın adaletinin yansımasıdır. Allah adaleti emreder çünkü kendisi de Muksit'tir.' Râzî: 'Muksit ismi; Allah'ın tasarrufunun tarafsız olduğunu bildirir. Ne mü'mine ayrıcalık ne inkârcıya haksız baskı.'"}
+  ],
+  hadisler:[
+    {metin:"Adil imamlar kıyamette Allah'ın sağında nurdan kürsülerde oturur.", kaynak:"Müslim, İmâret 18; Nesâî, Âdâb 1", derece:"Sahih"},
+    {metin:"İki taraf arasında adil davrananlar kıyamette Muksitlerin makamındadır.", kaynak:"Müslim, İmâret 18; Tirmizî, Ahkâm 4", derece:"Sahih"}
+  ],
+  geylani:"Muksit Allah'ın terazisi her şeyi tartıya koyar. Bu tartıya girerken elini iyilik tarafından dolu tut."
+},
+{
+  no:88, arapca:"ٱلْجَامِع", latin:"el-Câmi'", anlam:"Toplayan — kıyamette bütün varlıkları bir araya getiren", grup:"Kemâl",
+  kok:"C-M-A kökü. 'Cem' toplama, bir araya getirme. Câmi' fa'il kalıbı: toplayan. Cami (namaz yeri) de aynı kökten. İki boyut: (1) Kıyamette tüm insanları toplayan; (2) Kâinattaki zıtları ve çeşitliliği bir arada tutan.",
+  ayetler:[
+    {arapca:"رَبَّنَآ إِنَّكَ جَامِعُ ٱلنَّاسِ لِيَوْمٍ لَّا رَيْبَ فِيهِ", meal:"Rabbimiz! Şüphe olmayan o günde insanları toplayacak olan Sensin.", kaynak:"Âl-i İmrân 3:9",
+     tefsir:"İbn Kesîr: 'Câmi' isminin en büyük tecellisi kıyamettir. Bu dua; Allah'ın kıyameti mutlaka gerçekleştireceğine olan imana dayanır ve O'na sığınmaktır.' Kurtubî: 'Kıyamette toplama hem adalet hem hesap içindir. Câmi' ismi her ikisini de kapsar.'"},
+    {arapca:"ذَٰلِكَ يَوْمٌ مَّجْمُوعٌ لَّهُ ٱلنَّاسُ وَذَٰلِكَ يَوْمٌ مَّشْهُودٌ", meal:"O, insanların toplanacağı ve şahit olunacak bir gündür.", kaynak:"Hûd 11:103",
+     tefsir:"Taberî: 'Câmi' isminin toplama eylemi kıyamette en kapsamlı biçimde gerçekleşir: İlkler ve sonrakiler, insanlar ve cinler, hepsi toplanır.' Râzî: 'Câmi' ismi kâinatın birliğini de anlatır: Çeşitlilik içinde birlik ve zıtlar içinde denge — hepsi O'nun tasarrufu.'"}
+  ],
+  hadisler:[
+    {metin:"Kıyamette ilkler ve sonrakiler tek bir alanda toplanır.", kaynak:"Buhârî, Rikâk 45; Müslim, Cennet 56", derece:"Sahih"},
+    {metin:"Camide toplananlar Allah'ı anmak için toplanmış; dağılanlar da O'nun meclisinden dağılmış olur.", kaynak:"Müslim, Zikir 38; Tirmizî, Da'avât 139", derece:"Sahih"}
+  ],
+  geylani:"Câmi' ismi dağınık kalplere mesaj verir: Ayrılığı sen seçme; birleştirmek Allah'ın işidir."
+},
+{
+  no:89, arapca:"ٱلْغَنِىّ", latin:"el-Ganiyy", anlam:"Hiçbir şeye muhtaç olmayan — tam zenginlik ve bağımsızlık sahibi", grup:"Zât",
+  kok:"G-N-V kökü. 'Gınâ' zenginlik, ihtiyaçsızlık. Ganiyy fa'îl kalıbı. Allah'ın zenginliği maddî değil, ontolojik; O hiçbir şeye muhtaç değildir. Her şey O'na muhtaçtır. Samed ile anlam yakınlığı vardır.",
+  ayetler:[
+    {arapca:"يَـٰٓأَيُّهَا ٱلنَّاسُ أَنتُمُ ٱلْفُقَرَآءُ إِلَى ٱللَّهِ ۖ وَٱللَّهُ هُوَ ٱلْغَنِىُّ ٱلْحَمِيدُ", meal:"Ey insanlar! Siz Allah'a muhtaçsınız; Allah ise Ganiyy ve Hamîd'dir.", kaynak:"Fâtır 35:15",
+     tefsir:"İbn Kesîr: 'Tevhidin en net ifadelerinden biri: İnsanın fakrı (muhtaçlığı) ile Allah'ın gınâsı karşı konumlanmıştır. Bu farkı bilen kibirden vazgeçer ve teslim olur.' Kurtubî: 'Ganiyy ve Hamîd birlikte; muhtaç olmadığı halde lütuf veriyor ve bu lütuf O'nu övgüye lâyık kılıyor.'"},
+    {arapca:"إِنَّ ٱللَّهَ لَغَنِىٌّ عَنِ ٱلْعَـٰلَمِينَ", meal:"Allah âlemlerden tamamen müstağnidir.", kaynak:"Âl-i İmrân 3:97",
+     tefsir:"Taberî: 'İbadet Allah'a bir şey katmaz; terk etmek de bir şey eksiltmez. O âlemlerden zengindir. Bu ibadetin Allah için değil, kul için olduğunu gösterir.' Râzî: 'Ganiyy ismi; Allah'ın ibadet emretmesinin sebebini açıklar: Kul için, kendi arınması ve kemâli için.'"}
+  ],
+  hadisler:[
+    {metin:"Allah buyurur: Ey kullarım! Siz Bana ne fayda verebilir ne de zarar. Yaptıklarınız yalnızca kendinize döner.", kaynak:"Müslim, Birr 55", derece:"Sahih"},
+    {metin:"Sadaka Allah'ın zenginliğini azaltmaz; aksine bereketlendirir.", kaynak:"Müslim, Zekât 69; Tirmizî, Birr 82", derece:"Sahih"}
+  ],
+  geylani:"Ganiyy olan Allah'a ihtiyaçlarını arz et; O'nun zenginliğinden talep et. O'na yük değilsin; O zaten her şeyin sahibidir."
+},
+{
+  no:90, arapca:"ٱلْمُغْنِى", latin:"el-Muğnî", anlam:"Zenginleştiren — dilediğini yoksulluktan çıkarıp doyuran", grup:"Cemâl",
+  kok:"G-N-V kökü. Ganiyy ile aynı kök; Muğnî if'âl kalıbı: zenginleştiren, yeterli kılan. Allah hem maddî hem manevî zenginliği verendir. Gerçek zenginlik ise kalbin kanaati ve huzurudur.",
+  ayetler:[
+    {arapca:"وَأَنَّهُۥ هُوَ أَغْنَىٰ وَأَقْنَىٰ", meal:"Zenginleştiren ve kalıcı mülk veren O'dur.", kaynak:"Necm 53:48",
+     tefsir:"İbn Kesîr: 'Muğnî isminin tecellisi; hem zenginleştirmek hem kalıcı mülk sahibi kılmak. Geçici bolluk değil, kalıcı yeterlilik.' Kurtubî: 'Gerçek zenginlik Allah'ın vermesiyledir; beşer gayreti yalnızca araçtır.'"},
+    {arapca:"وَوَجَدَكَ عَآئِلًا فَأَغْنَىٰ", meal:"Seni fakir buldu ve zenginleştirdi.", kaynak:"Duhâ 93:8",
+     tefsir:"Taberî: 'Hz. Peygamber'in fakr hâlinden çıkarılması; Muğnî isminin en somut örneğidir. Allah yoksulluğun ortasında bile zenginlik yolunu açar.' Râzî: 'Muğnî ismi; servet değil, yeterlilik anlamında zenginleştirir. Kalp kanaatini de bu isim verir.'"}
+  ],
+  hadisler:[
+    {metin:"Gerçek zenginlik mal çokluğu değil, kalp zenginliğidir.", kaynak:"Buhârî, Rikâk 15; Müslim, Zekât 120", derece:"Sahih"},
+    {metin:"Helâl kazananın rızkını Allah bereketlendirir.", kaynak:"Beyhakî, Şuabü'l-İman 5/12; Taberânî, Evsat", derece:"Hasen"}
+  ],
+  geylani:"Muğnî'nin zenginleştirmesi çantanı değil kalbini doldurmaktır. Kalp zengin olunca dünya fakirliği de çekilir."
+},
+{
+  no:91, arapca:"ٱلْمَانِع", latin:"el-Mâni'", anlam:"Engelleyen — dilediğini men eden, verdiğini kimse tutamaz", grup:"Celâl",
+  kok:"M-N-A kökü. 'Men' engelleme, yasaklama. Mâni' fa'il kalıbı. Mu'tî (veren) ile çifttir: Allah dilediğine verir, dilediğini men eder. Hiçbir güç O'nun verdiğini alamaz veya men ettiğini veremez.",
+  ayetler:[
+    {arapca:"مَّا يَفْتَحِ ٱللَّهُ لِلنَّاسِ مِن رَّحْمَةٍ فَلَا مُمْسِكَ لَهَا ۖ وَمَا يُمْسِكْ فَلَا مُرْسِلَ لَهُۥ", meal:"Allah'ın açtığını tutacak, tuttuğunu açacak yoktur.", kaynak:"Fâtır 35:2",
+     tefsir:"İbn Kesîr: 'Mâni' isminin özü; O men ettiğinde hiçbir güç veremez. Sebeplere takılanlar için en güçlü uyarı: Sebepler yalnızca O'nun izniyle çalışır.' Kurtubî: 'Mâni' ve Fettâh birlikte düşünülmeli: Allah hem açar hem kapatır; her ikisi de hikmetlidir.'"},
+    {arapca:"لَّا مُعَقِّبَ لِحُكْمِهِۦ وَهُوَ سَرِيعُ ٱلْحِسَابِ", meal:"O'nun hükmünü geri çevirecek yoktur.", kaynak:"Ra'd 13:41",
+     tefsir:"Taberî: 'Mâni' isminin hüküm boyutu; Allah'ın kararını boşa çıkaracak hiçbir güç yoktur.' Râzî: 'Mâni' ismi sebepler zincirini kıran ve yalnızca Allah'ın iradesine bağlayan isimdir; tevekkülün en sağlam zeminidir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme lâ mâni'a limâ a'tayt ve lâ mu'tiya limâ mana't — Allah'ım verdiğini engelleyecek, engellediğini verecek kimse yoktur.", kaynak:"Buhârî, Ezân 155; Müslim, Mesâcid 137", derece:"Sahih"},
+    {metin:"Kim Allah'ın kapısını çalarsa o kapı açılır; kim başkasının kapısını çalarsa kapalı bulur.", kaynak:"Tirmizî, Da'avât 109; İbn Mâce, Duâ 3", derece:"Hasen"}
+  ],
+  geylani:"Mâni' kapattığında başka kapı yoktur; o zaman geriye yalnız O'na dua kalmıştır. Ve O o kapıyı açabilir."
+},
+{
+  no:92, arapca:"ٱلضَّارّ", latin:"ed-Dârr", anlam:"Zarar veren — dilediğine zarar dokunduran", grup:"Celâl",
+  kok:"D-R-R kökü. 'Darar' zarar, ziyan. Dârr fa'il kalıbı. Allah için; yaratılmışlara dokunan her zararın nihaî kaynağı ve sahibi demektir. Nâfi' ile çifttir ve bu isim asla tek başına kullanılmaz.",
+  ayetler:[
+    {arapca:"وَإِن يَمْسَسْكَ ٱللَّهُ بِضُرٍّ فَلَا كَاشِفَ لَهُۥٓ إِلَّا هُوَ ۖ وَإِن يَمْسَسْكَ بِخَيْرٍ فَهُوَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", meal:"Allah sana bir zarar dokundurursa onu O'ndan başkası açamaz; bir hayır dokundurursa O her şeye kâdirdir.", kaynak:"En'âm 6:17",
+     tefsir:"İbn Kesîr: 'Dârr isminin tecellisi: Zarar O'ndan geldiyse O'ndan başkası kaldıramaz. Bu; sihirbaz, hekim veya insan değil — yalnızca Allah.' Kurtubî: 'Dârr ismi; zarara karşı tek sığınağın Allah olduğunu öğretir. Başka kapı çalmak beyhudedir.'"},
+    {arapca:"مَّآ أَصَابَكَ مِنْ حَسَنَةٍ فَمِنَ ٱللَّهِ ۖ وَمَآ أَصَابَكَ مِن سَيِّئَةٍ فَمِن نَّفْسِكَ", meal:"Sana gelen iyilik Allah'tandır; gelen kötülük ise nefsindendir.", kaynak:"Nisâ 4:79",
+     tefsir:"Taberî: 'Bu âyet Dârr ismini nüanslandırır: Allah zarar yaratır ama kulun nefsi buna sebebiyet verir. İlahî yaratma ve beşerî sorumluluk birlikte geçerlidir.' Râzî: 'Zarar ve fayda Allah'ın elindedir; kulun seçimleri ise hangi yönün açılacağını etkiler.'"}
+  ],
+  hadisler:[
+    {metin:"Bil ki tüm ümmet sana zarar vermek için toplansa, Allah'ın sana yazmadığını veremez.", kaynak:"Tirmizî, Kıyamet 60; Elbânî: sahih", derece:"Sahih"},
+    {metin:"Belâ; günahların kefareti ve derecelerin artmasıdır.", kaynak:"Tirmizî, Zühd 57; İbn Mâce, Fiten 23", derece:"Sahih"}
+  ],
+  geylani:"Dârr olan Allah'ın gönderdiği belâ, seni bitirmek için değil inşa etmek için gelir."
+},
+{
+  no:93, arapca:"ٱلنَّافِع", latin:"en-Nâfi'", anlam:"Fayda veren — her türlü hayrın ve faydanın yaratıcısı", grup:"Cemâl",
+  kok:"N-F-A kökü. 'Nef'' fayda, yarar. Nâfi' fa'il kalıbı. Dârr'ın zıddı. Her türlü fayda — sağlık, nimet, başarı, hidayet — yalnız Allah'tandır. Araçlar aracıdır; asıl veren O'dur.",
+  ayetler:[
+    {arapca:"قُل لَّآ أَمْلِكُ لِنَفْسِى نَفْعًا وَلَا ضَرًّا إِلَّا مَا شَآءَ ٱللَّهُ", meal:"De ki: Allah dilemedikçe kendime fayda da zarar da vermeye gücüm yetmez.", kaynak:"A'râf 7:188",
+     tefsir:"İbn Kesîr: 'Hz. Peygamber bile yalnızca Allah'ın izniyle fayda verebileceğini beyan eder. Nâfi' isminin özü budur: Her fayda O'ndan ve O'nun izniyle.' Kurtubî: 'Nâfi' ismini bilen; fayda için yalnız Allah'a yönelir. Başkasına yalvarmak ya cehaletten ya da zayıflıktan kaynaklanır.'"},
+    {arapca:"إِن تَنصُرُوا۟ ٱللَّهَ يَنصُرْكُمْ وَيُثَبِّتْ أَقْدَامَكُمْ", meal:"Allah'a (dinine) yardım ederseniz O da size yardım eder ve ayaklarınızı sabit kılar.", kaynak:"Muhammed 47:7",
+     tefsir:"Taberî: 'Nâfi' isminin şartlı tecellisi; Allah'ın yardımı ve faydası verme şartı O'na yardım etmektir. Bu; Nâfi' isminin belirli bir düzen içinde çalıştığını gösterir.' Râzî: 'Nâfi' her şeyin faydası; O dilediğinde ve dilediğine fayda ulaştırır. Araç ve sebepler O'nun sünnetinin kanallarıdır.'"}
+  ],
+  hadisler:[
+    {metin:"Tüm ümmet sana zarar vermek için toplansa Allah'ın yazmadığını veremez; fayda vermek için toplansa Allah'ın yazmadığını da veremez.", kaynak:"Tirmizî, Kıyamet 60; Elbânî: sahih", derece:"Sahih"},
+    {metin:"En faydalı amel, Allah'a en yakın olandır.", kaynak:"Buhârî, Zekât 18; Müslim, Zekât 53", derece:"Sahih"}
+  ],
+  geylani:"Nâfi' olan Allah'tan başkasından fayda beklemek; nehri geçtikten sonra kayığı taşımak gibidir."
+},
+{
+  no:94, arapca:"ٱلنُّور", latin:"en-Nûr", anlam:"Gerçek nur — göklerin ve yerin ışığının kaynağı", grup:"Zât",
+  kok:"N-V-R kökü. 'Nûr' ışık, aydınlık. Allah'ın Nûr oluşu fiziksel ışık değil; hidayet nuru, varlık nuru ve anlam nurudur. Her ışığın ışık olabilmesi O'nun nurundan kaynaklanır.",
+  ayetler:[
+    {arapca:"ٱللَّهُ نُورُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ ۚ مَثَلُ نُورِهِۦ كَمِشْكَوٰةٍ فِيهَا مِصْبَاحٌ", meal:"Allah göklerin ve yerin nurudur. O'nun nuruna örnek: İçinde kandil bulunan bir kandillik gibi.", kaynak:"Nûr 24:35",
+     tefsir:"İbn Kesîr: 'Bu âyet müfessirlerin en çok üzerinde durduğu âyetlerden biridir. Gazzâlî bu âyete Mişkâtü'l-Envâr adlı kitabını yazmıştır. Allah fiziksel ışık değil; kalpleri, akılları ve kâinatı anlamlandıran mânevî nurdur.' Kurtubî: 'Nûr; aydınlatan demektir. Allah'ın nuru kalpleri, yolları ve hakikati aydınlatır. Bu âyet müteşâbih olup zâhiri kabul edilmekte ya da mecaz olduğu söylenmektedir.'"},
+    {arapca:"يَهْدِى ٱللَّهُ لِنُورِهِۦ مَن يَشَآءُ", meal:"Allah nuruna dilediğini iletir.", kaynak:"Nûr 24:35",
+     tefsir:"Taberî: 'Hidayet; Allah'ın nuruna götürmektir. Bu hidayet O'nun iradesindedir.' Râzî: 'Nûr ismi; Allah'ın tüm bilgi ve aydınlatmanın kaynağı olduğunu anlatır. Kur'ân da nurdur (Mâide 5:15); çünkü Allah'ın nurundan gelmektedir.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme'c-al fî kalbî nûrâ ve fî lisânî nûrâ... — Allah'ım kalbime, dilime, gözlerime, kulaklarıma nur koy.", kaynak:"Buhârî, Da'avât 10; Müslim, Müsâfirîn 181", derece:"Sahih"},
+    {metin:"Allah'ın nurundan perde vardır; onu kaldırsa yüzünün nuru her şeyi yakardı.", kaynak:"Müslim, İman 293; İbn Mâce, Mukaddime 13", derece:"Sahih"}
+  ],
+  geylani:"Nûr olan Allah'ın nuru kalbe düşünce zulmet (karanlık) kalmaz. Bu nuru iste; onsuz yolun karanlıktır."
+},
+{
+  no:95, arapca:"ٱلْهَادِى", latin:"el-Hâdî", anlam:"Yol gösteren — kalpleri ve akılları hakka ileten", grup:"Cemâl",
+  kok:"H-D-V kökü. 'Hidayet' yol gösterme. Hâdî fa'il kalıbı. İki tür hidayet: (1) Delâlet hidayeti — doğruyu göstermek; (2) Tevfik hidayeti — kalbi doğruya yönlendirmek. İkincisi yalnız Allah'a aittir.",
+  ayetler:[
+    {arapca:"وَإِنَّ ٱللَّهَ لَهَادِ ٱلَّذِينَ ءَامَنُوٓا۟ إِلَىٰ صِرَٰطٍ مُّسْتَقِيمٍ", meal:"Şüphesiz Allah inananları doğru yola iletir.", kaynak:"Hacc 22:54",
+     tefsir:"İbn Kesîr: 'Hâdî isminin garantisi bu âyet: İman edenlere doğru yol vaad edilmiştir. İman hâlinde sürekli geçerli olan bir teminattır.' Kurtubî: 'Hidayet yalnızca tebliğ değil, kalbi yönlendirmektir. İkincisi Allah'ın özel takdiridir.'"},
+    {arapca:"إِنَّكَ لَا تَهْدِى مَنْ أَحْبَبْتَ وَلَـٰكِنَّ ٱللَّهَ يَهْدِى مَن يَشَآءُ", meal:"Sen sevdiğini hidayete erdiremezsin; ancak Allah dilediğini hidayete erdirir.", kaynak:"Kasas 28:56",
+     tefsir:"Taberî: 'Bu âyet Hz. Ebû Tâlib için inmiştir. Hidayetin yalnız Allah'tan gelebileceğini; beşer sevgisinin bile buna güç yetiremeyeceğini bildirir.' Râzî: 'Hâdî ismi, hidayeti dilediğine verme yetkisinin yalnız Allah'ta olduğunu ilan eder. Bu hem tevazuyu hem de Allah'a duayı zorunlu kılar.'"}
+  ],
+  hadisler:[
+    {metin:"Allahümme ihdini ve seddidnî — Allah'ım beni hidayete erdir ve doğruya yönelt.", kaynak:"Müslim, Zikir 19; Ebû Dâvûd, Salât 165", derece:"Sahih"},
+    {metin:"Allah'ın seninle bir kişiyi hidayete erdirmesi, kırmızı develerden daha hayırlıdır.", kaynak:"Buhârî, Cihâd 102; Müslim, Fedâil 34", derece:"Sahih"}
+  ],
+  geylani:"Hâdî'nin rehberliğini iste; kendine güvenme. En bilgili adam bile kendi aklına güvenince yolunu şaşırır."
+},
+{
+  no:96, arapca:"ٱلْبَدِيع", latin:"el-Bedî'", anlam:"Eşsiz yaratıcı — her şeyi örneksiz ve benzersiz var eden", grup:"Kemâl",
+  kok:"B-D-A kökü. 'İbdâ' örnek olmaksızın yoktan yaratma. Bedî' fa'îl kalıbı. Bid'at (yeni icat) aynı kökten. Allah'ın yarattığı şeylerin ne bir modeli ne de bir emsali vardır; her yaratılmış eşsizdir.",
+  ayetler:[
+    {arapca:"بَدِيعُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ ۖ وَإِذَا قَضَىٰٓ أَمْرًا فَإِنَّمَا يَقُولُ لَهُۥ كُن فَيَكُونُ", meal:"Gökleri ve yeri örnek almaksızın yaratan O'dur; bir şeye 'Ol' dediğinde olur.", kaynak:"Bakara 2:117",
+     tefsir:"İbn Kesîr: 'Bedî' ismi; Allah'ın yaratmasının tamamen özgün olduğunu bildirir. Hiçbir sanatçı eserini yoktan yaratmaz; Allah ise örneksiz ve sıfırdan yaratır. Kün feyekûn (ol der olur) ifadesi bu kudretin formülüdür.' Kurtubî: 'Göklerin ve yerin benzersiz yaratılması; Bedî' isminin en büyük delilidir. Bu kadar çeşit ve bu kadar düzen; yalnız Bedî' olan Allah'tan gelebilir.'"},
+    {arapca:"بَدِيعُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ أَنَّىٰ يَكُونُ لَهُۥ وَلَدٌ", meal:"Gökleri ve yeri örnek almaksızın yaratan O'dur; O'nun nasıl çocuğu olabilir?", kaynak:"En'âm 6:101",
+     tefsir:"Taberî: 'Bedî' ismi; Allah'ın hiçbir şeye muhtaç olmaksızın yarattığını anlatır. Bu muhtaçsızlık; eş veya çocuğa olan her türlü ihtiyacı da ortadan kaldırır.' Râzî: 'Bedî' ismi tevhidin delillerinden biridir: Yoktan ve örneksiz yaratan, hiçbir şeye muhtaç değildir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah en güzel surete, en güzel ölçüye (ahsenü takvîme) yarattı.", kaynak:"Buhârî, Bed'ü'l-halk 1; Müslim, Kader 28 bağlamı", derece:"Sahih"},
+    {metin:"Kâinatın yaratılışını tefekkür etmek en büyük ibadettir.", kaynak:"Beyhakî, Şuabü'l-İman 1/136; Münzirî, et-Terğîb", derece:"Hasen"}
+  ],
+  geylani:"Bedî' olan Allah seni de örneksiz ve benzersiz yarattı. Başkası gibi olmaya çalışmak O'nun sanatını küçümsemektir."
+},
+{
+  no:97, arapca:"ٱلْبَاقِى", latin:"el-Bâkî", anlam:"Kalıcı olan — her şey yok olduğunda da var olmaya devam eden", grup:"Zât",
+  kok:"B-K-V kökü. 'Bakâ' kalıcılık, süreklilik. Bâkî fa'il kalıbı. Fânî'nin (geçici) zıddı. Her yaratılmış fânîdir; yalnızca Allah bâkîdir. Cennet ve cehennemin sürekliliği de O'nun bakâsının bir yansımasıdır.",
+  ayetler:[
+    {arapca:"كُلُّ مَنْ عَلَيْهَا فَانٍ ۝ وَيَبْقَىٰ وَجْهُ رَبِّكَ ذُو ٱلْجَلَـٰلِ وَٱلْإِكْرَامِ", meal:"Yeryüzündeki her şey yok olacak; yalnızca Celâl ve İkrâm sahibi Rabbinin yüzü bâki kalacak.", kaynak:"Rahmân 55:26-27",
+     tefsir:"İbn Kesîr: 'Bâkî isminin en güçlü ifadesi bu âyettir. Her şey geçip gidecek; yalnızca Allah kalacak. Bu sonsuzluk yaratılmışlarınkinden tamamen farklıdır.' Kurtubî: 'Fânî olmak korkutucu görünse de Bâkî ismini bilmek teselli eder: Geçici olan gidecek ama gidilen yer bâkîdir.'"},
+    {arapca:"كُلُّ شَىْءٍ هَالِكٌ إِلَّا وَجْهَهُۥ", meal:"O'nun yüzü (zâtı) hariç her şey yok olacaktır.", kaynak:"Kasas 28:88",
+     tefsir:"Taberî: 'Bâkî isminin en kısa ifadesi: Her şey yok olur, O kalır. Bu ebedîlik yaratılmışlarla paylaşılmaz.' Râzî: 'Bakâ Allah'a özgüdür; yaratılmışların sürekliliği ise Allah'ın izni ve iradesiyledir — O dileseydi bitirirdi.'"}
+  ],
+  hadisler:[
+    {metin:"Dünya metaı azdır; âhiret daha hayırlı ve kalıcıdır.", kaynak:"Nahl 16:30 bağlamı; Müslim, İman 275; Buhârî, Rikâk 1", derece:"Sahih"},
+    {metin:"Geçici için kalıcıyı satma; ebedî için geçiciyi ver.", kaynak:"Buhârî, Rikâk 18; Müslim, Zühd 1 bağlamı", derece:"Sahih"}
+  ],
+  geylani:"Bâkî olan Allah için çalış; fâniye takılma. Bâkî'ye yatırım yap; fânî üzerine ağlama."
+},
+{
+  no:98, arapca:"ٱلْوَارِث", latin:"el-Vâris", anlam:"Her şeyin vârisi — tüm mülkün gerçek mirasçısı", grup:"Celâl",
+  kok:"V-R-S kökü. 'Miras' kalıtım, devir. Vâris fa'il kalıbı: mirasçı olan. Her şey sona erdiğinde mülk gerçek sahibine döner. Bu isim Bâkî ile tamamlanır: O kalıcıdır ve her şey O'na miras kalır.",
+  ayetler:[
+    {arapca:"وَإِنَّا لَنَحْنُ نُحْىِۦ وَنُمِيتُ وَنَحْنُ ٱلْوَٰرِثُونَ", meal:"Biz diriltiriz ve öldürürüz; vâris olan Biziz.", kaynak:"Hicr 15:23",
+     tefsir:"İbn Kesîr: 'Vâris ismi; her şeyin Allah'a döneceğini ilan eder. Dünyada geçici sahiplik görünümü vardır; gerçek mülk her zaman Allah'ın olmuştur.' Kurtubî: 'Bu isim hem tevekkülü hem zühdü teşvik eder: Gerçek mülk sahibini bilen geçici mülke gönül bağlamaz.'"},
+    {arapca:"وَلِلَّهِ مِيرَاثُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ", meal:"Göklerin ve yerin mirası Allah'ındır.", kaynak:"Âl-i İmrân 3:180",
+     tefsir:"Taberî: 'Cimrilik edenlerin cezasını anlatan bu âyette Vâris ismi; biriktirilenin nihayetinde Allah'a kalacağını söyler. Cimrilik; asıl sahibe verilmekten kaçınmaktır.' Râzî: 'Vâris ismi dünya ile ahiret arasındaki dengeyi kurar: Her şey geçici; asıl mülk sahibi Allah.'"}
+  ],
+  hadisler:[
+    {metin:"Her şey gidecek; yalnızca Allah kalacak. O Vâris'tir.", kaynak:"Rahmân 55:26-27 bağlamı; Buhârî, Tefsir, Rahmân", derece:"Sahih"},
+    {metin:"Zekeriyanın duası: 'Ve Ente hayru'l-vârisîn — Sen vârislerin en hayırlısısın.'", kaynak:"Enbiyâ 21:89 bağlamı; Buhârî, Enbiyâ 37", derece:"Sahih (âyet)"}
+  ],
+  geylani:"Ahireti isteyene dünyada zühd gerekir; Allah'ı isteyene ahirette zühd gerekir."
+},
+{
+  no:99, arapca:"ٱلصَّبُور", latin:"es-Sabûr", anlam:"Çok sabırlı — günahkâra hemen ceza vermeyip uzun süre mühlet tanıyan", grup:"Cemâl",
+  kok:"S-B-R kökü. 'Sabr' sabır, tahammül. Sabûr fa'ûl kalıbı: son derece sabırlı. Halîm ile anlam yakınlığı; Halîm aceleye gelmeyip yumuşak olan; Sabûr ise uzun süre bekleyip mühlet veren. Allah günahkâra en uzun süreyi tanır; bu mühlet tövbe kapısının açık tutulmasıdır.",
+  ayetler:[
+    {arapca:"وَلَوْ يُؤَاخِذُ ٱللَّهُ ٱلنَّاسَ بِمَا كَسَبُوا۟ مَا تَرَكَ عَلَىٰ ظَهْرِهَا مِن دَآبَّةٍ", meal:"Eğer Allah insanları kazandıklarıyla hemen hesaba çekse yeryüzünde tek bir canlı bırakmazdı.", kaynak:"Fâtır 35:45",
+     tefsir:"İbn Kesîr: 'Sabûr isminin en güçlü delili bu âyet: Allah hemen hesaba çekseydi kimse hayatta kalmazdı. Yeryüzündeki hayat; Allah'ın sabrının ve mühletinin eseridir.' Kurtubî: 'Sabûr ismi kulun tövbe etmesi için tanınan en uzun süreyi anlatır. Bu sürenin değerini bilmek, hayatı ciddiye almayı gerektirir.'"},
+    {arapca:"وَرَبُّكَ ٱلْغَفُورُ ذُو ٱلرَّحْمَةِ ۖ لَوْ يُؤَاخِذُهُم بِمَا كَسَبُوا۟ لَعَجَّلَ لَهُمُ ٱلْعَذَابَ", meal:"Rabbin Gafûr ve rahmet sahibidir; kazandıklarıyla hesaba çekseydi azabı hemen verirdi.", kaynak:"Kehf 18:58",
+     tefsir:"Taberî: 'Sabûr ismi Gafûr ve Rahim isimleriyle bütünleşir: Allah hem bağışlayan hem merhametli hem de sabırlıdır — bu üçü birlikte mühletin genişliğini oluşturur.' Râzî: 'Azabın acele edilmemesi; hem kullar için bir nimet hem de Allah'ın sabrının en açık tezahürüdür. Bu sabır, en büyük lütuf olabilir.'"}
+  ],
+  hadisler:[
+    {metin:"Allah'tan daha sabırlı kimse yoktur; O'na çocuk isnat ediyorlar, yine de rızıklandırıyor ve afiyet veriyor.", kaynak:"Buhârî, Tevhid 3; Müslim, Sıfatü'l-münâfikîn 49", derece:"Sahih"},
+    {metin:"Allah kulunun tövbe etmesini bekler; güneş batıdan doğana kadar bu kapıyı açık tutar.", kaynak:"Müslim, Zikir 43; Tirmizî, Da'avât 98", derece:"Sahih"}
+  ],
+  geylani:"Sabûr olan Allah seni bekliyor. Bu bekleme; O'nun sana değer verdiğinin işaretidir. Sabır, hayrın temelidir."
+}
+];
+// ============================================================
+// VERİ BURAYA GELECEK (merged_data.js inline edilecek)
+// ============================================================
+
+// ---- UYGULAMA KODU ----
+let aktifFiltre = 'hepsi';
+let aktifEsmaNo = null;
+let ogrenildiSet = new Set(JSON.parse(localStorage.getItem('esma_ogrenildi') || '[]'));
+
+function kaydetOgrenildi() {
+  localStorage.setItem('esma_ogrenildi', JSON.stringify([...ogrenildiSet]));
+}
+
+function ilerlemeGuncelle() {
+  const sayi = ogrenildiSet.size;
+  const yuzde = (sayi / 99) * 100;
+  document.getElementById('ilerlemeIc').style.width = yuzde + '%';
+  document.getElementById('ilerlemeYazi').textContent = sayi + '/99';
+}
+
+function filtrelenmisList() {
+  const ara = document.getElementById('aramaInput').value.toLowerCase().trim();
+  return ESMALAR.filter(e => {
+    if (aktifFiltre === 'ogrenildi') return ogrenildiSet.has(e.no);
+    if (aktifFiltre !== 'hepsi' && e.grup !== aktifFiltre) return false;
+    if (ara) {
+      return e.latin.toLowerCase().includes(ara) ||
+             e.anlam.toLowerCase().includes(ara) ||
+             String(e.no).includes(ara);
+    }
+    return true;
+  });
+}
+
+function listeRender() {
+  const liste = filtrelenmisList();
+  const konteyner = document.getElementById('esmaListesi');
+  konteyner.innerHTML = '';
+  liste.forEach(e => {
+    const el = document.createElement('div');
+    el.className = 'esma-item' +
+      (e.no === aktifEsmaNo ? ' aktif' : '') +
+      (ogrenildiSet.has(e.no) ? ' ogrenildi' : '');
+    el.dataset.no = e.no;
+    el.innerHTML = `
+      <span class="esma-no">${e.no}</span>
+      <div class="grup-nokta gp-${e.grup}"></div>
+      <div>
+        <div class="esma-arapca-kucuk">${e.arapca}</div>
+        <div class="esma-latin">${e.latin}</div>
+      </div>
+      ${ogrenildiSet.has(e.no) ? '<span class="ogrenildi-isaret">✓</span>' : ''}
+    `;
+    el.addEventListener('click', () => esmaGoster(e.no));
+    konteyner.appendChild(el);
+  });
+}
+
+function derece(d) {
+  const bas = d.split(/[—\-\s]/)[0].trim();
+  if (bas === 'Sahih') return 'hd-Sahih';
+  if (bas === 'Hasen') return 'hd-Hasen';
+  return 'hd-Zayıf';
+}
+
+function esmaGoster(no) {
+  const e = ESMALAR.find(x => x.no === no);
+  if (!e) return;
+  aktifEsmaNo = no;
+
+  // Listedeki aktif işareti güncelle
+  document.querySelectorAll('.esma-item').forEach(el => {
+    el.classList.toggle('aktif', Number(el.dataset.no) === no);
+  });
+
+  const filtreliListe = filtrelenmisList();
+  const idx = filtreliListe.findIndex(x => x.no === no);
+
+  const panel = document.getElementById('detayPanel');
+
+  // Ayet HTML
+  const ayetHTML = e.ayetler.map(a => `
+    <div class="ayet-kart">
+      <div class="ayet-arapca arapca">${a.arapca}</div>
+      <div class="ayet-meal">"${a.meal}"</div>
+      <cite class="ayet-kaynak">${a.kaynak}</cite>
+      <div class="ayet-tefsir">${a.tefsir}</div>
+    </div>
+  `).join('');
+
+  // Hadis HTML
+  const hadisHTML = e.hadisler.map(h => `
+    <div class="hadis-kart">
+      <div class="hadis-metin">"${h.metin}"</div>
+      <div class="hadis-alt">
+        <cite class="hadis-kaynak">${h.kaynak}</cite>
+        <span class="hadis-derece ${derece(h.derece)}">${h.derece}</span>
+      </div>
+    </div>
+  `).join('');
+
+  const ogr = ogrenildiSet.has(no);
+
+  panel.innerHTML = `
+    <div class="kart">
+      <div class="kart-baslik">
+        <div class="kart-no-grup">
+          <span class="kart-no">#${e.no}</span>
+          <span class="grup-etiket ge-${e.grup}">${e.grup}</span>
+        </div>
+        <div class="kart-isim-blok">
+          <div class="kart-arapca arapca">${e.arapca}</div>
+          <div class="kart-latin">${e.latin}</div>
+          <div class="kart-anlam">${e.anlam}</div>
+        </div>
+      </div>
+
+      <div class="bolum">
+        <div class="bolum-baslik">Kök ve Dil Analizi</div>
+        <div class="kok-metin">${e.kok}</div>
+      </div>
+
+      <div class="bolum">
+        <div class="bolum-baslik">Kur'ân Âyetleri ve Tefsir</div>
+        ${ayetHTML}
+      </div>
+
+      <div class="bolum">
+        <div class="bolum-baslik">Hadisler</div>
+        ${hadisHTML}
+      </div>
+
+      <div class="bolum">
+        <div class="bolum-baslik">Geylânî Hikmeti</div>
+        <div class="geylani-kutu">
+          <div class="geylani-metin">${e.geylani}</div>
+          <div class="geylani-imza">— Abdülkâdir Geylânî (k.s.)</div>
+        </div>
+      </div>
+
+      <div class="kart-alt">
+        <button class="nav-buton" id="btnOnceki" ${idx === 0 ? 'disabled' : ''}>
+          ← Önceki
+        </button>
+        <button class="ogrenildi-buton ${ogr ? 'isaret' : ''}" id="btnOgrenildi">
+          ${ogr ? '✓ Öğrenildi' : 'Öğrenildi işaretle'}
+        </button>
+        <button class="nav-buton" id="btnSonraki" ${idx >= filtreliListe.length - 1 ? 'disabled' : ''}>
+          Sonraki →
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btnOgrenildi').addEventListener('click', () => {
+    if (ogrenildiSet.has(no)) ogrenildiSet.delete(no);
+    else ogrenildiSet.add(no);
+    kaydetOgrenildi();
+    ilerlemeGuncelle();
+    listeRender();
+    esmaGoster(no);
+  });
+
+  if (idx > 0) {
+    document.getElementById('btnOnceki').addEventListener('click', () => {
+      esmaGoster(filtreliListe[idx - 1].no);
+    });
+  }
+  if (idx < filtreliListe.length - 1) {
+    document.getElementById('btnSonraki').addEventListener('click', () => {
+      esmaGoster(filtreliListe[idx + 1].no);
+    });
+  }
+
+  panel.scrollTop = 0;
+}
+
+// Filtre butonları
+document.querySelectorAll('.filtre-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('aktif'));
+    btn.classList.add('aktif');
+    aktifFiltre = btn.dataset.filtre;
+    listeRender();
+    const liste = filtrelenmisList();
+    if (liste.length > 0) esmaGoster(liste[0].no);
+  });
+});
+
+// Arama
+document.getElementById('aramaInput').addEventListener('input', () => {
+  listeRender();
+  const liste = filtrelenmisList();
+  if (liste.length > 0) esmaGoster(liste[0].no);
+});
+
+// Klavye navigasyonu
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const liste = filtrelenmisList();
+  const idx = liste.findIndex(x => x.no === aktifEsmaNo);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (idx < liste.length - 1) esmaGoster(liste[idx + 1].no);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    if (idx > 0) esmaGoster(liste[idx - 1].no);
+  }
+});
+
+// Başlat
+ilerlemeGuncelle();
+listeRender();
+esmaGoster(1);
+
+</script>
+</body>
+</html>
